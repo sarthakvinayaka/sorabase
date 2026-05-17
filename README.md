@@ -1,139 +1,175 @@
-# Pilot — staffing / recruiting MVP (monorepo)
+# Recruiter Intake — Phase 1
 
-Monorepo layout:
+B2B workflow product for staffing teams. Turns a recruiter screening call transcript into a structured, reviewable, exportable candidate profile using OpenAI Structured Outputs.
 
-- **`web/`** — Next.js 15 (App Router, TypeScript, Tailwind). Browser calls the API via **`NEXT_PUBLIC_API_URL`**. Server components / RSC health check use **`SERVER_API_URL`**.
-- **`server/`** — FastAPI (SQLAlchemy + Alembic, PostgreSQL). Mock transcription and extraction providers for local demos; audit logs on review actions and extraction completion.
-- **`docs/`** — Schema notes, seed scenarios, export shape.
-- **`scripts/`** — Local setup helper (`setup_local.sh`).
+---
 
-## What works in this MVP
+## Architecture
 
-- **Audio intake** — multipart upload, storage, transcript job row, list uploads by organization.
-- **Intake pipeline** — transcribe and extract per upload (extraction defaults to **`mock`** heuristics; set **`openai`** for structured LLM extraction — see below); candidate **`processing_stage`** / **`approval_status`** stay consistent through extraction.
-- **Review console** — load transcript + latest completed extraction fields, edit/save with audit trail, approve/reject, re-run extraction, exports when approved.
-- **Analytics** — `GET /v1/analytics/recruiting` with tenant filters; dashboard at **`/analytics`**.
-- **Mock auth** — `GET /v1/auth/whoami` for a fixed principal (see server routes).
-
-## Prerequisites
-
-- Node.js 20+ and npm
-- Python 3.11+
-- Docker (optional, for PostgreSQL via `docker-compose.yml`)
-
-## Quick start
-
-### 1. Environment files
-
-```bash
-cp .env.example .env
-cp .env.example web/.env.local
-cp .env.example server/.env
+```
+pilot-4-staffing/
+├── backend/        FastAPI service — extraction, persistence, audit trail
+│   ├── app/
+│   │   ├── api/routes/     HTTP endpoints (transcripts, extractions, candidates, exports)
+│   │   ├── db/             SQLAlchemy ORM models + session factory
+│   │   ├── domain/         Pydantic schemas (API contracts + LLM output schema)
+│   │   ├── prompts/        Versioned prompt templates
+│   │   ├── repositories/   DB access layer — no business logic
+│   │   └── services/       Extraction pipeline, normalization, OpenAI client, audit log
+│   ├── alembic/            Database migrations
+│   └── tests/              Unit + integration tests
+└── frontend/       Next.js 14 App Router — transcript input and review UI
+    ├── app/
+    │   ├── page.tsx                  Transcript paste + submit
+    │   └── review/[candidateId]/    Candidate review, editing, export
+    ├── components/review/           FieldRow, EvidencePanel, MissingFieldsBanner, ExportButton
+    └── lib/                         Typed API client + TypeScript types
 ```
 
-Important keys:
+### Data flow
 
-| Key | Used by | Purpose |
-| --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | Next.js (browser) | API base URL, default `http://127.0.0.1:8000` |
-| `SERVER_API_URL` | Next.js (server) | RSC `fetch` to API, e.g. homepage `/health` |
-| `NEXT_PUBLIC_DEV_ORG_ID` | Web demo forms | Default tenant UUID after seed |
-| `NEXT_PUBLIC_DEV_RECRUITER_ID` | Upload page | Default recruiter UUID for intake |
-| `NEXT_PUBLIC_DEV_EDITOR_USER_ID` | Review PATCH/POST | Must exist in `users` table (seed provides Morgan) |
-| `DATABASE_URL` | Server / Alembic | PostgreSQL connection string |
-| `CORS_ORIGINS` | Server | Browser origins allowed for API |
-| `EXTRACTION_PROVIDER` | Server | `mock` (default) or `openai` |
-| `OPENAI_API_KEY` | Server | Required when `EXTRACTION_PROVIDER=openai` |
-| `OPENAI_EXTRACTION_MODEL` | Server | Optional; default `gpt-4o-mini` |
-| `OPENAI_BASE_URL` | Server | Optional custom API base URL |
-
-**LLM extraction (OpenAI)**
-
-1. In **`server/.env`**: `EXTRACTION_PROVIDER=openai`, `OPENAI_API_KEY=sk-...` (see `.env.example`).
-2. Restart **uvicorn**. Read-only routes (e.g. upload detail) **do not** call OpenAI; only **`POST /v1/audio/uploads/{id}/extract`** does (after a complete transcript exists).
-3. The provider loads **`prompts/staffing/extraction.md`**, calls **`beta.chat.completions.parse`** with `response_format=StaffingExtractionOutput`, then **post-processing** drops non-null values whose `evidence.quote` is not a verbatim substring of the transcript. Full detail: **`docs/extraction_llm_integration.md`**.
-4. **Tests:** `cd server && source .venv/bin/activate && pip install -r requirements.txt && PYTHONPATH=. pytest tests/ -q`
-
-Misconfiguration (OpenAI selected without a key) → **503** on extract; provider/runtime failure → **502** (failed extraction run is persisted when applicable).
-
-### 2. Optional: start PostgreSQL
-
-```bash
-docker compose up -d postgres
+```
+Recruiter pastes transcript
+  → POST /api/transcripts       (persist raw text)
+  → POST /api/extractions       (call OpenAI → normalize → persist fields + audit log)
+  → Redirect to /review/{id}
+  → Recruiter reviews fields, evidence snippets, confidence scores
+  → PATCH /api/candidates/{id}/fields/{field_id}  (per-field edits with audit log)
+  → GET  /api/candidates/{id}/export              (reviewed values → JSON download)
 ```
 
-### 3. Backend (FastAPI)
+### Database tables
+
+| Table | Purpose |
+|---|---|
+| `transcripts` | Raw transcript text — immutable after creation |
+| `candidate_records` | One per transcript, tracks approval status and latest extraction |
+| `extractions` | One per AI run — immutable snapshot including raw LLM response |
+| `extracted_fields` | Per-field values: raw (LLM) · normalized (deterministic rules) · reviewed (human) |
+| `audit_logs` | Append-only event stream — every extraction, edit, and export |
+
+---
+
+## Running locally
+
+### Requirements
+
+- Python 3.12+
+- Node 20+
+- PostgreSQL 15 (or Docker)
+
+### 1. Start PostgreSQL
 
 ```bash
-cd server
-python3 -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+docker run --rm -p 5432:5432 \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=staffing \
+  postgres:15-alpine
+```
+
+Or `docker compose up db` from the repo root.
+
+### 2. Backend
+
+```bash
+cd backend
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
 
-Smoke test:
+cp .env.example .env
+# Edit .env — set OPENAI_API_KEY and DATABASE_URL
 
-```bash
-curl -s http://127.0.0.1:8000/health
-curl -s http://127.0.0.1:8000/v1/auth/whoami
-```
-
-### 4. Database migrations (Alembic)
-
-With Postgres running and `DATABASE_URL` set in `server/.env`:
-
-```bash
-cd server
-source .venv/bin/activate
 alembic upgrade head
+
+uvicorn app.main:app --reload --port 8000
 ```
 
-### 5. Frontend (Next.js)
+API docs: http://localhost:8000/docs
+
+### 3. Frontend
 
 ```bash
-cd web
+cd frontend
 npm install
+cp .env.local.example .env.local
 npm run dev
 ```
 
-Open `http://localhost:3000`. Use **Upload audio** → open an upload → **Run transcription (mock)** → **Run extraction (mock)** → **Review console**. **`/analytics`** needs `organization_id` in the query string or `NEXT_PUBLIC_DEV_ORG_ID` in `web/.env.local`.
+App: http://localhost:3000
 
-### One-shot helper
-
-```bash
-chmod +x scripts/setup_local.sh
-./scripts/setup_local.sh
-```
-
-## Demo database seed (optional)
-
-After migrations:
+### 4. Full stack with Docker Compose
 
 ```bash
-cd server
-source .venv/bin/activate
-export DATABASE_URL=postgresql+psycopg://pilot:pilot@127.0.0.1:5432/pilot
-python scripts/seed_staffing_mvp.py
-# python scripts/seed_staffing_mvp.py --dry-run
+OPENAI_API_KEY=sk-... docker compose up
 ```
 
-Scenario narrative: **`docs/seed_scenarios.md`** (content is assembled by `seed_staffing_mvp.py` from `server/scripts/seed_staffing_scenarios.py`).
+---
 
-## Architecture notes
+## Required environment variables
 
-- **PostgreSQL** is the system of record; **SQLAlchemy + Alembic** live under `server/`. The web app talks to the API over HTTP only.
-- **File storage** — local directory (`FILE_STORAGE_ROOT`); see `server/app/storage`.
-- **Review / reject** — Rejected records keep **`approval_status=rejected`** and **`processing_stage`** aligned with available artifacts (`extracted` if extraction completed, else `transcribed` / `uploaded`), so operational filters are not polluted by `needs_review` + `rejected`.
+### Backend (`backend/.env`)
 
-## Scripts
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `DATABASE_URL` | Yes | — | PostgreSQL connection string |
+| `OPENAI_API_KEY` | Yes | — | OpenAI API key |
+| `OPENAI_MODEL` | No | `gpt-4o-2024-08-06` | Must support Structured Outputs |
+| `MAX_TRANSCRIPT_CHARS` | No | `50000` | Hard limit before rejecting transcript |
 
-| Script | Purpose |
-| --- | --- |
-| `scripts/setup_local.sh` | Docker Postgres, Python venv + pip, optional Alembic, `npm install` in `web/` |
-| `server/scripts/seed_staffing_mvp.py` | **Destructive** demo seed: one org, recruiters, screening scenarios (uses `seed_staffing_scenarios` module) |
-| `server/scripts/dump_staffing_extraction_schema.py` | Dev helper for extraction schema introspection |
+### Frontend (`frontend/.env.local`)
 
-## License
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `BACKEND_URL` | No | `http://localhost:8000` | FastAPI service URL for Next.js rewrites |
 
-Private / TBD.
+---
+
+## Where the OpenAI integration lives
+
+- **`backend/app/services/openai_client.py`** — isolated call to `client.beta.chat.completions.parse()` using Structured Outputs. Returns a validated `ExtractionLLMResponse` Pydantic model or raises `ExtractionError`.
+- **`backend/app/domain/schemas.py`** — `ExtractionLLMResponse` + `FieldExtraction` define the strict JSON schema sent to OpenAI. All 28 candidate fields are required; unknown values must be `null`.
+- **`backend/app/prompts/extraction.py`** — system prompt and user message builder, versioned as constants.
+- **`backend/app/services/extraction_service.py`** — orchestrator: loads transcript → calls OpenAI → applies normalization → persists extraction and fields → writes audit log.
+
+---
+
+## Transcript extraction and review flow
+
+1. **Transcript input** — recruiter pastes a raw transcript on the home page. Frontend calls `POST /api/transcripts` (persists text), then `POST /api/extractions` (runs OpenAI pipeline). Rejected if over 50k characters.
+
+2. **Extraction pipeline** — `extraction_service.run_extraction()` calls the OpenAI client, receives a schema-validated `ExtractionLLMResponse`, applies deterministic normalization per field (email format, phone format, salary normalization, work auth canonicalization, skills list splitting), then persists one `Extraction` record and 28 `ExtractedField` rows.
+
+3. **Review page** — displays all 28 fields in a table. Each row shows: current value, evidence snippet (verbatim quote from transcript), confidence bar, and source badge (AI vs. Edited). Recruiter can click Edit on any row to override a value inline.
+
+4. **Edits** — `PATCH /api/candidates/{id}/fields/{field_id}` sets `reviewed_value`, marks `edited=true`, updates `status` to `"edited"`, and appends an audit log row with `old_value`, `new_value`, `actor_id`, and timestamp.
+
+5. **Export** — `GET /api/candidates/{id}/export` returns a clean JSON snapshot. Each field's `value` is `reviewed_value` if edited, else `normalized_value`, else `raw_value`. The `source` field distinguishes `"ai_extracted"` from `"human_edited"`.
+
+---
+
+## Running tests
+
+```bash
+cd backend
+
+# Set test database (PostgreSQL required)
+export TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/staffing_test
+
+# Run all tests
+pytest
+
+# Normalization and schema tests only (no DB required)
+pytest tests/test_normalization.py tests/test_schemas.py -v
+```
+
+---
+
+## Phase 2 work (not in scope here)
+
+- Individual field confirmation (status: `confirmed`)
+- Rerun extraction from the review page
+- Approval / rejection workflow on the candidate record
+- Auth and multi-recruiter support
+- Audio upload + transcription pipeline
+- ATS export adapters

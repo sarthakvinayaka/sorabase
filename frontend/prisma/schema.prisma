@@ -1,0 +1,204 @@
+// SoraBase — Prisma schema
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── NextAuth required models ────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Core user ───────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  // Nullable — only set for email/password accounts; OAuth users have no password
+  passwordHash  String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // SoraBase relations
+  profile      UserProfile?
+  memberships  Membership[]
+  meetings     MeetingRecord[]
+  schemas      SchemaTemplate[]
+  activityLogs ActivityLog[]
+}
+
+// ─── Access & plan profile ───────────────────────────────────────────────────
+
+model UserProfile {
+  id           String     @id @default(cuid())
+  userId       String     @unique
+  accessType   AccessType @default(pending)
+  planType     PlanType   @default(free)
+  meetingLimit Int        @default(10) // null-equivalent encoded as -1 for unlimited
+  meetingsUsed Int        @default(0)
+  onboarded    Boolean    @default(false)
+  orgId        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organization? @relation(fields: [orgId], references: [id])
+}
+
+enum AccessType {
+  recruiter
+  general
+  pending
+}
+
+enum PlanType {
+  free
+  pro
+  custom
+}
+
+// ─── Organizations / workspaces ──────────────────────────────────────────────
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members      Membership[]
+  userProfiles UserProfile[]
+  meetings     MeetingRecord[]
+}
+
+model Membership {
+  id     String @id @default(cuid())
+  userId String
+  orgId  String
+  role   String @default("member")
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+}
+
+// ─── Meeting sessions ─────────────────────────────────────────────────────────
+
+model MeetingRecord {
+  id         String        @id @default(cuid())
+  userId     String
+  orgId      String?
+  mode       AccessType
+  sourceType String?
+  title      String?
+  status     SessionStatus @default(pending)
+  transcript String?       @db.Text
+  summary    String?       @db.Text
+  schemaId   String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org     Organization?     @relation(fields: [orgId], references: [id])
+  schema  SchemaTemplate?   @relation(fields: [schemaId], references: [id])
+  outputs ExtractedOutput[]
+}
+
+enum SessionStatus {
+  pending
+  processing
+  complete
+  failed
+}
+
+// ─── Schemas / templates ─────────────────────────────────────────────────────
+
+model SchemaTemplate {
+  id               String     @id @default(cuid())
+  userId           String
+  orgId            String?
+  name             String
+  version          Int        @default(1)
+  mode             AccessType
+  schemaDefinition Json
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meetings MeetingRecord[]
+}
+
+// ─── Extraction outputs ───────────────────────────────────────────────────────
+
+model ExtractedOutput {
+  id                 String   @id @default(cuid())
+  meetingId          String
+  structuredJson     Json
+  confidenceMetadata Json?
+  createdAt          DateTime @default(now())
+
+  meeting MeetingRecord @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+// ─── Activity / event log ─────────────────────────────────────────────────────
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  orgId     String?
+  eventType String   // auth | workspace | session | schema | export | billing
+  eventName String   // user_signed_up | session_created | extraction_run | …
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([eventName, createdAt])
+}

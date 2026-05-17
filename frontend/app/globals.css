@@ -1,0 +1,291 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Utility overrides ────────────────────────────────────────────────────── */
+@layer utilities {
+  .text-2xs       { font-size: 10px; line-height: 14px; }
+  .tracking-label { letter-spacing: 0.06em; }
+  .font-display   { font-family: "DM Serif Display", Georgia, serif; }
+  .font-mono      { font-family: "JetBrains Mono", ui-monospace, monospace; }
+}
+
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    /* ── Surfaces ─────────────────────────────────── warm, not paper-white */
+    --surface-base:    #FAFAF9;   /* page background        */
+    --surface-card:    #FFFFFF;   /* card background        */
+    --surface-subtle:  #F5F4F2;   /* inset / tinted areas   */
+    --surface-overlay: #EEEDE9;   /* hover overlays         */
+
+    /* ── Borders ────────────────────────────────────── warm grey, not cold */
+    --border:          #E7E5E1;
+    --border-subtle:   #EFEDE9;
+    --border-strong:   #D4D1CB;
+
+    /* ── Text ─────────────────────────────────── very warm, near-brown-black */
+    --text-primary:    #1C1A17;
+    --text-secondary:  #78746D;
+    --text-muted:      #A9A49D;
+    --text-disabled:   #C4C0B9;
+
+    /* ── Accent ──────────────────────────────────── deep forest teal, not cyan */
+    --accent:          #1A6B5A;
+    --accent-hover:    #135246;
+    --accent-light:    #EDF6F3;
+    --accent-border:   #A9DAD0;
+  }
+
+  .dark {
+    --surface-base:    #131211;
+    --surface-card:    #1C1B18;
+    --surface-subtle:  #242320;
+    --surface-overlay: #2C2B28;
+
+    --border:          #2E2C29;
+    --border-subtle:   #262420;
+    --border-strong:   #3C3A36;
+
+    --text-primary:    #F0EEE9;
+    --text-secondary:  #9B9790;
+    --text-muted:      #6B6863;
+    --text-disabled:   #4A4845;
+
+    --accent:          #24897B;
+    --accent-hover:    #3FA396;
+    --accent-light:    #0D2420;
+    --accent-border:   #1A4A41;
+  }
+
+  html {
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color-scheme: light;
+    background-color: var(--surface-base);
+    color: var(--text-primary);
+    scroll-behavior: smooth;
+  }
+
+  .dark { color-scheme: dark; }
+
+  /* Warm selection highlight */
+  ::selection       { background: #A9DAD0; color: #0E3D34; }
+  .dark ::selection { background: #1A4A41; color: #D3EDE6; }
+
+  /* Teal focus ring — replaces browser default */
+  *:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #FAFAF9, 0 0 0 4px rgba(26, 107, 90, 0.35);
+  }
+  .dark *:focus-visible {
+    box-shadow: 0 0 0 2px #131211, 0 0 0 4px rgba(36, 137, 123, 0.45);
+  }
+
+  /* Thin warm scrollbar */
+  ::-webkit-scrollbar               { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track         { background: transparent; }
+  ::-webkit-scrollbar-thumb         { background: #D4D1CB; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover   { background: #A9A49D; }
+  .dark ::-webkit-scrollbar-thumb       { background: #3C3A36; }
+  .dark ::-webkit-scrollbar-thumb:hover { background: #52504A; }
+}
+
+/* ── Component classes ────────────────────────────────────────────────────── */
+@layer components {
+
+  /* ━━ App UI buttons ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  .btn-primary {
+    @apply inline-flex items-center gap-1.5 rounded bg-teal-600 px-3.5 py-2
+           text-sm font-medium text-white
+           hover:bg-teal-700 active:bg-teal-800
+           transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-1.5 rounded
+           border border-stone-200 dark:border-stone-700
+           bg-white dark:bg-stone-800 px-3.5 py-2
+           text-sm font-medium text-stone-700 dark:text-stone-300
+           hover:bg-stone-50 dark:hover:bg-stone-700
+           transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 rounded px-3 py-1.5
+           text-sm font-medium text-stone-600 dark:text-stone-400
+           hover:bg-stone-100 dark:hover:bg-stone-800
+           transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center gap-1.5 rounded
+           border border-stone-200 dark:border-stone-700
+           bg-white dark:bg-stone-800 px-3.5 py-2
+           text-sm font-medium text-red-800
+           hover:bg-red-50 hover:border-red-200
+           transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  /* ━━ Marketing buttons ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  /* Primary: filled teal — principal conversion CTA */
+  .btn-mkt-primary {
+    @apply inline-flex items-center gap-2 rounded bg-teal-600 px-5 py-2.5
+           text-[13px] font-semibold tracking-tight text-white
+           hover:bg-teal-700 active:bg-teal-800
+           transition-colors;
+  }
+
+  /* Ghost: warm border — secondary action */
+  .btn-mkt-ghost {
+    @apply inline-flex items-center gap-2 rounded
+           border border-stone-300 dark:border-stone-600
+           px-5 py-2.5 text-[13px] font-semibold tracking-tight
+           text-stone-700 dark:text-stone-300
+           hover:border-stone-400 dark:hover:border-stone-500
+           hover:text-stone-900 dark:hover:text-stone-100
+           transition-colors;
+  }
+
+  /* Dark fill: near-black — editorial brand moments, dark sections */
+  .btn-mkt-dark {
+    @apply inline-flex items-center gap-2 rounded
+           bg-stone-900 dark:bg-stone-100 px-5 py-2.5
+           text-[13px] font-semibold tracking-tight
+           text-white dark:text-stone-900
+           hover:bg-stone-800 dark:hover:bg-white
+           transition-colors;
+  }
+
+  /* ━━ Form inputs ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  .input {
+    @apply w-full rounded border border-stone-200 dark:border-stone-700
+           bg-white dark:bg-stone-900 px-3 py-2
+           text-sm text-stone-900 dark:text-stone-100
+           placeholder:text-stone-400 dark:placeholder:text-stone-600
+           focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10
+           transition-colors;
+  }
+
+  /* Larger input for marketing / auth forms */
+  .input-lg {
+    @apply w-full rounded border border-stone-200 dark:border-stone-700
+           bg-white dark:bg-stone-900 px-4 py-3
+           text-sm text-stone-900 dark:text-stone-100
+           placeholder:text-stone-400 dark:placeholder:text-stone-600
+           focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10
+           transition-colors;
+  }
+
+  .textarea { @apply input resize-none leading-relaxed font-mono; }
+
+  /* ━━ Cards ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  /* App card: very subtle shadow for depth cuing */
+  .card {
+    @apply bg-white dark:bg-stone-900
+           border border-stone-200 dark:border-stone-800 rounded-lg;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Marketing card: no shadow, just border — editorial, flat */
+  .mkt-card {
+    @apply bg-white dark:bg-stone-900
+           border border-stone-200 dark:border-stone-800 rounded-lg p-6;
+  }
+
+  /* ━━ Labels, badges, pills ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  .section-label {
+    @apply text-2xs font-semibold tracking-label uppercase
+           text-stone-400 dark:text-stone-500;
+  }
+
+  /* Eyebrow label above headings */
+  .eyebrow {
+    @apply text-[11px] font-semibold tracking-[0.1em] uppercase
+           text-teal-600 dark:text-teal-400;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1
+           px-2 py-0.5 text-2xs font-semibold tracking-wide border;
+    border-radius: 3px;
+  }
+
+  /* Small neutral pill — for tags, modes, categories */
+  .tag-mkt {
+    @apply inline-flex items-center rounded-full
+           border border-stone-200 dark:border-stone-700
+           px-2.5 py-0.5 text-[11px] font-medium
+           text-stone-500 dark:text-stone-400;
+  }
+
+  /* ━━ Typography helpers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  /* Large lead paragraph below hero headlines */
+  .text-lead {
+    @apply text-lg text-stone-500 dark:text-stone-400 leading-relaxed;
+  }
+
+  /* Editorial italic callout — testimonials, pull quotes */
+  .text-display-para {
+    @apply font-display italic text-stone-700 dark:text-stone-300
+           text-xl leading-relaxed;
+  }
+
+  /* Section heading: DM Serif italic */
+  .heading-section {
+    @apply font-display italic text-stone-900 dark:text-stone-100 leading-tight;
+  }
+
+  /* Inline text link — subtle underline style */
+  .link-mkt {
+    @apply font-medium text-stone-600 dark:text-stone-400
+           underline decoration-stone-300 dark:decoration-stone-600
+           underline-offset-2
+           hover:text-stone-900 dark:hover:text-stone-100
+           hover:decoration-stone-500 dark:hover:decoration-stone-400
+           transition-colors;
+  }
+
+  /* ━━ Page layout ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  /* App inner pages */
+  .page { @apply max-w-6xl mx-auto px-5 py-8; }
+
+  /* Marketing container */
+  .mkt-section { @apply w-full max-w-7xl mx-auto px-6 lg:px-10; }
+
+  /* Section vertical padding rhythm */
+  .mkt-pad { @apply py-24 lg:py-32; }
+
+  /* Thin warm section divider */
+  .mkt-divider { @apply border-t border-stone-200 dark:border-stone-800; }
+
+  /* ━━ Metrics / stats ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+  .stat-number {
+    @apply font-display text-5xl text-stone-900 dark:text-stone-100 tabular-nums;
+  }
+
+  .stat-label {
+    @apply text-sm text-stone-500 dark:text-stone-400 mt-1;
+  }
+}
+
+/* ── ReactFlow overrides ────────────────────────────────────────────────────── */
+.react-flow                            { background-color: var(--surface-subtle); }
+.react-flow__background                { opacity: 0.5; }
+.react-flow__edge-path                 { stroke: #D4D1CB; stroke-width: 1.5; }
+.dark .react-flow__edge-path           { stroke: #3C3A36; }
+.react-flow__edge.selected .react-flow__edge-path { stroke: #1A6B5A; }
+.react-flow__attribution               { display: none; }
