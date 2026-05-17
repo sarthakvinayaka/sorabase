@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: pilot
+      POSTGRES_PASSWORD: pilot
+      POSTGRES_DB: pilot
+    # Host port defaults to 5432; if you see "port is already allocated", set e.g.
+    #   POSTGRES_PUBLISH_PORT=5433 docker compose up -d postgres
+    # and point DATABASE_URL at that port (127.0.0.1:5433).
+    ports:
+      - "${POSTGRES_PUBLISH_PORT:-5432}:5432"
+    volumes:
+      - pilot_pg_data:/var/lib/postgresql/data
+
+volumes:
+  pilot_pg_data:

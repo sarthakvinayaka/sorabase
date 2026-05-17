@@ -1,0 +1,318 @@
+{
+  "$defs": {
+    "StaffingExtractionFields": {
+      "additionalProperties": false,
+      "description": "All staffing fields \u2014 each must appear exactly once in JSON output.",
+      "properties": {
+        "availability_date": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "certifications": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "client_fit_summary": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "concerns_or_red_flags": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "current_company": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "current_location": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "current_title": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "domain_experience": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "education": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "email": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "employment_type_preference": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "full_name": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "industries_worked_in": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "interview_availability": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "notice_period": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "phone": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "preferred_location": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "previous_companies": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "primary_skills": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "recruiter_recommendation": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "remote_preference": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "secondary_skills": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "target_rate_or_salary": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "target_roles": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "visa_status": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "willing_to_relocate": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "work_authorization": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        },
+        "years_experience": {
+          "$ref": "#/$defs/StaffingFieldBlock"
+        }
+      },
+      "required": [
+        "full_name",
+        "email",
+        "phone",
+        "current_location",
+        "preferred_location",
+        "work_authorization",
+        "visa_status",
+        "willing_to_relocate",
+        "remote_preference",
+        "current_title",
+        "years_experience",
+        "primary_skills",
+        "secondary_skills",
+        "domain_experience",
+        "industries_worked_in",
+        "current_company",
+        "previous_companies",
+        "education",
+        "certifications",
+        "target_roles",
+        "target_rate_or_salary",
+        "employment_type_preference",
+        "availability_date",
+        "notice_period",
+        "interview_availability",
+        "client_fit_summary",
+        "recruiter_recommendation",
+        "concerns_or_red_flags"
+      ],
+      "title": "StaffingExtractionFields",
+      "type": "object"
+    },
+    "StaffingFieldBlock": {
+      "additionalProperties": false,
+      "description": "One staffing field with confidence, evidence, and optional ambiguity note.",
+      "properties": {
+        "ambiguity_note": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Recruiter-facing note when wording is vague or conflicting (see ambiguous_fields).",
+          "title": "Ambiguity Note"
+        },
+        "confidence": {
+          "description": "0\u20131; use low values unless quote clearly supports value.",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TranscriptEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Required when confidence >= 0.5 and value is non-null; otherwise may be null."
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Structured value or null if not stated. Never invent \u2014 use null when unknown.",
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value",
+        "confidence"
+      ],
+      "title": "StaffingFieldBlock",
+      "type": "object"
+    },
+    "TranscriptEvidence": {
+      "additionalProperties": false,
+      "description": "Grounding for a single field \u2014 quote must be a verbatim substring of the transcript when value is non-null.",
+      "properties": {
+        "end_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Audio offset end for the cited span.",
+          "title": "End Ms"
+        },
+        "quote": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Verbatim excerpt from the transcript supporting the value; null if value is null.",
+          "title": "Quote"
+        },
+        "segment_index": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "0-based transcript segment index when segmentation is available.",
+          "title": "Segment Index"
+        },
+        "start_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Audio offset start for the cited span.",
+          "title": "Start Ms"
+        }
+      },
+      "title": "TranscriptEvidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Root object returned by extraction (LLM or mock).",
+  "properties": {
+    "ambiguous_fields": {
+      "description": "Field keys where the transcript partially supports a value or wording is unclear.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Ambiguous Fields",
+      "type": "array"
+    },
+    "extraction_notes": {
+      "anyOf": [
+        {
+          "maxLength": 4000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional brief recruiter-facing summary of extraction quality (no new factual claims).",
+      "title": "Extraction Notes"
+    },
+    "fields": {
+      "$ref": "#/$defs/StaffingExtractionFields"
+    },
+    "missing_fields": {
+      "description": "Field keys where value is null and the transcript does not support an inference.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Missing Fields",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "staffing_extraction.v1",
+      "default": "staffing_extraction.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "suggested_follow_up_questions": {
+      "description": "Short, professional questions the recruiter can ask to fill gaps (no assumptions).",
+      "items": {
+        "type": "string"
+      },
+      "title": "Suggested Follow Up Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "fields"
+  ],
+  "title": "StaffingExtractionOutput",
+  "type": "object"
+}

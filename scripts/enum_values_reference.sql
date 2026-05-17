@@ -1,0 +1,17 @@
+-- Reference-only: PostgreSQL ENUM labels created by Alembic revision `20260514_000002`.
+-- These values mirror `server/app/db/enums.py` (do not execute as seed data).
+--
+-- audio_upload_status: pending, stored, failed
+-- transcript_status: pending, processing, complete, failed
+-- candidate_approval_status: not_started, pending_review, partially_approved, approved, rejected
+-- candidate_extraction_status: none, queued, running, complete, failed, stale
+-- candidate_ats_sync_status: none, pending, in_progress, synced, failed, skipped
+-- extraction_run_status: queued, running, complete, failed, cancelled
+-- extracted_field_status: pending, draft, approved, rejected, superseded
+-- extracted_field_source: model, heuristic, manual, imported
+-- export_job_format: json, csv
+-- export_job_status: queued, processing, complete, failed
+-- ats_provider: bullhorn, other
+-- ats_connection_status: disconnected, connected, error, revoked
+-- ats_sync_log_status: started, success, failed, partial
+-- audit_actor_type: user, system, api_key
