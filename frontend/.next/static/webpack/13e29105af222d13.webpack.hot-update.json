@@ -1,1 +1,0 @@
-{"c":["app/layout","app/workflow/page","webpack"],"r":[],"m":["(app-pages-browser)/./lib/nanoid.ts","(app-pages-browser)/./lib/workflow-store.ts","(app-pages-browser)/./node_modules/zustand/esm/middleware.mjs","(app-pages-browser)/./node_modules/zustand/esm/react.mjs","(app-pages-browser)/./node_modules/zustand/esm/vanilla.mjs"]}

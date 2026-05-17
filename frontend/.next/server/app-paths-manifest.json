@@ -1,8 +1,22 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/activity/route": "app/api/activity/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/api/auth/register/route": "app/api/auth/register/route.js",
+  "/api/user/profile/route": "app/api/user/profile/route.js",
+  "/candidates/page": "app/candidates/page.js",
+  "/review/[candidateId]/page": "app/review/[candidateId]/page.js",
   "/dashboard/page": "app/dashboard/page.js",
+  "/(marketing)/pricing/page": "app/(marketing)/pricing/page.js",
+  "/(app)/entry/page": "app/(app)/entry/page.js",
   "/(auth)/signup/page": "app/(auth)/signup/page.js",
   "/(auth)/signin/page": "app/(auth)/signin/page.js",
-  "/(marketing)/page": "app/(marketing)/page.js",
-  "/(marketing)/pricing/page": "app/(marketing)/pricing/page.js"
+  "/(app)/onboarding/page": "app/(app)/onboarding/page.js",
+  "/general/dashboard/page": "app/general/dashboard/page.js",
+  "/general/schema/[conversationId]/page": "app/general/schema/[conversationId]/page.js",
+  "/general/page": "app/general/page.js",
+  "/general/processing/[conversationId]/page": "app/general/processing/[conversationId]/page.js",
+  "/general/results/[candidateId]/page": "app/general/results/[candidateId]/page.js",
+  "/workflow/page": "app/workflow/page.js",
+  "/(marketing)/page": "app/(marketing)/page.js"
 }

@@ -1,4 +1,4 @@
-// File: /Users/sarthakvinayaka/Desktop/pilot-4-staffing/frontend/app/general/dashboard/page.tsx
+// File: /Users/sarthakvinayaka/Desktop/sorabase/frontend/app/general/dashboard/page.tsx
 import * as entry from '../../../../../app/general/dashboard/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

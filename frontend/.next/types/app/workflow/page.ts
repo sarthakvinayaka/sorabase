@@ -1,4 +1,4 @@
-// File: /Users/sarthakvinayaka/Desktop/pilot-4-staffing/frontend/app/workflow/page.tsx
+// File: /Users/sarthakvinayaka/Desktop/sorabase/frontend/app/workflow/page.tsx
 import * as entry from '../../../../app/workflow/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

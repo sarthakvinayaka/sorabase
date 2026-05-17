@@ -1,4 +1,4 @@
-// File: /Users/sarthakvinayaka/Desktop/pilot-4-staffing/frontend/app/api/auth/register/route.ts
+// File: /Users/sarthakvinayaka/Desktop/sorabase/frontend/app/api/auth/register/route.ts
 import * as entry from '../../../../../../app/api/auth/register/route.js'
 import type { NextRequest } from 'next/server.js'
 
