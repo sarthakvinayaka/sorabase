@@ -13,9 +13,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 export const metadata: Metadata = {
-  title: "Pilot",
-  description: "Recruiting intake, review console, exports, and staffing analytics MVP.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "SoraBase",
+    template: "%s | SoraBase",
+  },
+  description: "Recruiting intake, review console, exports, and staffing analytics.",
+  openGraph: {
+    siteName: "SoraBase",
+    type: "website",
+    url: siteUrl,
+  },
 };
 
 export default function RootLayout({

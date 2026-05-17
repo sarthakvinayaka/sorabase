@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { publicApiBase } from "@/lib/apiBase";
 import { DEV_DEFAULT_EDITOR_USER_ID } from "@/lib/devEditorUser";
 import { apiErrorMessage } from "@/lib/parseApiError";
+import { AuditTimelinePanel } from "./AuditTimelinePanel";
 import { CandidateExportPanel } from "./CandidateExportPanel";
 import { JsonProfileTab } from "./JsonProfileTab";
 import { NarrativeWorkspace } from "./NarrativeWorkspace";
