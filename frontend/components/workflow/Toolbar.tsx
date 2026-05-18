@@ -37,7 +37,7 @@ export default function Toolbar({ onRun }: Props) {
       {/* Left: wordmark + context */}
       <div className="flex items-center gap-3">
         <Link
-          href={isRecruiting ? "/candidates" : "/"}
+          href={isRecruiting ? "/dashboard" : "/general/dashboard"}
           className="font-display italic text-[17px] leading-none text-stone-900 dark:text-stone-100 hover:opacity-60 transition-opacity"
           aria-label="SoraBase home"
         >

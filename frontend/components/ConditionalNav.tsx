@@ -8,7 +8,21 @@ import { LogoMark } from "@/components/ui/LogoMark";
 
 const MARKETING_PATHS = new Set(["/", "/pricing"]);
 const AUTH_PATHS      = new Set(["/signin", "/signup"]);
-const BUILDER_PATHS   = ["/workflow", "/general", "/app/", "/entry", "/onboarding"];
+
+// Returns true for pages that manage their own toolbar / layout header
+function isNavSuppressed(pathname: string): boolean {
+  // Canvas builder pages — have their own Toolbar component
+  if (pathname === "/workflow" || pathname === "/general") return true;
+  // App gate pages — have their own page-level headers
+  if (pathname === "/entry" || pathname.startsWith("/onboarding")) return true;
+  // General Mode focused-flow step pages — full-screen workspaces with own headers
+  if (
+    pathname.startsWith("/general/processing") ||
+    pathname.startsWith("/general/schema") ||
+    pathname.startsWith("/general/results")
+  ) return true;
+  return false;
+}
 
 export default function ConditionalNav() {
   const pathname = usePathname();
@@ -21,11 +35,13 @@ export default function ConditionalNav() {
   // Auth pages — minimal header handled by the auth layout itself
   if (AUTH_PATHS.has(pathname)) return null;
 
-  // Builder / app-entry pages — have their own toolbars or no nav needed
-  if (BUILDER_PATHS.some((p) => pathname.startsWith(p))) return null;
+  // Builder / focused-flow pages — suppress shared nav
+  if (isNavSuppressed(pathname)) return null;
 
   // Internal app pages — shared app nav
-  const mode = modeFromPath(pathname);
+  const mode    = modeFromPath(pathname);
+  // Logo routes authenticated users to their mode home, not the marketing site
+  const appHome = mode === "general" ? "/general/dashboard" : "/dashboard";
 
   return (
     <nav className="sticky top-0 z-40 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900">
@@ -33,7 +49,7 @@ export default function ConditionalNav() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/"
+            href={appHome}
             className="flex items-center gap-2 hover:opacity-70 transition-opacity"
             aria-label="SoraBase home"
           >
@@ -76,7 +92,13 @@ export default function ConditionalNav() {
           {mode === "general" ? (
             <>
               <NavLink href="/general/dashboard">Dashboard</NavLink>
-              <NavLink href="/general">New session</NavLink>
+              <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
+              <Link
+                href="/general"
+                className="rounded bg-aubergine-800 text-white text-xs font-medium px-3 py-1.5 hover:bg-aubergine-900 transition-colors"
+              >
+                Workspace
+              </Link>
             </>
           ) : (
             <>

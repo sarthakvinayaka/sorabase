@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { getDashboard } from "@/lib/api";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { HorizontalBar } from "@/components/dashboard/HorizontalBar";
@@ -84,13 +85,28 @@ export default function DashboardPage() {
       {/* ── Candidate pipeline ─────────────────────────────────────────────── */}
       <section>
         <SectionLabel title="Candidate pipeline" />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <StatCard label="Total" value={candidates.total} accent />
-          <StatCard label="Needs Review"      value={candidates.needs_review} />
-          <StatCard label="Approved"          value={candidates.approved} />
-          <StatCard label="Rejected"          value={candidates.rejected} />
-          <StatCard label="Extraction done"   value={candidates.extraction_completed} />
-        </div>
+        {candidates.total === 0 ? (
+          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-6 py-12 text-center">
+            <p className="text-sm font-medium text-stone-600 dark:text-stone-300 mb-1">No candidates yet</p>
+            <p className="text-xs text-stone-400 dark:text-stone-500 mb-6">
+              Run your first interview transcript through the workflow to see pipeline analytics here.
+            </p>
+            <Link
+              href="/workflow"
+              className="inline-flex items-center gap-1.5 rounded bg-aubergine-800 text-white text-xs font-medium px-4 py-2 hover:bg-aubergine-900 transition-colors"
+            >
+              Open workflow builder →
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <StatCard label="Total" value={candidates.total} accent />
+            <StatCard label="Needs Review"      value={candidates.needs_review} />
+            <StatCard label="Approved"          value={candidates.approved} />
+            <StatCard label="Rejected"          value={candidates.rejected} />
+            <StatCard label="Extraction done"   value={candidates.extraction_completed} />
+          </div>
+        )}
       </section>
 
       {/* ── Extraction quality ─────────────────────────────────────────────── */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { getGeneralDashboard } from "@/lib/api";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { HorizontalBar } from "@/components/dashboard/HorizontalBar";
@@ -297,9 +298,15 @@ export default function GeneralDashboardPage() {
           <p className="text-sm font-medium text-stone-600 dark:text-stone-300 mb-1">
             No General Mode sessions yet
           </p>
-          <p className="text-xs text-stone-400 dark:text-stone-500">
+          <p className="text-xs text-stone-400 dark:text-stone-500 mb-6">
             Run a transcript through General Mode to see extraction analytics here.
           </p>
+          <Link
+            href="/general"
+            className="inline-flex items-center gap-1.5 rounded bg-aubergine-800 text-white text-xs font-medium px-4 py-2 hover:bg-aubergine-900 transition-colors"
+          >
+            Open workspace →
+          </Link>
         </div>
       )}
     </main>
