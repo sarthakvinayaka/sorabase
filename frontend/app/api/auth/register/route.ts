@@ -4,10 +4,18 @@ import { prisma } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as { name?: string; email?: string; password?: string };
-    const name  = (body.name  ?? "").trim();
-    const email = (body.email ?? "").toLowerCase().trim();
-    const pass  = body.password ?? "";
+    const body = await req.json() as {
+      name?: string;
+      email?: string;
+      password?: string;
+      intent?: "recruiter" | "general";
+    };
+    const name   = (body.name  ?? "").trim();
+    const email  = (body.email ?? "").toLowerCase().trim();
+    const pass   = body.password ?? "";
+    const access = body.intent === "recruiter" ? "recruiter" as const
+                 : body.intent === "general"   ? "general"   as const
+                 : "general" as const; // default: general (self-serve, no approval gate)
 
     if (!name)        return NextResponse.json({ error: "Full name is required." },              { status: 400 });
     if (!email)       return NextResponse.json({ error: "Email is required." },                  { status: 400 });
@@ -27,7 +35,7 @@ export async function POST(req: NextRequest) {
         passwordHash,
         profile: {
           create: {
-            accessType:   "pending",
+            accessType:   access,
             planType:     "free",
             meetingLimit: 10,
             meetingsUsed: 0,

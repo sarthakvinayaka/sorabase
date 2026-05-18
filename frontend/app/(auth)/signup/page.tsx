@@ -62,7 +62,7 @@ export default function SignUpPage() {
     setError("");
     setFormState("loading");
     try {
-      await signUp(name, email, password);
+      await signUp(name, email, password, intent);
       justAuthed.current = true;
       setFormState("success");
     } catch (err: unknown) {
@@ -205,8 +205,7 @@ export default function SignUpPage() {
                 ))}
               </div>
               <p className="mt-2 text-[10px] text-stone-400 dark:text-stone-500 leading-relaxed">
-                Access is confirmed by your org admin after signup.
-                Demo accounts are pre-assigned — use demo@sorabase.com to see pending state.
+                You can switch modes at any time from your workspace settings.
               </p>
             </div>
 

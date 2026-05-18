@@ -1,38 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { getRedirectForUser } from "@/lib/auth";
+import type { AccessType } from "@/lib/auth";
 
-type Step = "welcome" | "tour" | "done";
+type Step = "choose" | "welcome" | "tour" | "done";
 
 export default function OnboardingPage() {
-  const { user, isLoading, markOnboarded } = useAuth();
-  const [step, setStep]                    = useState<Step>("welcome");
-  const router                             = useRouter();
+  const { user, isLoading, markOnboarded, grantAccess } = useAuth();
+  const [step, setStep]           = useState<Step>("welcome");
+  const [chosenAccess, setChosen] = useState<Exclude<AccessType, "pending">>("general");
+  const [granting, setGranting]   = useState(false);
+  const router                    = useRouter();
+  const hasChosenRef              = useRef(false);
+  const wasPendingRef             = useRef(false);
 
   useEffect(() => {
     if (isLoading) return;
-    if (!user) {
-      router.replace("/signin");
+    if (!user) { router.replace("/signin"); return; }
+    // Pending users need to choose their mode first
+    if (user.access === "pending" && !hasChosenRef.current) {
+      wasPendingRef.current = true;
+      setStep("choose");
       return;
     }
-    // Pending users have no workspace to onboard into
-    if (user.access === "pending") {
-      router.replace("/entry");
-      return;
-    }
-    // Already onboarded → skip straight to their workspace
+    // Already onboarded → skip to workspace
     if (user.onboarded) {
       router.replace(getRedirectForUser(user));
     }
   }, [user, isLoading, router]);
 
-  if (isLoading || !user || user.access === "pending") return null;
-  if (user.onboarded) return null;
+  if (isLoading || !user) return null;
+  if (user.access !== "pending" && user.onboarded) return null;
 
   const isRecruiter = user.access === "recruiter";
+  const STEP_LIST: Step[] = wasPendingRef.current
+    ? ["choose", "welcome", "tour", "done"]
+    : ["welcome", "tour", "done"];
+
+  async function handleChooseAccess() {
+    setGranting(true);
+    try {
+      hasChosenRef.current = true;
+      await grantAccess(chosenAccess);
+      setStep("welcome");
+    } finally {
+      setGranting(false);
+    }
+  }
 
   async function handleFinish() {
     const updated = await markOnboarded();
@@ -55,9 +72,9 @@ export default function OnboardingPage() {
 
           {/* Step indicator */}
           <div className="flex items-center gap-2 mb-10 justify-center" aria-label="Onboarding progress">
-            {(["welcome", "tour", "done"] as Step[]).map((s, i) => {
-              const stepOrder: Record<Step, number> = { welcome: 0, tour: 1, done: 2 };
-              const currentOrder = stepOrder[step];
+            {STEP_LIST.map((s, i) => {
+              const orderMap = Object.fromEntries(STEP_LIST.map((st, idx) => [st, idx])) as Record<Step, number>;
+              const currentOrder = orderMap[step] ?? 0;
               const isPast    = i < currentOrder;
               const isCurrent = s === step;
               return (
@@ -79,13 +96,87 @@ export default function OnboardingPage() {
                       </svg>
                     ) : i + 1}
                   </div>
-                  {i < 2 && (
+                  {i < STEP_LIST.length - 1 && (
                     <div className={["w-8 h-px transition-colors", isPast ? "bg-aubergine-200 dark:bg-aubergine-900" : "bg-stone-200 dark:bg-stone-700"].join(" ")} />
                   )}
                 </div>
               );
             })}
           </div>
+
+          {/* Step: Choose access mode (Google OAuth users) */}
+          {step === "choose" && (
+            <div>
+              <h1 className="font-display italic text-stone-900 dark:text-stone-100 text-3xl mb-3 text-center">
+                Welcome to SoraBase.
+              </h1>
+              <p className="text-sm text-stone-500 dark:text-stone-400 mb-8 text-center leading-relaxed max-w-sm mx-auto">
+                Choose the workspace that fits your workflow.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3 mb-8">
+                {[
+                  {
+                    id:   "recruiter" as const,
+                    label: "Recruiter Mode",
+                    body:  "Structured candidate profiles from every interview. JD fit scoring, 35+ fields, candidate dashboard.",
+                  },
+                  {
+                    id:   "general" as const,
+                    label: "General Mode",
+                    body:  "Custom schemas for any meeting type. AI field proposals, reusable templates, JSON/webhook output.",
+                  },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setChosen(opt.id)}
+                    className={[
+                      "text-left rounded-xl border px-4 py-4 transition-colors",
+                      chosenAccess === opt.id
+                        ? "border-aubergine-300 dark:border-aubergine-800 bg-aubergine-50 dark:bg-aubergine-950/30"
+                        : "border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600",
+                    ].join(" ")}
+                    aria-pressed={chosenAccess === opt.id}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <p className={[
+                        "text-sm font-semibold",
+                        chosenAccess === opt.id
+                          ? "text-aubergine-900 dark:text-aubergine-300"
+                          : "text-stone-800 dark:text-stone-200",
+                      ].join(" ")}>
+                        {opt.label}
+                      </p>
+                      <span
+                        className={[
+                          "mt-0.5 w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors",
+                          chosenAccess === opt.id
+                            ? "border-aubergine-700 bg-aubergine-700"
+                            : "border-stone-300 dark:border-stone-600",
+                        ].join(" ")}
+                        aria-hidden
+                      >
+                        {chosenAccess === opt.id && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{opt.body}</p>
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleChooseAccess}
+                disabled={granting}
+                className="w-full btn-mkt-primary justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {granting
+                  ? "Setting up…"
+                  : `Continue with ${chosenAccess === "recruiter" ? "Recruiter Mode" : "General Mode"} →`}
+              </button>
+            </div>
+          )}
 
           {/* Step: Welcome */}
           {step === "welcome" && (
@@ -102,11 +193,10 @@ export default function OnboardingPage() {
                 Welcome to SoraBase, {user.name.split(" ")[0]}.
               </h1>
               <p className="text-sm text-stone-500 dark:text-stone-400 mb-2 leading-relaxed">
-                You&apos;ve been granted{" "}
+                You&apos;re in{" "}
                 <strong className="text-stone-700 dark:text-stone-300">
                   {isRecruiter ? "Recruiter Mode" : "General Mode"}
-                </strong>{" "}
-                access.
+                </strong>.
               </p>
               <p className="text-sm text-stone-500 dark:text-stone-400 mb-8 leading-relaxed max-w-md mx-auto">
                 {isRecruiter

@@ -8,7 +8,7 @@ import { LogoMark } from "@/components/ui/LogoMark";
 
 const MARKETING_PATHS = new Set(["/", "/pricing"]);
 const AUTH_PATHS      = new Set(["/signin", "/signup"]);
-const BUILDER_PATHS   = ["/workflow", "/general", "/app/"];
+const BUILDER_PATHS   = ["/workflow", "/general", "/app/", "/entry", "/onboarding"];
 
 export default function ConditionalNav() {
   const pathname = usePathname();
