@@ -62,16 +62,16 @@ async function handle(
 
   // Forward Content-Type for POST/PATCH/PUT but skip for multipart (browser sets it with boundary).
   const contentType = req.headers.get("content-type") ?? "";
-  const forwardContentType = !contentType.startsWith("multipart/form-data")
-    ? { "content-type": contentType || "application/json" }
-    : {};
+  const forwardHeaders: Record<string, string> = {
+    ...extraHeaders,
+  };
+  if (!contentType.startsWith("multipart/form-data")) {
+    forwardHeaders["content-type"] = contentType || "application/json";
+  }
 
   const backendRes = await fetch(targetUrl.toString(), {
     method: req.method,
-    headers: {
-      ...forwardContentType,
-      ...extraHeaders,
-    },
+    headers: forwardHeaders,
     body: body ? Buffer.from(body) : undefined,
   });
 
