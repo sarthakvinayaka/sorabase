@@ -32,11 +32,11 @@
     --text-muted:      #A9A49D;
     --text-disabled:   #C4C0B9;
 
-    /* ── Accent ──────────────────── smoked aubergine — warm plum, European */
-    --accent:          #482263;   /* aubergine-800 */
-    --accent-hover:    #351650;   /* aubergine-900 */
-    --accent-light:    #f8f0fd;   /* aubergine-50  */
-    --accent-border:   #d6b4ee;   /* aubergine-200 */
+    /* ── Accent ─────────────── wine-charcoal — smoked plum, dyed leather */
+    --accent:          #3a1828;   /* aubergine-800 */
+    --accent-hover:    #260e18;   /* aubergine-900 */
+    --accent-light:    #faf7f4;   /* aubergine-50  */
+    --accent-border:   #ddd2c6;   /* aubergine-200 */
   }
 
   .dark {
@@ -54,10 +54,10 @@
     --text-muted:      #6B6863;
     --text-disabled:   #4A4845;
 
-    --accent:          #7744a0;   /* aubergine-500 — lighter for dark bg */
-    --accent-hover:    #623587;   /* aubergine-600 */
-    --accent-light:    #1c0a2c;   /* aubergine-950 */
-    --accent-border:   #552d76;   /* aubergine-700 */
+    --accent:          #7c5060;   /* aubergine-500 — lighter for dark bg */
+    --accent-hover:    #5e3848;   /* aubergine-600 */
+    --accent-light:    #140810;   /* aubergine-950 */
+    --accent-border:   #4a2838;   /* aubergine-700 */
   }
 
   html {
@@ -74,17 +74,17 @@
 
   .dark { color-scheme: dark; }
 
-  /* Warm selection highlight — muted mauve */
-  ::selection       { background: #d6b4ee; color: #1c0a2c; }
-  .dark ::selection { background: #351650; color: #edd8f8; }
+  /* Warm selection highlight — dusty stone taupe */
+  ::selection       { background: #ddd2c6; color: #140810; }
+  .dark ::selection { background: #260e18; color: #f2ebe3; }
 
-  /* Aubergine focus ring — replaces browser default */
+  /* Wine-charcoal focus ring — replaces browser default */
   *:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px #FAFAF9, 0 0 0 4px rgba(72, 34, 99, 0.35);
+    box-shadow: 0 0 0 2px #FAFAF9, 0 0 0 4px rgba(58, 24, 40, 0.35);
   }
   .dark *:focus-visible {
-    box-shadow: 0 0 0 2px #131211, 0 0 0 4px rgba(119, 68, 160, 0.45);
+    box-shadow: 0 0 0 2px #131211, 0 0 0 4px rgba(124, 80, 96, 0.45);
   }
 
   /* Thin warm scrollbar */
@@ -287,5 +287,5 @@
 .react-flow__background                { opacity: 0.5; }
 .react-flow__edge-path                 { stroke: #D4D1CB; stroke-width: 1.5; }
 .dark .react-flow__edge-path           { stroke: #3C3A36; }
-.react-flow__edge.selected .react-flow__edge-path { stroke: #482263; }
+.react-flow__edge.selected .react-flow__edge-path { stroke: #3a1828; }
 .react-flow__attribution               { display: none; }

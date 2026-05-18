@@ -37,19 +37,19 @@ const config: Config = {
       },
 
       colors: {
-        /* ── Aubergine accent — smoked, warm plum, European premium ─────── */
+        /* ── Smoked plum — warm wine-charcoal, dyed leather, not purple ── */
         aubergine: {
-          50:  "#f8f0fd",   /* barely-there lavender blush        */
-          100: "#edd8f8",   /* soft mauve mist                    */
-          200: "#d6b4ee",   /* muted mauve (light borders/tints)  */
-          300: "#b78cd4",   /* dusty mauve                        */
-          400: "#9466ba",   /* medium plum (dark-mode text)       */
-          500: "#7744a0",   /* smoked aubergine mid               */
-          600: "#623587",   /* deep plum                          */
-          700: "#552d76",   /* dark plum (icons, dots, eyebrows)  */
-          800: "#482263",   /* PRIMARY CTA background             */
-          900: "#351650",   /* CTA hover / deepest accent         */
-          950: "#1c0a2c",   /* near-black plum (dark bg tints)    */
+          50:  "#faf7f4",   /* warm ivory parchment               */
+          100: "#f2ebe3",   /* soft cream blush                   */
+          200: "#ddd2c6",   /* warm stone taupe (borders/tints)   */
+          300: "#c2a898",   /* dusty mauve-taupe                  */
+          400: "#9e7880",   /* muted plum-rose (dark-mode text)   */
+          500: "#7c5060",   /* smoked plum-mauve                  */
+          600: "#5e3848",   /* deep smoked plum                   */
+          700: "#4a2838",   /* dark plum-wine (icons, accents)    */
+          800: "#3a1828",   /* wine-charcoal — PRIMARY CTA        */
+          900: "#260e18",   /* espresso-plum — CTA hover          */
+          950: "#140810",   /* near-black plum (dark bg tints)    */
         },
         /* ── Warm stone — replaces cold slate/zinc everywhere ────────────── */
         stone: {
@@ -98,7 +98,7 @@ const config: Config = {
         card:          "0 1px 2px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)",
         panel:         "0 2px 8px rgba(0,0,0,0.07)",
         popover:       "0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)",
-        focus:         "0 0 0 2.5px rgba(72,34,99,0.22)",
+        focus:         "0 0 0 2.5px rgba(58,24,40,0.22)",
         "focus-error": "0 0 0 2.5px rgba(185,28,28,0.20)",
         none:          "none",
       },

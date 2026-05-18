@@ -1382,14 +1382,14 @@ function BrandSignature() {
         background:
           "linear-gradient(to bottom," +
           "  #FFFFFF    0%,"  +
-          "  #F8F4F7    5%,"  +
-          "  #ECE1EE   14%,"  +
-          "  #D3B6D4   25%,"  +
-          "  #A87CAA   37%,"  +
-          "  #7A4882   49%,"  +
-          "  #481C5A   62%,"  +
-          "  #240E36   80%,"  +
-          "  #0C0618  100%"   +
+          "  #FAF5F1    4%,"  +
+          "  #EFE4D8   12%,"  +
+          "  #D4BCA8   24%,"  +
+          "  #AA8082   38%,"  +
+          "  #6E3C4A   50%,"  +
+          "  #3D1828   63%,"  +
+          "  #1E0C14   80%,"  +
+          "  #090408  100%"   +
           ")",
       }}
     >
@@ -1446,8 +1446,8 @@ function BrandSignature() {
           height: "52%",
           background:
             "radial-gradient(ellipse 85% 70% at 50% 32%," +
-            "  rgba(148, 88, 168, 0.22)  0%,"  +
-            "  rgba(100, 50, 135, 0.10) 48%,"  +
+            "  rgba(138, 88, 100, 0.26)  0%,"  +
+            "  rgba(88,  50,  68, 0.12) 48%,"  +
             "  transparent              72%"   +
             ")",
           filter: "blur(48px)",
@@ -1473,7 +1473,7 @@ function BrandSignature() {
           className="font-display italic block w-full text-center"
           style={{
             fontSize: "clamp(3.5rem, 17.5vw, 24rem)",
-            color: "rgba(238, 226, 248, 0.86)",
+            color: "rgba(240, 226, 210, 0.88)",
             letterSpacing: "-0.025em",
             lineHeight: 0.82,
           }}
