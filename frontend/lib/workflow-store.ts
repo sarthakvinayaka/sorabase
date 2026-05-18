@@ -437,7 +437,7 @@ function createWorkflowStore({
 // ─── Store instances ──────────────────────────────────────────────────────────
 
 export const useWorkflowStore = createWorkflowStore({
-  storageKey:   "pilot-workflow-v4",
+  storageKey:   "sorabase-workflow-v1",
   initialNodes: RECRUITING_INITIAL_NODES,
   initialEdges: RECRUITING_INITIAL_EDGES,
   coreNodeIds:  RECRUITING_CORE_NODE_IDS,
@@ -445,7 +445,7 @@ export const useWorkflowStore = createWorkflowStore({
 });
 
 export const useGeneralWorkflowStore = createWorkflowStore({
-  storageKey:   "pilot-general-workflow-v1",
+  storageKey:   "sorabase-general-workflow-v1",
   initialNodes: GENERAL_INITIAL_NODES,
   initialEdges: GENERAL_INITIAL_EDGES,
   coreNodeIds:  GENERAL_CORE_NODE_IDS,

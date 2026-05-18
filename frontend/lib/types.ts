@@ -524,7 +524,7 @@ export interface SchemaTemplateUpdate {
   columns?:     ProposedColumn[];
 }
 
-/** Persisted to localStorage under `pilot-schema-${conversationId}`. */
+/** Persisted to localStorage under `sorabase-schema-${conversationId}`. */
 export interface StoredSchema {
   columns:          ProposedColumn[];
   templateId?:      string;

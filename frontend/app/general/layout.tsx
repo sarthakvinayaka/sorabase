@@ -3,6 +3,7 @@ import "@xyflow/react/dist/style.css";
 import AuthGuard from "@/components/AuthGuard";
 
 export const metadata: Metadata = {
+  title: "General Mode",
   robots: { index: false, follow: false },
 };
 

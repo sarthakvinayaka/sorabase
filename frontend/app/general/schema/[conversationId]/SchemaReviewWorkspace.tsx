@@ -110,7 +110,7 @@ function validate(columns: EditableColumn[]): ValidationErrors {
 // ─── localStorage hook ────────────────────────────────────────────────────────
 
 function useApprovedSchema(conversationId: string) {
-  const key = `pilot-schema-${conversationId}`;
+  const key = `sorabase-schema-${conversationId}`;
 
   const save = useCallback((
     columns: EditableColumn[],

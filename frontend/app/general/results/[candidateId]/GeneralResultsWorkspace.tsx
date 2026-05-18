@@ -162,7 +162,7 @@ export default function GeneralResultsWorkspace({ initial }: Props) {
 
   // Read approved schema from localStorage — handles both old array format and new StoredSchema
   useEffect(() => {
-    const raw = localStorage.getItem(`pilot-schema-${conversation.id}`);
+    const raw = localStorage.getItem(`sorabase-schema-${conversation.id}`);
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw);

@@ -38,9 +38,10 @@ export default function Toolbar({ onRun }: Props) {
       <div className="flex items-center gap-3">
         <Link
           href={isRecruiting ? "/candidates" : "/"}
-          className="text-sm font-semibold tracking-tight text-stone-900 dark:text-stone-100 hover:opacity-60 transition-opacity"
+          className="font-display italic text-[17px] leading-none text-stone-900 dark:text-stone-100 hover:opacity-60 transition-opacity"
+          aria-label="SoraBase home"
         >
-          Pilot<span className="text-aubergine-800">.</span>
+          SoraBase
         </Link>
         <div className="h-3.5 w-px bg-stone-200 dark:bg-stone-700" />
         <span className="text-xs text-stone-400 dark:text-stone-500">{contextLabel}</span>

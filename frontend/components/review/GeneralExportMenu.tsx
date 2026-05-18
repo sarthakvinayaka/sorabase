@@ -262,7 +262,7 @@ function WebhookPanel({ candidateId, onClose }: { candidateId: string; onClose: 
       <p className="text-2xs text-stone-400 dark:text-stone-500 leading-relaxed">
         Retries up to 3× on server errors. Sends{" "}
         <code className="font-mono bg-stone-100 dark:bg-stone-800 px-0.5 rounded">
-          X-Pilot-Event: general.extraction.exported
+          X-SoraBase-Event: general.extraction.exported
         </code>
         .
       </p>

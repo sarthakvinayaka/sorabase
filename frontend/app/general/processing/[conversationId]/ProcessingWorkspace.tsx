@@ -36,7 +36,7 @@ export default function ProcessingWorkspace({ conversationId, source }: Props) {
     setRunState("running");
     setError(null);
     try {
-      const raw = localStorage.getItem(`pilot-schema-${conversationId}`);
+      const raw = localStorage.getItem(`sorabase-schema-${conversationId}`);
       const parsed = raw ? JSON.parse(raw) : null;
 
       // Support both old format (ProposedColumn[]) and new StoredSchema format
