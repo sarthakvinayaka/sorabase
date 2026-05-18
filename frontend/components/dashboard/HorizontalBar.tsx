@@ -5,7 +5,7 @@ interface Props {
   colorClass?: string;
 }
 
-export function HorizontalBar({ items, colorClass = "bg-rose-700" }: Props) {
+export function HorizontalBar({ items, colorClass = "bg-aubergine-700" }: Props) {
   if (items.length === 0) {
     return <p className="text-xs text-stone-400 dark:text-stone-500 py-2">No data yet.</p>;
   }

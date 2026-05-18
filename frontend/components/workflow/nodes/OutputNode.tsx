@@ -15,7 +15,7 @@ export default function OutputNode({ id, data: raw, selected }: NodeProps) {
   return (
     <BaseNode
       selected={selected}
-      accent="bg-rose-700"
+      accent="bg-aubergine-700"
       icon="↑"
       typeLabel="Output"
       status={data.status}
@@ -27,7 +27,7 @@ export default function OutputNode({ id, data: raw, selected }: NodeProps) {
       </p>
       {/* Dashboard is always-on — shown as a fixed indicator */}
       <div className="flex items-center gap-1 mt-1">
-        <span className="text-[10px] font-semibold text-rose-700">Dashboard</span>
+        <span className="text-[10px] font-semibold text-aubergine-700">Dashboard</span>
         <span className="text-[10px] text-stone-300 dark:text-stone-600">· always on</span>
       </div>
       {/* Optional extra formats */}
@@ -39,7 +39,7 @@ export default function OutputNode({ id, data: raw, selected }: NodeProps) {
         <p className="text-[10px] text-stone-300 dark:text-stone-600 mt-0.5">No extras</p>
       )}
       {data.status === "completed" && data.candidateId && (
-        <p className="text-[10px] text-rose-700 mt-1.5">Output ready</p>
+        <p className="text-[10px] text-aubergine-700 mt-1.5">Output ready</p>
       )}
     </BaseNode>
   );

@@ -14,10 +14,10 @@ const BOT_DOT: Record<string, string> = {
   waiting_for_admission: "bg-amber-400 animate-pulse",
   in_meeting:            "bg-blue-400",
   recording:             "bg-blue-500 animate-pulse",
-  transcribing:          "bg-rose-400 animate-pulse",
-  ready:                 "bg-rose-700",
-  extracting:            "bg-rose-400 animate-pulse",
-  complete:              "bg-rose-700",
+  transcribing:          "bg-aubergine-400 animate-pulse",
+  ready:                 "bg-aubergine-700",
+  extracting:            "bg-aubergine-400 animate-pulse",
+  complete:              "bg-aubergine-700",
   failed:                "bg-red-400",
 };
 
@@ -63,7 +63,7 @@ export default function SourceNode({ id, data: raw, selected }: NodeProps) {
             </p>
           )}
           {hasTranscript && (
-            <p className="text-[10px] text-rose-700 mt-1.5">
+            <p className="text-[10px] text-aubergine-700 mt-1.5">
               {data.transcript.length.toLocaleString()} chars
             </p>
           )}

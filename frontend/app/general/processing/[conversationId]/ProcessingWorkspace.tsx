@@ -169,8 +169,8 @@ export default function ProcessingWorkspace({ conversationId, source }: Props) {
 function StepDot({ state }: { state: StepState }) {
   if (state === "done") {
     return (
-      <div className="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <svg className="w-3.5 h-3.5 text-rose-800 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+      <div className="w-6 h-6 rounded-full bg-aubergine-100 dark:bg-aubergine-950/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <svg className="w-3.5 h-3.5 text-aubergine-800 dark:text-aubergine-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
@@ -179,7 +179,7 @@ function StepDot({ state }: { state: StepState }) {
   if (state === "running") {
     return (
       <div className="w-6 h-6 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <svg className="w-3.5 h-3.5 animate-spin text-rose-800 dark:text-rose-400" fill="none" viewBox="0 0 24 24">
+        <svg className="w-3.5 h-3.5 animate-spin text-aubergine-800 dark:text-aubergine-400" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
         </svg>

@@ -73,15 +73,15 @@ export default function SignInPage() {
 
       {/* ── Success state ─────────────────────────────────────────────── */}
       {formState === "success" && (
-        <div className="rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/30 px-5 py-5 flex items-start gap-4">
-          <div className="w-8 h-8 rounded-full border border-rose-200 dark:border-rose-900 bg-white dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-rose-800 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <div className="rounded-lg border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/30 px-5 py-5 flex items-start gap-4">
+          <div className="w-8 h-8 rounded-full border border-aubergine-200 dark:border-aubergine-900 bg-white dark:bg-aubergine-950/40 flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-aubergine-800 dark:text-aubergine-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <div>
-            <p className="text-[14px] font-semibold text-rose-900 dark:text-rose-200">Signed in.</p>
-            <p className="text-[12px] text-rose-800 dark:text-rose-400 mt-1 flex items-center gap-1.5">
+            <p className="text-[14px] font-semibold text-aubergine-900 dark:text-aubergine-200">Signed in.</p>
+            <p className="text-[12px] text-aubergine-800 dark:text-aubergine-400 mt-1 flex items-center gap-1.5">
               <SpinIcon size={12} />
               Redirecting to your workspace…
             </p>
@@ -118,7 +118,7 @@ export default function SignInPage() {
                 </p>
               </div>
               {[
-                { email: "recruiter@sorabase.com", label: "Recruiter workspace", dot: "bg-rose-700",  color: "text-rose-800 dark:text-rose-400"  },
+                { email: "recruiter@sorabase.com", label: "Recruiter workspace", dot: "bg-aubergine-700",  color: "text-aubergine-800 dark:text-aubergine-400"  },
                 { email: "general@sorabase.com",   label: "General workspace",   dot: "bg-stone-400", color: "text-stone-500 dark:text-stone-300" },
                 { email: "demo@sorabase.com",       label: "Pending access",      dot: "bg-amber-400", color: "text-amber-600 dark:text-amber-400" },
               ].map(({ email: demoEmail, label, dot, color }) => (
@@ -159,7 +159,7 @@ export default function SignInPage() {
             <Field
               label="Password"
               aside={
-                <a href="#" className="text-[11px] text-rose-800 dark:text-rose-400 hover:underline underline-offset-2">
+                <a href="#" className="text-[11px] text-aubergine-800 dark:text-aubergine-400 hover:underline underline-offset-2">
                   Forgot password?
                 </a>
               }
@@ -207,7 +207,7 @@ export default function SignInPage() {
         No account?{" "}
         <Link
           href="/signup"
-          className="font-medium text-rose-800 dark:text-rose-400 hover:underline underline-offset-2"
+          className="font-medium text-aubergine-800 dark:text-aubergine-400 hover:underline underline-offset-2"
         >
           Get started free
         </Link>

@@ -100,7 +100,7 @@ type TagVariant = "default" | "teal" | "stone";
 
 const TAG_VARIANT: Record<TagVariant, string> = {
   default: "tag-mkt",
-  teal:    "inline-flex items-center rounded-full border border-rose-200 dark:border-rose-900 px-2.5 py-0.5 text-[11px] font-medium text-rose-900 dark:text-rose-400",
+  teal:    "inline-flex items-center rounded-full border border-aubergine-200 dark:border-aubergine-900 px-2.5 py-0.5 text-[11px] font-medium text-aubergine-900 dark:text-aubergine-400",
   stone:   "inline-flex items-center rounded-full border border-stone-200 dark:border-stone-700 px-2.5 py-0.5 text-[11px] font-medium text-stone-500 dark:text-stone-400",
 };
 

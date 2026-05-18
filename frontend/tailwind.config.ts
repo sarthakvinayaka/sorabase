@@ -3,7 +3,7 @@ import type { Config } from "tailwindcss";
 /**
  * SoraBase design system.
  *
- * Philosophy: warm stone neutrals, deep teal accent, editorial serif headings.
+ * Philosophy: warm stone neutrals, smoked aubergine accent, editorial serif headings.
  * No loud gradients, no AI-purple, no toy-rounded UI.
  * Radius: xs=3px → lg=10px (tight, restrained)
  * Shadow: single-layer, low-opacity, purely for depth cues
@@ -37,19 +37,19 @@ const config: Config = {
       },
 
       colors: {
-        /* ── Teal accent — deep, forest, premium ────────────────────────── */
-        teal: {
-          50:  "#EDF6F3",
-          100: "#D3EDE6",
-          200: "#A9DAD0",
-          300: "#72BFB1",
-          400: "#3FA396",
-          500: "#24897B",
-          600: "#1A6B5A",   /* PRIMARY */
-          700: "#135246",
-          800: "#0E3D34",
-          900: "#082820",
-          950: "#041610",
+        /* ── Aubergine accent — smoked, warm plum, European premium ─────── */
+        aubergine: {
+          50:  "#f8f0fd",   /* barely-there lavender blush        */
+          100: "#edd8f8",   /* soft mauve mist                    */
+          200: "#d6b4ee",   /* muted mauve (light borders/tints)  */
+          300: "#b78cd4",   /* dusty mauve                        */
+          400: "#9466ba",   /* medium plum (dark-mode text)       */
+          500: "#7744a0",   /* smoked aubergine mid               */
+          600: "#623587",   /* deep plum                          */
+          700: "#552d76",   /* dark plum (icons, dots, eyebrows)  */
+          800: "#482263",   /* PRIMARY CTA background             */
+          900: "#351650",   /* CTA hover / deepest accent         */
+          950: "#1c0a2c",   /* near-black plum (dark bg tints)    */
         },
         /* ── Warm stone — replaces cold slate/zinc everywhere ────────────── */
         stone: {
@@ -98,7 +98,7 @@ const config: Config = {
         card:          "0 1px 2px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)",
         panel:         "0 2px 8px rgba(0,0,0,0.07)",
         popover:       "0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)",
-        focus:         "0 0 0 2.5px rgba(26,107,90,0.22)",
+        focus:         "0 0 0 2.5px rgba(72,34,99,0.22)",
         "focus-error": "0 0 0 2.5px rgba(185,28,28,0.20)",
         none:          "none",
       },

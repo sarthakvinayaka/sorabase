@@ -47,7 +47,7 @@ export default function DashboardPage() {
     return (
       <main className="page">
         <div className="flex items-center gap-2 text-sm text-stone-400">
-          <span className="w-4 h-4 rounded-full border-2 border-rose-400 border-t-transparent animate-spin inline-block" />
+          <span className="w-4 h-4 rounded-full border-2 border-aubergine-400 border-t-transparent animate-spin inline-block" />
           Loading…
         </div>
       </main>
@@ -122,7 +122,7 @@ export default function DashboardPage() {
             value={fs.analyzed_count > 0 ? `${fs.avg_score.toFixed(1)}/10` : "—"}
           />
           <Card title="By tier">
-            <HorizontalBar items={fs.by_tier} colorClass="bg-rose-700" />
+            <HorizontalBar items={fs.by_tier} colorClass="bg-aubergine-700" />
           </Card>
         </div>
       </section>
@@ -132,7 +132,7 @@ export default function DashboardPage() {
         <SectionLabel title="Candidate distributions" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           <Card title="Experience">
-            <HorizontalBar items={stats.experience_distribution}     colorClass="bg-rose-700" />
+            <HorizontalBar items={stats.experience_distribution}     colorClass="bg-aubergine-700" />
           </Card>
           <Card title="Work auth status">
             <HorizontalBar items={stats.work_auth_status_breakdown}  colorClass="bg-stone-400" />
@@ -141,13 +141,13 @@ export default function DashboardPage() {
             <HorizontalBar items={stats.work_auth_type_breakdown}    colorClass="bg-stone-400" />
           </Card>
           <Card title="Remote preference">
-            <HorizontalBar items={stats.remote_preference_breakdown} colorClass="bg-rose-400" />
+            <HorizontalBar items={stats.remote_preference_breakdown} colorClass="bg-aubergine-400" />
           </Card>
           <Card title="Notice period">
             <HorizontalBar items={stats.notice_period_distribution}  colorClass="bg-warning-DEFAULT" />
           </Card>
           <Card title="Salary ask (min)">
-            <HorizontalBar items={stats.salary_distribution}         colorClass="bg-rose-800" />
+            <HorizontalBar items={stats.salary_distribution}         colorClass="bg-aubergine-800" />
           </Card>
         </div>
       </section>

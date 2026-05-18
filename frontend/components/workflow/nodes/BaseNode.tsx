@@ -21,9 +21,9 @@ interface BaseNodeProps {
 
 const STATUS_DOT: Record<NodeStatus, string> = {
   idle:       "bg-stone-300 dark:bg-stone-600",
-  configured: "bg-rose-400",
+  configured: "bg-aubergine-400",
   running:    "bg-amber-400 animate-pulse",
-  completed:  "bg-rose-700",
+  completed:  "bg-aubergine-700",
   error:      "bg-red-400",
 };
 
@@ -67,7 +67,7 @@ export default function BaseNode({
         "group relative w-56 rounded-md overflow-visible select-none",
         "bg-white dark:bg-stone-900 border transition-all duration-100",
         selected
-          ? "border-rose-700 shadow-[0_0_0_2px_rgba(26,107,90,0.18)]"
+          ? "border-aubergine-700 shadow-[0_0_0_2px_rgba(26,107,90,0.18)]"
           : "border-stone-200 dark:border-stone-700 shadow-card",
       ].join(" ")}
     >
@@ -149,8 +149,8 @@ export default function BaseNode({
             "!w-3 !h-3 !min-w-0 !min-h-0 !rounded-full !left-[-6px]",
             "!bg-white dark:!bg-stone-900 !border-2",
             "!border-stone-300 dark:!border-stone-600",
-            "group-hover:!border-rose-400 group-hover:!bg-rose-50 dark:group-hover:!bg-rose-950/30",
-            "hover:!scale-125 hover:!border-rose-700 hover:!bg-rose-50",
+            "group-hover:!border-aubergine-400 group-hover:!bg-aubergine-50 dark:group-hover:!bg-aubergine-950/30",
+            "hover:!scale-125 hover:!border-aubergine-700 hover:!bg-aubergine-50",
             "transition-all duration-150",
           ].join(" ")}
         />
@@ -163,8 +163,8 @@ export default function BaseNode({
             "!w-3 !h-3 !min-w-0 !min-h-0 !rounded-full !right-[-6px]",
             "!bg-white dark:!bg-stone-900 !border-2",
             "!border-stone-300 dark:!border-stone-600",
-            "group-hover:!border-rose-400 group-hover:!bg-rose-50 dark:group-hover:!bg-rose-950/30",
-            "hover:!scale-125 hover:!border-rose-700 hover:!bg-rose-50",
+            "group-hover:!border-aubergine-400 group-hover:!bg-aubergine-50 dark:group-hover:!bg-aubergine-950/30",
+            "hover:!scale-125 hover:!border-aubergine-700 hover:!bg-aubergine-50",
             "transition-all duration-150",
           ].join(" ")}
         />

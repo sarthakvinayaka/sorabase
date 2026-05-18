@@ -65,7 +65,7 @@ function Hero() {
 
             <div className="mt-7 flex flex-wrap items-center gap-4">
               <span className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-stone-500">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-700" />
+                <span className="w-1.5 h-1.5 rounded-full bg-aubergine-700" />
                 Recruiter Mode — prebuilt
               </span>
               <span className="w-px h-3 bg-stone-200 dark:bg-stone-700" />
@@ -104,8 +104,8 @@ function SessionPreview() {
         <span className="text-xs font-mono text-stone-400 dark:text-stone-500">
           sorabase / sessions / discovery-call
         </span>
-        <span className="ml-auto flex items-center gap-1.5 text-xs font-medium text-rose-800 dark:text-rose-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-700 animate-pulse" />
+        <span className="ml-auto flex items-center gap-1.5 text-xs font-medium text-aubergine-800 dark:text-aubergine-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-aubergine-700 animate-pulse" />
           Extracted
         </span>
       </div>
@@ -142,14 +142,14 @@ function SessionPreview() {
         >
           <span className="text-xs text-stone-400 dark:text-stone-500 w-24 flex-shrink-0">{label}</span>
           <span className="flex-1 text-sm text-stone-800 dark:text-stone-200 truncate">{value}</span>
-          <span className="text-xs font-mono text-rose-700 dark:text-rose-400 flex-shrink-0">{conf}%</span>
+          <span className="text-xs font-mono text-aubergine-700 dark:text-aubergine-400 flex-shrink-0">{conf}%</span>
         </div>
       ))}
 
       {/* Footer */}
       <div className="px-5 py-3 bg-stone-50/60 dark:bg-stone-950/60 flex items-center justify-between">
         <span className="text-xs text-stone-400 dark:text-stone-500">6 of 12 fields shown</span>
-        <span className="text-xs font-medium text-rose-800 dark:text-rose-400">93% avg confidence</span>
+        <span className="text-xs font-medium text-aubergine-800 dark:text-aubergine-400">93% avg confidence</span>
       </div>
     </div>
   );
@@ -325,7 +325,7 @@ function WorkflowCanvas() {
             <div className="ml-auto flex items-center gap-2">
               <span className="text-[10px] font-mono text-stone-400 dark:text-stone-500">7 nodes</span>
               <span className="h-3 w-px bg-stone-200 dark:bg-stone-700" />
-              <span className="text-[10px] font-semibold text-rose-800 dark:text-rose-400">Ready to run</span>
+              <span className="text-[10px] font-semibold text-aubergine-800 dark:text-aubergine-400">Ready to run</span>
             </div>
           </div>
 
@@ -360,7 +360,7 @@ function WorkflowCanvas() {
                       className={[
                         "relative flex flex-col items-center gap-1 px-3 py-3 rounded-lg border text-center w-[96px]",
                         node.active
-                          ? "border-rose-300 dark:border-rose-900 bg-white dark:bg-stone-900 shadow-sm ring-2 ring-rose-200/60 dark:ring-rose-900/40"
+                          ? "border-aubergine-300 dark:border-aubergine-900 bg-white dark:bg-stone-900 shadow-sm ring-2 ring-aubergine-200/60 dark:ring-aubergine-900/40"
                           : "border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900",
                       ].join(" ")}
                     >
@@ -369,7 +369,7 @@ function WorkflowCanvas() {
                         className={[
                           "text-[11px] font-semibold leading-tight",
                           node.active
-                            ? "text-rose-900 dark:text-rose-300"
+                            ? "text-aubergine-900 dark:text-aubergine-300"
                             : "text-stone-700 dark:text-stone-300",
                         ].join(" ")}
                       >
@@ -379,7 +379,7 @@ function WorkflowCanvas() {
                         {node.sub}
                       </span>
                       {node.active && (
-                        <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-rose-700 flex items-center justify-center shadow-sm">
+                        <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-aubergine-700 flex items-center justify-center shadow-sm">
                           <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                           </svg>
@@ -409,13 +409,13 @@ function WorkflowCanvas() {
           </div>
 
           {/* Column Config panel — open state */}
-          <div className="border-t-2 border-rose-200 dark:border-rose-900">
+          <div className="border-t-2 border-aubergine-200 dark:border-aubergine-900">
 
             {/* Panel header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-100 dark:border-stone-800 bg-rose-50/40 dark:bg-rose-950/20">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-100 dark:border-stone-800 bg-aubergine-50/40 dark:bg-aubergine-950/20">
               <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-xs border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950 flex items-center justify-center">
-                  <svg className="w-3 h-3 text-rose-800 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <div className="w-5 h-5 rounded-xs border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950 flex items-center justify-center">
+                  <svg className="w-3 h-3 text-aubergine-800 dark:text-aubergine-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h8" />
                   </svg>
                 </div>
@@ -452,12 +452,12 @@ function WorkflowCanvas() {
                   className={[
                     "w-3.5 h-3.5 rounded-xs border flex items-center justify-center flex-shrink-0",
                     checked
-                      ? "border-rose-400 dark:border-rose-800 bg-rose-50 dark:bg-rose-950"
+                      ? "border-aubergine-400 dark:border-aubergine-800 bg-aubergine-50 dark:bg-aubergine-950"
                       : "border-stone-300 dark:border-stone-600",
                   ].join(" ")}
                 >
                   {checked && (
-                    <svg className="w-2.5 h-2.5 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg className="w-2.5 h-2.5 text-aubergine-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   )}
@@ -469,11 +469,11 @@ function WorkflowCanvas() {
                   {type}
                 </span>
                 {/* Required */}
-                <span className={["text-xs font-medium", req ? "text-rose-800 dark:text-rose-400" : "text-stone-300 dark:text-stone-600"].join(" ")}>
+                <span className={["text-xs font-medium", req ? "text-aubergine-800 dark:text-aubergine-400" : "text-stone-300 dark:text-stone-600"].join(" ")}>
                   {req ? "yes" : "—"}
                 </span>
                 {/* Confidence */}
-                <span className="text-[11px] font-mono text-rose-700 dark:text-rose-400 text-right">{conf}%</span>
+                <span className="text-[11px] font-mono text-aubergine-700 dark:text-aubergine-400 text-right">{conf}%</span>
               </div>
             ))}
 
@@ -490,7 +490,7 @@ function WorkflowCanvas() {
               </button>
               <button
                 type="button"
-                className="text-[12px] font-semibold text-rose-800 dark:text-rose-400 hover:text-rose-900 dark:hover:text-rose-300 flex items-center gap-1 transition-colors"
+                className="text-[12px] font-semibold text-aubergine-800 dark:text-aubergine-400 hover:text-aubergine-900 dark:hover:text-aubergine-300 flex items-center gap-1 transition-colors"
               >
                 Save as template →
               </button>
@@ -509,7 +509,7 @@ function WorkflowCanvas() {
 function WorkflowNodeIcon({ id, active }: { id: string; active: boolean }) {
   const cls = [
     "w-4 h-4 mb-0.5 flex-shrink-0",
-    active ? "text-rose-800 dark:text-rose-400" : "text-stone-400 dark:text-stone-500",
+    active ? "text-aubergine-800 dark:text-aubergine-400" : "text-stone-400 dark:text-stone-500",
   ].join(" ");
 
   switch (id) {
@@ -616,7 +616,7 @@ function ModeComparison() {
                       className={[
                         "inline-flex items-center rounded-xs px-2 py-1 text-[10px] font-medium",
                         node === "Col. Config"
-                          ? "border border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/50 text-rose-900 dark:text-rose-300"
+                          ? "border border-aubergine-300 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/50 text-aubergine-900 dark:text-aubergine-300"
                           : "border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 text-stone-500 dark:text-stone-400",
                       ].join(" ")}
                     >
@@ -657,10 +657,10 @@ function ModeComparison() {
           </div>
 
           {/* ── Recruiter Mode — RIGHT, teal header ── */}
-          <div className="rounded-xl border border-rose-200 dark:border-rose-950 bg-white dark:bg-stone-900 overflow-hidden">
-            <div className="border-b border-rose-100 dark:border-rose-950/60 bg-rose-50/50 dark:bg-rose-950/30 px-8 py-6">
-              <span className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.12em] uppercase text-rose-900 dark:text-rose-400 mb-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-700" />
+          <div className="rounded-xl border border-aubergine-200 dark:border-aubergine-950 bg-white dark:bg-stone-900 overflow-hidden">
+            <div className="border-b border-aubergine-100 dark:border-aubergine-950/60 bg-aubergine-50/50 dark:bg-aubergine-950/30 px-8 py-6">
+              <span className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.12em] uppercase text-aubergine-900 dark:text-aubergine-400 mb-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-aubergine-700" />
                 Recruiter Mode
               </span>
               <h3
@@ -683,7 +683,7 @@ function ModeComparison() {
               <div className="flex items-center gap-1 flex-wrap">
                 {["Source", "Transcript", "Extraction", "JD Analysis", "Profile", "Review"].map((node, i, arr) => (
                   <div key={node} className="flex items-center gap-1">
-                    <span className="inline-flex items-center rounded-xs border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/50 px-2.5 py-1 text-[10px] font-medium text-rose-900 dark:text-rose-400">
+                    <span className="inline-flex items-center rounded-xs border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/50 px-2.5 py-1 text-[10px] font-medium text-aubergine-900 dark:text-aubergine-400">
                       {node}
                     </span>
                     {i < arr.length - 1 && (
@@ -707,7 +707,7 @@ function ModeComparison() {
                   "JSON export or direct ATS push",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm text-stone-600 dark:text-stone-300">
-                    <CheckIcon className="text-rose-700" />
+                    <CheckIcon className="text-aubergine-700" />
                     {item}
                   </li>
                 ))}
@@ -774,7 +774,7 @@ function StructuredDataSection() {
           <div className="hidden lg:flex items-center justify-center pt-10">
             <div className="flex flex-col items-center gap-2">
               <div className="w-px h-8 bg-stone-200 dark:bg-stone-700" />
-              <div className="w-8 h-8 rounded-full border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950 flex items-center justify-center text-rose-800 dark:text-rose-400">
+              <div className="w-8 h-8 rounded-full border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950 flex items-center justify-center text-aubergine-800 dark:text-aubergine-400">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -804,12 +804,12 @@ function StructuredDataSection() {
                   <span className="text-xs font-mono text-stone-300 dark:text-stone-600 w-32 flex-shrink-0">{field}</span>
                   <span className="flex-1 text-sm text-stone-800 dark:text-stone-200 truncate">{value}</span>
                   <span className="text-[10px] font-mono text-stone-300 dark:text-stone-600 flex-shrink-0 mr-1">{type}</span>
-                  <span className="text-[11px] font-semibold font-mono text-rose-700 dark:text-rose-400 flex-shrink-0 w-8 text-right">{conf}%</span>
+                  <span className="text-[11px] font-semibold font-mono text-aubergine-700 dark:text-aubergine-400 flex-shrink-0 w-8 text-right">{conf}%</span>
                 </div>
               ))}
               <div className="px-4 py-2.5 bg-stone-50 dark:bg-stone-950 flex items-center justify-between">
                 <span className="text-xs text-stone-400 dark:text-stone-500">6 of 12 fields</span>
-                <span className="text-xs font-medium text-rose-800 dark:text-rose-400">93% avg confidence</span>
+                <span className="text-xs font-medium text-aubergine-800 dark:text-aubergine-400">93% avg confidence</span>
               </div>
             </div>
           </div>
@@ -895,7 +895,7 @@ function Integrations() {
               <div className="space-y-2">
                 {[
                   { name: "Zoom",         note: "Live bot · Cloud recording", dot: "bg-blue-400"   },
-                  { name: "Google Meet",  note: "Live bot via calendar",       dot: "bg-rose-400"  },
+                  { name: "Google Meet",  note: "Live bot via calendar",       dot: "bg-aubergine-400"  },
                   { name: "Audio upload", note: "MP3, MP4, M4A, WAV",          dot: "bg-stone-400"  },
                   { name: "Transcript",   note: "Paste · Bulk import",         dot: "bg-stone-400"  },
                   { name: "REST API",     note: "Programmatic ingestion",      dot: "bg-violet-400" },
@@ -921,9 +921,9 @@ function Integrations() {
               </p>
               <div className="space-y-2">
                 {[
-                  { name: "Dashboard",   note: "Built-in review UI",          dot: "bg-rose-400"   },
-                  { name: "JSON export", note: "Full structured record",       dot: "bg-rose-400"   },
-                  { name: "CSV export",  note: "Flat file for spreadsheets",  dot: "bg-rose-400"   },
+                  { name: "Dashboard",   note: "Built-in review UI",          dot: "bg-aubergine-400"   },
+                  { name: "JSON export", note: "Full structured record",       dot: "bg-aubergine-400"   },
+                  { name: "CSV export",  note: "Flat file for spreadsheets",  dot: "bg-aubergine-400"   },
                   { name: "Webhooks",    note: "Real-time event delivery",     dot: "bg-amber-400"  },
                   { name: "REST API",    note: "Pull any session's data",      dot: "bg-violet-400" },
                 ].map(({ name, note, dot }) => (
@@ -1141,12 +1141,12 @@ function BrandMoment() {
           <div key={i} className="flex-1 border-r border-stone-800/40" />
         ))}
       </div>
-      <div aria-hidden className="absolute left-0 top-0 bottom-0 w-px bg-rose-900/30" />
+      <div aria-hidden className="absolute left-0 top-0 bottom-0 w-px bg-aubergine-700/30" />
 
       <div className="relative mkt-section">
 
         <div className="flex items-center gap-5 mb-14">
-          <div className="h-px w-10 bg-rose-900" />
+          <div className="h-px w-10 bg-aubergine-700" />
           <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-stone-600">
             SoraBase
           </span>
@@ -1165,11 +1165,11 @@ function BrandMoment() {
 
         <div className="overflow-hidden mb-14">
           <h2
-            className="font-display italic text-rose-400 leading-[0.96] select-none"
+            className="font-display italic text-aubergine-400 leading-[0.96] select-none"
             style={{ fontSize: "clamp(3.2rem, 11vw, 10.5rem)" }}
           >
             <span className="block">Structure</span>
-            <span className="block text-rose-900/80">is permanent.</span>
+            <span className="block text-aubergine-900/80">is permanent.</span>
           </h2>
         </div>
 
@@ -1252,7 +1252,7 @@ function PricingPreview() {
               className={[
                 "rounded-xl border flex flex-col p-7",
                 plan.highlight
-                  ? "border-rose-300 dark:border-rose-900 bg-white dark:bg-stone-900 ring-1 ring-rose-200 dark:ring-rose-900/50"
+                  ? "border-aubergine-300 dark:border-aubergine-900 bg-white dark:bg-stone-900 ring-1 ring-aubergine-200 dark:ring-aubergine-900/50"
                   : "border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900",
               ].join(" ")}
             >
@@ -1281,7 +1281,7 @@ function PricingPreview() {
               <ul className="space-y-2.5 flex-1 mb-7">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm text-stone-600 dark:text-stone-300">
-                    <CheckIcon className={plan.highlight ? "text-rose-700" : "text-stone-400"} />
+                    <CheckIcon className={plan.highlight ? "text-aubergine-700" : "text-stone-400"} />
                     {f}
                   </li>
                 ))}
@@ -1305,7 +1305,7 @@ function PricingPreview() {
 
         <p className="text-center mt-7 text-xs text-stone-400 dark:text-stone-500">
           Free includes 10 meetings. Pro is $20/month, unlimited.{" "}
-          <Link href="/pricing" className="text-rose-800 dark:text-rose-400 hover:underline underline-offset-2">
+          <Link href="/pricing" className="text-aubergine-800 dark:text-aubergine-400 hover:underline underline-offset-2">
             See full feature comparison →
           </Link>
         </p>
@@ -1368,14 +1368,14 @@ function BrandSignature() {
         background:
           "linear-gradient(to bottom," +
           "  #FFFFFF    0%,"  +
-          "  #F9F5F2    5%,"  +
-          "  #EDE0D9   14%,"  +
-          "  #D5B8BF   25%,"  +
-          "  #AA788A   37%,"  +
-          "  #7A3A52   49%,"  +
-          "  #471523   62%,"  +
-          "  #1E0B10   80%,"  +
-          "  #080306  100%"   +
+          "  #F8F4F7    5%,"  +
+          "  #ECE1EE   14%,"  +
+          "  #D3B6D4   25%,"  +
+          "  #A87CAA   37%,"  +
+          "  #7A4882   49%,"  +
+          "  #481C5A   62%,"  +
+          "  #240E36   80%,"  +
+          "  #0C0618  100%"   +
           ")",
       }}
     >
@@ -1432,8 +1432,8 @@ function BrandSignature() {
           height: "52%",
           background:
             "radial-gradient(ellipse 85% 70% at 50% 32%," +
-            "  rgba(168, 88, 118, 0.24)  0%,"  +
-            "  rgba(130, 58, 88,  0.12) 48%,"  +
+            "  rgba(148, 88, 168, 0.22)  0%,"  +
+            "  rgba(100, 50, 135, 0.10) 48%,"  +
             "  transparent              72%"   +
             ")",
           filter: "blur(48px)",
@@ -1459,7 +1459,7 @@ function BrandSignature() {
           className="font-display italic block w-full text-center"
           style={{
             fontSize: "clamp(3.5rem, 17.5vw, 24rem)",
-            color: "rgba(243, 232, 222, 0.88)",
+            color: "rgba(238, 226, 248, 0.86)",
             letterSpacing: "-0.025em",
             lineHeight: 0.82,
           }}
@@ -1475,7 +1475,7 @@ function BrandSignature() {
    SHARED ICONS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-function CheckIcon({ className = "text-rose-700" }: { className?: string }) {
+function CheckIcon({ className = "text-aubergine-700" }: { className?: string }) {
   return (
     <svg
       className={["w-[15px] h-[15px] flex-shrink-0 mt-0.5", className].join(" ")}

@@ -100,15 +100,15 @@ export default function SignUpPage() {
 
       {/* ── Success state ─────────────────────────────────────────────── */}
       {formState === "success" && (
-        <div className="rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/30 px-5 py-5 flex items-start gap-4">
-          <div className="w-8 h-8 rounded-full border border-rose-200 dark:border-rose-900 bg-white dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-rose-800 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <div className="rounded-lg border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/30 px-5 py-5 flex items-start gap-4">
+          <div className="w-8 h-8 rounded-full border border-aubergine-200 dark:border-aubergine-900 bg-white dark:bg-aubergine-950/40 flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-aubergine-800 dark:text-aubergine-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <div>
-            <p className="text-[14px] font-semibold text-rose-900 dark:text-rose-200">Account created.</p>
-            <p className="text-[12px] text-rose-800 dark:text-rose-400 mt-1 flex items-center gap-1.5">
+            <p className="text-[14px] font-semibold text-aubergine-900 dark:text-aubergine-200">Account created.</p>
+            <p className="text-[12px] text-aubergine-800 dark:text-aubergine-400 mt-1 flex items-center gap-1.5">
               <SpinIcon size={12} />
               Setting up your workspace…
             </p>
@@ -154,7 +154,7 @@ export default function SignUpPage() {
                       "relative text-left rounded-lg border px-3.5 py-3 transition-colors",
                       intent === opt.id
                         ? opt.id === "recruiter"
-                          ? "border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/30"
+                          ? "border-aubergine-300 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/30"
                           : "border-stone-400 dark:border-stone-500 bg-stone-100 dark:bg-stone-800/60"
                         : "border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600",
                     ].join(" ")}
@@ -166,7 +166,7 @@ export default function SignUpPage() {
                         "absolute top-2.5 right-2.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center transition-colors",
                         intent === opt.id
                           ? opt.id === "recruiter"
-                            ? "border-rose-700 bg-rose-700"
+                            ? "border-aubergine-700 bg-aubergine-700"
                             : "border-stone-500 bg-stone-500"
                           : "border-stone-300 dark:border-stone-600",
                       ].join(" ")}
@@ -180,7 +180,7 @@ export default function SignUpPage() {
                     <p className={[
                       "text-[12px] font-semibold mb-0.5 pr-4",
                       intent === opt.id && opt.id === "recruiter"
-                        ? "text-rose-900 dark:text-rose-300"
+                        ? "text-aubergine-900 dark:text-aubergine-300"
                         : "text-stone-800 dark:text-stone-200",
                     ].join(" ")}>
                       {opt.label}
@@ -194,7 +194,7 @@ export default function SignUpPage() {
                           <span className={[
                             "w-1 h-1 rounded-full flex-shrink-0",
                             intent === opt.id && opt.id === "recruiter"
-                              ? "bg-rose-400"
+                              ? "bg-aubergine-400"
                               : "bg-stone-400 dark:bg-stone-500",
                           ].join(" ")} />
                           {b}
@@ -271,7 +271,7 @@ export default function SignUpPage() {
                         "h-0.5 flex-1 rounded-full transition-colors",
                         password.length >= level * 3
                           ? password.length >= 9
-                            ? "bg-rose-700"
+                            ? "bg-aubergine-700"
                             : password.length >= 6
                             ? "bg-amber-400"
                             : "bg-red-400"
@@ -326,7 +326,7 @@ export default function SignUpPage() {
         Already have an account?{" "}
         <Link
           href="/signin"
-          className="font-medium text-rose-800 dark:text-rose-400 hover:underline underline-offset-2"
+          className="font-medium text-aubergine-800 dark:text-aubergine-400 hover:underline underline-offset-2"
         >
           Sign in
         </Link>

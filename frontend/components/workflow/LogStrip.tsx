@@ -6,14 +6,14 @@ import type { LogLevel } from "@/lib/workflow-types";
 
 const LEVEL_COLOR: Record<LogLevel, string> = {
   info:    "text-stone-400 dark:text-stone-500",
-  success: "text-rose-800 dark:text-rose-400",
+  success: "text-aubergine-800 dark:text-aubergine-400",
   error:   "text-red-500 dark:text-red-400",
   warn:    "text-amber-600 dark:text-amber-400",
 };
 
 const LEVEL_DOT: Record<LogLevel, string> = {
   info:    "bg-stone-300 dark:bg-stone-600",
-  success: "bg-rose-700",
+  success: "bg-aubergine-700",
   error:   "bg-red-400",
   warn:    "bg-amber-400",
 };

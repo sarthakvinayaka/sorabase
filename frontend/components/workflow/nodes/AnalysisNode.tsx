@@ -3,7 +3,7 @@ import type { AnalysisNodeData } from "@/lib/workflow-types";
 import BaseNode from "./BaseNode";
 
 const TIER_COLOR: Record<string, string> = {
-  strong_fit:  "text-rose-700",
+  strong_fit:  "text-aubergine-700",
   good_fit:    "text-blue-500",
   partial_fit: "text-amber-500",
   weak_fit:    "text-orange-500",

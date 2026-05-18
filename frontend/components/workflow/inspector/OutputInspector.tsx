@@ -53,16 +53,16 @@ export default function OutputInspector({ id, data }: Props) {
 
       {/* ── Dashboard (fixed, always on) ──────────────────────────────────── */}
       <Field label="Primary output">
-        <div className="rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/30 px-3 py-2.5 flex items-center justify-between">
+        <div className="rounded-lg border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/30 px-3 py-2.5 flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-rose-900 dark:text-rose-400">
+            <p className="text-sm font-medium text-aubergine-900 dark:text-aubergine-400">
               {isGeneral ? "Results dashboard" : "Recruiter dashboard"}
             </p>
-            <p className="text-[10px] text-rose-800/70 dark:text-rose-700/70 mt-0.5">
+            <p className="text-[10px] text-aubergine-800/70 dark:text-aubergine-700/70 mt-0.5">
               Results always appear here after every run.
             </p>
           </div>
-          <span className="text-[10px] font-semibold text-rose-700 bg-rose-100 dark:bg-rose-950/50 rounded px-1.5 py-0.5 flex-shrink-0">
+          <span className="text-[10px] font-semibold text-aubergine-700 bg-aubergine-100 dark:bg-aubergine-950/50 rounded px-1.5 py-0.5 flex-shrink-0">
             Always on
           </span>
         </div>
@@ -84,7 +84,7 @@ export default function OutputInspector({ id, data }: Props) {
                   !fmt.implemented
                     ? "opacity-40 cursor-not-allowed border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800"
                     : active
-                      ? "border-rose-400 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/30"
+                      ? "border-aubergine-400 dark:border-aubergine-800 bg-aubergine-50 dark:bg-aubergine-950/30"
                       : "border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 hover:border-stone-300 dark:hover:border-stone-600",
                 ].join(" ")}
               >
@@ -93,7 +93,7 @@ export default function OutputInspector({ id, data }: Props) {
                     <div className={[
                       "w-3.5 h-3.5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-colors",
                       active
-                        ? "border-rose-700 bg-rose-700"
+                        ? "border-aubergine-700 bg-aubergine-700"
                         : "border-stone-300 dark:border-stone-600",
                     ].join(" ")}>
                       {active && (
@@ -138,7 +138,7 @@ export default function OutputInspector({ id, data }: Props) {
                 </span>
                 <div className={[
                   "w-7 h-3.5 rounded-full transition-colors flex-shrink-0 relative",
-                  on ? "bg-rose-700" : "bg-stone-200 dark:bg-stone-700",
+                  on ? "bg-aubergine-700" : "bg-stone-200 dark:bg-stone-700",
                 ].join(" ")}>
                   <span className={[
                     "absolute top-0.5 w-2.5 h-2.5 bg-white rounded-full shadow-sm transition-transform",
@@ -170,7 +170,7 @@ export default function OutputInspector({ id, data }: Props) {
               <div className={[
                 "w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 transition-colors",
                 data.dataSource === s.value
-                  ? "border-rose-700 bg-rose-700"
+                  ? "border-aubergine-700 bg-aubergine-700"
                   : "border-stone-300 dark:border-stone-600 group-hover:border-stone-400",
               ].join(" ")} />
               <span className="text-sm text-stone-600 dark:text-stone-400">{s.label}</span>
@@ -186,7 +186,7 @@ export default function OutputInspector({ id, data }: Props) {
           className={[
             "w-full rounded-lg border bg-stone-50 dark:bg-stone-800 px-3 py-2",
             "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
-            "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-rose-700",
+            "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
           ].join(" ")}
           placeholder="e.g. candidate-export"
           value={data.exportLabel ?? ""}
@@ -199,12 +199,12 @@ export default function OutputInspector({ id, data }: Props) {
         <Field label="Last run">
           <Link
             href={isGeneral ? `/general/results/${data.candidateId}` : `/review/${data.candidateId}`}
-            className="flex items-center justify-between rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/30 px-3 py-2.5 hover:bg-rose-100 dark:hover:bg-rose-950/50 transition-colors"
+            className="flex items-center justify-between rounded-lg border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/30 px-3 py-2.5 hover:bg-aubergine-100 dark:hover:bg-aubergine-950/50 transition-colors"
           >
-            <span className="text-xs font-medium text-rose-900 dark:text-rose-400">
+            <span className="text-xs font-medium text-aubergine-900 dark:text-aubergine-400">
               Open in dashboard
             </span>
-            <span className="text-rose-700 text-sm">→</span>
+            <span className="text-aubergine-700 text-sm">→</span>
           </Link>
         </Field>
       )}

@@ -16,7 +16,7 @@ const TIER_LABEL: Record<string, string> = {
 };
 
 const TIER_COLOR: Record<string, string> = {
-  strong_fit:  "text-rose-800 dark:text-rose-400",
+  strong_fit:  "text-aubergine-800 dark:text-aubergine-400",
   good_fit:    "text-blue-600 dark:text-blue-400",
   partial_fit: "text-amber-600 dark:text-amber-400",
   weak_fit:    "text-orange-600 dark:text-orange-400",

@@ -50,14 +50,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <div key={i} className="flex-1 border-r border-stone-800/40 last:border-0" />
           ))}
         </div>
-        {/* Teal left accent */}
-        <div aria-hidden className="absolute left-0 top-0 bottom-0 w-px bg-rose-900/30" />
+        {/* Aubergine left accent */}
+        <div aria-hidden className="absolute left-0 top-0 bottom-0 w-px bg-aubergine-700/30" />
 
         <div className="relative flex flex-col h-full px-14 py-14">
 
           {/* Top: brand label */}
           <div className="flex items-center gap-3 mb-auto">
-            <div className="h-px w-8 bg-rose-900" />
+            <div className="h-px w-8 bg-aubergine-700" />
             <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-stone-600">
               SoraBase
             </span>
@@ -74,9 +74,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             >
               <span className="text-stone-100">Every meeting ends.</span>
               <br />
-              <span className="text-rose-400">The record</span>
+              <span className="text-aubergine-400">The record</span>
               <br />
-              <span className="text-rose-900/80">doesn&apos;t.</span>
+              <span className="text-aubergine-900/80">doesn&apos;t.</span>
             </h2>
             <p className="mt-8 text-[13px] text-stone-500 leading-relaxed max-w-xs">
               SoraBase extracts structured, confidence-scored data from every call —
@@ -88,8 +88,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="mt-auto">
             <div className="rounded-lg border border-stone-800 bg-stone-900/60 overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2.5 border-b border-stone-800">
-                <span className="flex items-center gap-1.5 text-[10px] font-medium text-rose-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-700 animate-pulse" />
+                <span className="flex items-center gap-1.5 text-[10px] font-medium text-aubergine-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-aubergine-700 animate-pulse" />
                   Extracted
                 </span>
                 <span className="ml-auto text-[10px] font-mono text-stone-600">94% avg confidence</span>

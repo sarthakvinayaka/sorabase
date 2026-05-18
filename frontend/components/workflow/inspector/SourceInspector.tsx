@@ -39,7 +39,7 @@ export default function SourceInspector({ id, data }: Props) {
                 className={[
                   "w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 transition-colors",
                   data.inputMode === m.value
-                    ? "border-rose-700 bg-rose-700"
+                    ? "border-aubergine-700 bg-aubergine-700"
                     : "border-stone-300 dark:border-stone-600 group-hover:border-stone-400",
                 ].join(" ")}
               />
@@ -56,7 +56,7 @@ export default function SourceInspector({ id, data }: Props) {
             className={[
               "w-full rounded-lg border bg-stone-50 dark:bg-stone-800 px-3 py-2",
               "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
-              "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-rose-700",
+              "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
               "resize-none font-mono leading-relaxed",
             ].join(" ")}
             rows={10}
@@ -99,7 +99,7 @@ export default function SourceInspector({ id, data }: Props) {
             className={[
               "w-full rounded-lg border bg-stone-50 dark:bg-stone-800 px-3 py-2",
               "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
-              "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-rose-700",
+              "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
             ].join(" ")}
             placeholder="e.g. REQ-1042"
             value={data.jobReference}
@@ -120,10 +120,10 @@ const BOT_STATUS_META: Record<string, { dot: string; label: string; hint: string
   waiting_for_admission: { dot: "bg-amber-400 animate-pulse", label: "Waiting for admission", hint: "Bot is in the waiting room." },
   in_meeting:            { dot: "bg-blue-400",                label: "In meeting",           hint: "Bot joined. Recording not started yet." },
   recording:             { dot: "bg-blue-500 animate-pulse",  label: "Recording",            hint: "Bot is actively recording." },
-  transcribing:          { dot: "bg-rose-400 animate-pulse",  label: "Transcribing…",        hint: "Call ended. Generating transcript." },
-  ready:                 { dot: "bg-rose-700",                label: "Transcript ready",     hint: "Running extraction pipeline." },
-  extracting:            { dot: "bg-rose-400 animate-pulse",  label: "Extracting…",         hint: "Running AI extraction." },
-  complete:              { dot: "bg-rose-700",             label: "Complete",             hint: "Workflow finished. Candidate ready." },
+  transcribing:          { dot: "bg-aubergine-400 animate-pulse",  label: "Transcribing…",        hint: "Call ended. Generating transcript." },
+  ready:                 { dot: "bg-aubergine-700",                label: "Transcript ready",     hint: "Running extraction pipeline." },
+  extracting:            { dot: "bg-aubergine-400 animate-pulse",  label: "Extracting…",         hint: "Running AI extraction." },
+  complete:              { dot: "bg-aubergine-700",             label: "Complete",             hint: "Workflow finished. Candidate ready." },
   failed:                { dot: "bg-red-500",                 label: "Failed",               hint: "Something went wrong." },
 };
 
@@ -234,7 +234,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
           <div className={[
             "rounded-lg border px-3 py-2.5",
             botStatus === "complete"
-              ? "border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/20"
+              ? "border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/20"
               : botStatus === "failed"
               ? "border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/20"
               : "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20",
@@ -264,7 +264,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
                 {botStatus === "complete" && data.botCandidateId && (
                   <a
                     href={`/review/${data.botCandidateId}`}
-                    className="text-[10px] font-medium text-rose-800 hover:text-rose-900"
+                    className="text-[10px] font-medium text-aubergine-800 hover:text-aubergine-900"
                   >
                     Review →
                   </a>
@@ -297,7 +297,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
             className={[
               "w-full rounded-lg border bg-stone-50 dark:bg-stone-800 px-3 py-2",
               "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
-              "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-rose-700",
+              "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
             ].join(" ")}
             placeholder="e.g. REQ-1042"
             value={data.jobReference}
@@ -317,7 +317,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
           className={[
             "w-full rounded-lg border bg-stone-50 dark:bg-stone-800 px-3 py-2",
             "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
-            "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-rose-700",
+            "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
           ].join(" ")}
           placeholder="https://zoom.us/j/12345678901"
           value={url}
@@ -331,7 +331,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
           className={[
             "w-full rounded-lg border bg-stone-50 dark:bg-stone-800 px-3 py-2",
             "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
-            "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-rose-700",
+            "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
           ].join(" ")}
           placeholder="e.g. Acme Corp – Eng screen"
           value={label}
@@ -345,7 +345,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
           className={[
             "w-full rounded-lg border bg-stone-50 dark:bg-stone-800 px-3 py-2",
             "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
-            "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-rose-700",
+            "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
           ].join(" ")}
           placeholder="e.g. REQ-1042"
           value={data.jobReference}
@@ -368,7 +368,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
               className={[
                 "relative inline-flex w-8 h-4.5 rounded-full border-2 transition-colors flex-shrink-0 ml-3",
                 autoRun
-                  ? "bg-rose-700 border-rose-700"
+                  ? "bg-aubergine-700 border-aubergine-700"
                   : "bg-stone-200 dark:bg-stone-700 border-stone-200 dark:border-stone-700",
               ].join(" ")}
             >
@@ -393,7 +393,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
         disabled={sending || !url.trim()}
         className={[
           "w-full rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-          "bg-rose-800 text-white hover:bg-rose-900 active:bg-rose-900",
+          "bg-aubergine-800 text-white hover:bg-aubergine-900 active:bg-aubergine-900",
           "disabled:opacity-40 disabled:cursor-not-allowed",
         ].join(" ")}
       >
@@ -492,7 +492,7 @@ function ZoomPicker({ id, data, update }: ZoomPickerProps) {
           type="button"
           onClick={load}
           disabled={loading}
-          className="text-[10px] font-medium text-rose-800 hover:text-rose-900 disabled:opacity-40"
+          className="text-[10px] font-medium text-aubergine-800 hover:text-aubergine-900 disabled:opacity-40"
         >
           {loading ? "Loading…" : "Refresh"}
         </button>
@@ -568,7 +568,7 @@ function ZoomPicker({ id, data, update }: ZoomPickerProps) {
 const STATUS_META: Record<MeetingSession["status"], { dot: string; label: string }> = {
   transcribing: { dot: "bg-amber-400",   label: "Transcribing…" },
   extracting:   { dot: "bg-blue-400",    label: "Extracting…"   },
-  complete:     { dot: "bg-rose-700", label: "Complete"      },
+  complete:     { dot: "bg-aubergine-700", label: "Complete"      },
   failed:       { dot: "bg-red-500",     label: "Failed"        },
 };
 
@@ -628,11 +628,11 @@ function AutoSessionsPanel() {
                 </div>
               </div>
               <div className="flex-shrink-0 text-right">
-                <p className={`text-[10px] font-medium ${s.status === "complete" ? "text-rose-700" : s.status === "failed" ? "text-red-500" : "text-stone-400"}`}>
+                <p className={`text-[10px] font-medium ${s.status === "complete" ? "text-aubergine-700" : s.status === "failed" ? "text-red-500" : "text-stone-400"}`}>
                   {meta.label}
                 </p>
                 {s.status === "complete" && s.candidate_id && (
-                  <a href={`/review/${s.candidate_id}`} className="text-[10px] text-rose-800 hover:text-rose-900 font-medium">
+                  <a href={`/review/${s.candidate_id}`} className="text-[10px] text-aubergine-800 hover:text-aubergine-900 font-medium">
                     Review →
                   </a>
                 )}
