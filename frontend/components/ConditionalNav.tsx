@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import SiteNav from "./marketing/SiteNav";
 import { modeFromPath } from "@/lib/mode";
+import { LogoMark } from "@/components/ui/LogoMark";
 
 const MARKETING_PATHS = new Set(["/", "/pricing"]);
 const AUTH_PATHS      = new Set(["/signin", "/signup"]);
@@ -33,9 +34,13 @@ export default function ConditionalNav() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="font-display italic text-[18px] leading-none text-stone-900 dark:text-stone-100 hover:opacity-70 transition-opacity"
+            className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+            aria-label="SoraBase home"
           >
-            SoraBase
+            <LogoMark size={18} className="text-stone-900 dark:text-stone-100" />
+            <span className="font-display italic text-[18px] leading-none text-stone-900 dark:text-stone-100">
+              SoraBase
+            </span>
           </Link>
 
           <div className="h-3.5 w-px bg-stone-200 dark:bg-stone-700" />

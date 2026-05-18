@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "./ThemeProvider";
 import { useAuth } from "@/lib/auth-context";
 import { getRedirectForUser } from "@/lib/auth";
+import { LogoMark } from "@/components/ui/LogoMark";
 
 export default function SiteNav() {
   const [scrolled,   setScrolled]   = useState(false);
@@ -36,12 +37,16 @@ export default function SiteNav() {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-10 h-[60px] flex items-center justify-between gap-8">
 
-        {/* ── Wordmark ─────────────────────────────────────────────────── */}
+        {/* ── Logo + Wordmark ───────────────────────────────────────────── */}
         <Link
           href="/"
-          className="flex-shrink-0 font-display italic text-[22px] leading-none text-stone-900 dark:text-stone-100 hover:opacity-75 transition-opacity"
+          className="flex-shrink-0 flex items-center gap-2.5 hover:opacity-75 transition-opacity"
+          aria-label="SoraBase home"
         >
-          SoraBase
+          <LogoMark size={22} className="text-stone-900 dark:text-stone-100" />
+          <span className="font-display italic text-[22px] leading-none text-stone-900 dark:text-stone-100">
+            SoraBase
+          </span>
         </Link>
 
         {/* ── Desktop nav links ─────────────────────────────────────────── */}

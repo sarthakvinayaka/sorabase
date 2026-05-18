@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     type:        "website",
     title:       "SoraBase — Meeting Intelligence Platform",
     description: "From every meeting, a structured record.",
+    images:      [{ url: "/logo.svg", width: 100, height: 100 }],
+  },
+  icons: {
+    icon:        [{ url: "/logo.svg", type: "image/svg+xml" }],
+    apple:       [{ url: "/logo.svg" }],
   },
 };
 

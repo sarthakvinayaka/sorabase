@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/ui/LogoMark";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,9 +11,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <header className="h-16 flex items-center px-8 lg:px-12 flex-shrink-0">
           <Link
             href="/"
-            className="font-display italic text-[20px] leading-none text-stone-900 dark:text-stone-100 hover:opacity-70 transition-opacity"
+            className="flex items-center gap-2.5 hover:opacity-70 transition-opacity"
+            aria-label="SoraBase home"
           >
-            SoraBase
+            <LogoMark size={20} className="text-stone-900 dark:text-stone-100" />
+            <span className="font-display italic text-[20px] leading-none text-stone-900 dark:text-stone-100">
+              SoraBase
+            </span>
           </Link>
         </header>
 
