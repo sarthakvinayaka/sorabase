@@ -13,6 +13,7 @@ import type {
   SchemaNodeData,
   WorkflowNodeType,
 } from "@/lib/workflow-types";
+import { NODE_PALETTE, GENERAL_NODE_PALETTE } from "@/lib/workflow-types";
 import SourceInspector from "./inspector/SourceInspector";
 import ExtractionInspector from "./inspector/ExtractionInspector";
 import AnalysisInspector from "./inspector/AnalysisInspector";
@@ -46,9 +47,11 @@ const TYPE_META: Record<WorkflowNodeType, { icon: string; accent: string }> = {
 };
 
 export default function InspectorPanel() {
-  const nodes          = useWorkflowStoreContext((s) => s.nodes);
-  const selectedNodeId = useWorkflowStoreContext((s) => s.selectedNodeId);
-  const selectedNode   = nodes.find((n) => n.id === selectedNodeId);
+  const nodes                  = useWorkflowStoreContext((s) => s.nodes);
+  const selectedNodeId         = useWorkflowStoreContext((s) => s.selectedNodeId);
+  const selectedLibraryNodeType = useWorkflowStoreContext((s) => s.selectedLibraryNodeType);
+  const selectedNode            = nodes.find((n) => n.id === selectedNodeId);
+  const { mode }               = useWorkflowMode();
 
   const [width, setWidth]    = useState(DEFAULT_WIDTH);
   const dragging             = useRef(false);
@@ -100,12 +103,16 @@ export default function InspectorPanel() {
 
       {/* Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {!selectedNode ? <EmptyState /> : (
+        {selectedNode ? (
           <SelectedState
             id={selectedNode.id}
             type={selectedNode.type as WorkflowNodeType}
             data={selectedNode.data as AnyNodeData}
           />
+        ) : selectedLibraryNodeType ? (
+          <LibraryNodePreview type={selectedLibraryNodeType} mode={mode} />
+        ) : (
+          <EmptyState />
         )}
       </div>
     </aside>
@@ -122,9 +129,93 @@ function EmptyState() {
         No node selected
       </p>
       <p className="text-2xs text-stone-400 dark:text-stone-500 mt-1 leading-relaxed">
-        Click any node on the canvas to configure it here.
+        Click a node in the left panel to preview it, or click any canvas node to configure it.
       </p>
     </div>
+  );
+}
+
+interface LibraryNodePreviewProps { type: WorkflowNodeType; mode: string }
+
+const NODE_DESCRIPTIONS: Record<WorkflowNodeType, string[]> = {
+  source:     ["Accepts transcript text, audio file, Zoom recording, or a live meeting bot.", "Connect to any downstream processing node."],
+  extraction: ["Runs an AI extraction pipeline over the transcript.", "Produces a structured data record based on your schema."],
+  analysis:   ["Scores the candidate against a job description.", "Returns tier (A/B/C/D) and rationale for each criterion."],
+  output:     ["Packages results and delivers them to the dashboard.", "Optionally exports JSON, CSV, or calls a webhook."],
+  transcript: ["Holds the cleaned conversation text.", "Feeds downstream schema and extraction nodes."],
+  summary:    ["Generates an AI narrative summary of the conversation.", "Appears in the results view alongside extracted data."],
+  schema:     ["Proposes structured columns based on the transcript.", "Columns can be reviewed and edited before extraction runs."],
+};
+
+function LibraryNodePreview({ type, mode }: LibraryNodePreviewProps) {
+  const addNodeAuto            = useWorkflowStoreContext((s) => s.addNodeAuto);
+  const setSelectedLibraryNode = useWorkflowStoreContext((s) => s.setSelectedLibraryNode);
+  const palette                = mode === "general" ? GENERAL_NODE_PALETTE : NODE_PALETTE;
+  const item                   = palette.find((p) => p.type === type);
+  const meta                   = TYPE_META[type];
+  const descriptions           = NODE_DESCRIPTIONS[type];
+
+  function handleAdd() {
+    addNodeAuto(type);
+    // addNodeAuto already clears selectedLibraryNodeType and sets selectedNodeId
+  }
+
+  return (
+    <>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-stone-100 dark:border-stone-800 flex-shrink-0 min-h-[44px]">
+        <div className="flex items-center gap-2">
+          <span className={`text-sm font-mono leading-none ${meta.accent}`}>{meta.icon}</span>
+          <div>
+            <p className="text-xs font-semibold text-stone-700 dark:text-stone-300">
+              {item?.label ?? TYPE_LABEL[type]}
+            </p>
+            <p className="text-2xs text-stone-400 dark:text-stone-500">library preview</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setSelectedLibraryNode(null)}
+          title="Close preview"
+          className="w-6 h-6 rounded flex items-center justify-center text-stone-300 dark:text-stone-600 hover:text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
+        <div className="space-y-2">
+          {descriptions.map((line, i) => (
+            <p key={i} className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
+              {line}
+            </p>
+          ))}
+        </div>
+
+        {item?.description && (
+          <p className="text-2xs text-stone-400 dark:text-stone-500 italic leading-relaxed border-t border-stone-100 dark:border-stone-800 pt-3">
+            {item.description}
+          </p>
+        )}
+
+        <div className="pt-1 border-t border-stone-100 dark:border-stone-800">
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded text-xs font-medium bg-aubergine-600 hover:bg-aubergine-700 text-white transition-colors"
+          >
+            <span>Add to canvas</span>
+            <span className="text-aubergine-300">→</span>
+          </button>
+          <p className="text-2xs text-stone-400 dark:text-stone-500 text-center mt-2">
+            or drag from the left panel
+          </p>
+        </div>
+      </div>
+    </>
   );
 }
 

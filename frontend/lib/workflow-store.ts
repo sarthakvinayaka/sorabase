@@ -151,6 +151,7 @@ export interface WorkflowStore {
   nodes: WorkflowNode[];
   edges: WorkflowEdge[];
   selectedNodeId: string | null;
+  selectedLibraryNodeType: WorkflowNodeType | null;
 
   // Run state
   runState: RunState;
@@ -171,6 +172,7 @@ export interface WorkflowStore {
   updateNodeData: (id: string, patch: Partial<Record<string, unknown>>) => void;
   removeNode: (id: string) => void;
   setSelectedNode: (id: string | null) => void;
+  setSelectedLibraryNode: (type: WorkflowNodeType | null) => void;
   resetWorkflow: () => void;
   newCandidate: () => void;
 
@@ -240,13 +242,14 @@ function createWorkflowStore({
   return create<WorkflowStore>()(
     persist(
       (set, get) => ({
-        nodes:          initialNodes,
-        edges:          initialEdges,
-        selectedNodeId: null,
-        runState:       "idle",
-        logEntries:     [],
-        isDark:         false,
-        logOpen:        false,
+        nodes:                   initialNodes,
+        edges:                   initialEdges,
+        selectedNodeId:          null,
+        selectedLibraryNodeType: null,
+        runState:                "idle",
+        logEntries:              [],
+        isDark:                  false,
+        logOpen:                 false,
 
         onNodesChange: (changes) => {
           const safe = changes.filter((c) => !(c.type === "remove" && coreNodeIds.has(c.id)));
@@ -294,7 +297,7 @@ function createWorkflowStore({
             : { x: 60 + col * 280, y: 160 + row * 180 };
           const id      = `${type}-${nanoid()}`;
           const newNode: WorkflowNode = { id, type, position, data: makeDefaultData(type, labels[type]) };
-          set({ nodes: [...get().nodes, newNode], selectedNodeId: id });
+          set({ nodes: [...get().nodes, newNode], selectedNodeId: id, selectedLibraryNodeType: null });
           return id;
         },
 
@@ -316,14 +319,17 @@ function createWorkflowStore({
           });
         },
 
-        setSelectedNode: (id) => set({ selectedNodeId: id }),
+        setSelectedNode: (id) => set({ selectedNodeId: id, selectedLibraryNodeType: null }),
+
+        setSelectedLibraryNode: (type) => set({ selectedLibraryNodeType: type, selectedNodeId: null }),
 
         resetWorkflow: () => set({
-          nodes:          initialNodes,
-          edges:          initialEdges,
-          selectedNodeId: null,
-          runState:       "idle",
-          logEntries:     [],
+          nodes:                   initialNodes,
+          edges:                   initialEdges,
+          selectedNodeId:          null,
+          selectedLibraryNodeType: null,
+          runState:                "idle",
+          logEntries:              [],
         }),
 
         newCandidate: () => {
@@ -410,7 +416,7 @@ function createWorkflowStore({
                 return { ...n, data: { ...d, status: "idle" as const } };
             }
           });
-          set({ nodes: updatedNodes, selectedNodeId: null, runState: "idle", logEntries: [] });
+          set({ nodes: updatedNodes, selectedNodeId: null, selectedLibraryNodeType: null, runState: "idle", logEntries: [] });
         },
 
         setRunState: (state) => set({ runState: state }),

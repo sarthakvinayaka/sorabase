@@ -24,10 +24,11 @@ const ACCENT_BG: Record<WorkflowNodeType, string> = {
 };
 
 export default function NodeLibrary() {
-  const addNodeAuto   = useWorkflowStoreContext((s) => s.addNodeAuto);
-  const resetWorkflow = useWorkflowStoreContext((s) => s.resetWorkflow);
-  const { mode }      = useWorkflowMode();
-  const palette       = mode === "general" ? GENERAL_NODE_PALETTE : NODE_PALETTE;
+  const setSelectedLibraryNode    = useWorkflowStoreContext((s) => s.setSelectedLibraryNode);
+  const selectedLibraryNodeType   = useWorkflowStoreContext((s) => s.selectedLibraryNodeType);
+  const resetWorkflow             = useWorkflowStoreContext((s) => s.resetWorkflow);
+  const { mode }                  = useWorkflowMode();
+  const palette                   = mode === "general" ? GENERAL_NODE_PALETTE : NODE_PALETTE;
 
   function onDragStart(e: React.DragEvent, type: WorkflowNodeType) {
     e.dataTransfer.setData("application/reactflow", type);
@@ -38,20 +39,24 @@ export default function NodeLibrary() {
     <aside className="w-48 flex-shrink-0 flex flex-col bg-stone-50 dark:bg-stone-950 border-r border-stone-200 dark:border-stone-700 overflow-y-auto">
 
       <div className="px-3 pt-4 pb-3">
-        <p className="section-label mb-3">Add node</p>
+        <p className="section-label mb-3">Nodes</p>
         <div className="space-y-1">
-          {palette.map((item) => (
+          {palette.map((item) => {
+            const isSelected = selectedLibraryNodeType === item.type;
+            return (
             <div
               key={item.type}
               draggable={!item.comingSoon}
-              onClick={() => !item.comingSoon && addNodeAuto(item.type)}
+              onClick={() => !item.comingSoon && setSelectedLibraryNode(item.type)}
               onDragStart={(e) => !item.comingSoon && onDragStart(e, item.type)}
-              title={item.comingSoon ? "Coming soon" : `Add ${item.label} node`}
+              title={item.comingSoon ? "Coming soon" : `Preview ${item.label} node`}
               className={[
                 "rounded border px-2.5 py-2 flex items-start gap-2 transition-colors",
                 item.comingSoon
                   ? "opacity-35 cursor-not-allowed border-stone-150 dark:border-stone-800 bg-transparent"
-                  : "cursor-pointer select-none border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 hover:bg-stone-25 dark:hover:bg-stone-800 active:scale-[0.98]",
+                  : isSelected
+                    ? "cursor-pointer select-none border-aubergine-400 dark:border-aubergine-600 bg-aubergine-50 dark:bg-aubergine-950/30 ring-1 ring-aubergine-300 dark:ring-aubergine-700"
+                    : "cursor-pointer select-none border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 hover:bg-stone-25 dark:hover:bg-stone-800 active:scale-[0.98]",
               ].join(" ")}
             >
               {/* Icon chip */}
@@ -70,6 +75,8 @@ export default function NodeLibrary() {
                     <span className="text-2xs font-medium text-stone-400 dark:text-stone-500 border border-stone-200 dark:border-stone-700 rounded-xs px-1">
                       soon
                     </span>
+                  ) : isSelected ? (
+                    <span className="text-aubergine-500 dark:text-aubergine-400 text-xs leading-none">›</span>
                   ) : (
                     <span className="text-stone-300 dark:text-stone-600 text-xs leading-none">+</span>
                   )}
@@ -79,7 +86,8 @@ export default function NodeLibrary() {
                 </p>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -88,8 +96,8 @@ export default function NodeLibrary() {
       <div className="px-3 py-3 space-y-3">
         <p className="text-2xs text-stone-400 dark:text-stone-500 leading-relaxed">
           {mode === "general"
-            ? "Click to add · or drag to canvas. Input → Transcript → Schema → Extraction → Output."
-            : "Click to add · or drag to canvas. Connect nodes: Source → AI Scoring → Extraction → Output."}
+            ? "Click to preview · drag to canvas."
+            : "Click to preview · drag to canvas."}
         </p>
         <button
           type="button"
