@@ -43,7 +43,7 @@ export default function SiteNav() {
           className="flex-shrink-0 flex items-center gap-2.5 hover:opacity-75 transition-opacity"
           aria-label="SoraBase home"
         >
-          <LogoMark size={22} className="text-stone-900 dark:text-stone-100" />
+          <LogoMark size={28} className="text-stone-900 dark:text-stone-100" />
           <span className="font-display italic text-[22px] leading-none text-stone-900 dark:text-stone-100">
             SoraBase
           </span>

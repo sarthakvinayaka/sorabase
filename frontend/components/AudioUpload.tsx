@@ -75,7 +75,7 @@ export default function AudioUpload() {
         className={[
           "relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-10 text-sm transition-colors",
           dragOver
-            ? "border-teal-500 bg-teal-50"
+            ? "border-rose-700 bg-rose-50"
             : "border-stone-200 bg-stone-50 hover:border-stone-300 hover:bg-white",
           isWorking ? "cursor-not-allowed opacity-60" : "cursor-pointer",
           state === "error" ? "border-red-300 bg-red-50" : "",

@@ -15,7 +15,7 @@ import { SubmittalDraftPanel } from "@/components/review/SubmittalDraftPanel";
 // ---------------------------------------------------------------------------
 
 const TIER_STYLES: Record<AnalysisTier, string> = {
-  strong_fit: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  strong_fit: "bg-rose-100 text-rose-900 border-rose-200",
   good_fit: "bg-green-100 text-green-800 border-green-200",
   partial_fit: "bg-yellow-100 text-yellow-800 border-yellow-200",
   weak_fit: "bg-orange-100 text-orange-800 border-orange-200",
@@ -47,9 +47,9 @@ const DIMENSION_WEIGHTS: Record<string, string> = {
 function ScoreBar({ score }: { score: number }) {
   const color =
     score >= 85
-      ? "bg-emerald-500"
+      ? "bg-rose-700"
       : score >= 70
-      ? "bg-green-500"
+      ? "bg-rose-700"
       : score >= 50
       ? "bg-yellow-500"
       : score >= 30
@@ -80,7 +80,7 @@ function RequirementList({
         <li key={i} className="flex gap-2 text-sm">
           <span className="mt-0.5 flex-shrink-0">
             {met ? (
-              <span className="text-emerald-600">✓</span>
+              <span className="text-rose-800">✓</span>
             ) : (
               <span className="text-red-500">✗</span>
             )}
@@ -206,10 +206,10 @@ function AnalysisView({ run }: { run: AnalysisRun }) {
       {/* Strengths / Gaps / Concerns */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <h4 className="text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-2">
+          <h4 className="text-xs font-semibold text-rose-800 uppercase tracking-wider mb-2">
             Strengths
           </h4>
-          <BulletList items={run.strengths ?? []} color="text-emerald-700" />
+          <BulletList items={run.strengths ?? []} color="text-rose-900" />
         </div>
         <div>
           <h4 className="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-2">
@@ -337,7 +337,7 @@ export function AnalysisPanel({ candidateId }: { candidateId: string }) {
               onClick={() => setActiveAnalysis(run)}
               className={`text-xs px-2 py-1 rounded border ${
                 activeAnalysis?.id === run.id
-                  ? "bg-blue-50 border-teal-300 text-blue-700"
+                  ? "bg-blue-50 border-rose-300 text-blue-700"
                   : "border-stone-200 text-stone-500 hover:border-stone-300"
               }`}
             >

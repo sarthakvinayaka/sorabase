@@ -206,7 +206,7 @@ export default function SchemaInspector({ id, data }: Props) {
                 key={tmpl.id}
                 type="button"
                 onClick={() => handleLoadTemplate(tmpl)}
-                className="w-full text-left rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 px-3 py-2 hover:border-teal-400 dark:hover:border-teal-600 transition-colors"
+                className="w-full text-left rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 px-3 py-2 hover:border-rose-400 dark:hover:border-rose-800 transition-colors"
               >
                 <p className="text-xs font-medium text-stone-700 dark:text-stone-300">{tmpl.name}</p>
                 <p className="text-[10px] text-stone-400 dark:text-stone-500">
@@ -324,7 +324,7 @@ export default function SchemaInspector({ id, data }: Props) {
           <div className="flex gap-2">
             <input
               type="text"
-              className="flex-1 min-w-0 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className="flex-1 min-w-0 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 px-3 py-1.5 text-xs text-stone-800 dark:text-stone-200 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-rose-700"
               placeholder="Template name…"
               value={saveName}
               onChange={(e) => setSaveName(e.target.value)}
@@ -333,13 +333,13 @@ export default function SchemaInspector({ id, data }: Props) {
               type="button"
               onClick={handleSaveTemplate}
               disabled={saving || !saveName.trim()}
-              className="rounded-lg border border-teal-300 dark:border-teal-700 bg-teal-50 dark:bg-teal-950/20 px-3 py-1.5 text-xs font-medium text-teal-700 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-950/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+              className="rounded-lg border border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/20 px-3 py-1.5 text-xs font-medium text-rose-900 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
             >
               {saving ? "Saving…" : "Save"}
             </button>
           </div>
           {saveMsg && (
-            <p className="text-[10px] text-teal-600 dark:text-teal-400 mt-1">{saveMsg}</p>
+            <p className="text-[10px] text-rose-800 dark:text-rose-400 mt-1">{saveMsg}</p>
           )}
         </Field>
       )}
@@ -347,12 +347,12 @@ export default function SchemaInspector({ id, data }: Props) {
       {/* ── Approve ──────────────────────────────────────────────────────── */}
       <div className="pt-1">
         {isApproved ? (
-          <div className="rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-950/20 px-3 py-2.5 flex items-center justify-between">
+          <div className="rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/20 px-3 py-2.5 flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-teal-700 dark:text-teal-400">
+              <p className="text-xs font-semibold text-rose-900 dark:text-rose-400">
                 Schema approved
               </p>
-              <p className="text-[10px] text-teal-600/70 dark:text-teal-500/70 mt-0.5">
+              <p className="text-[10px] text-rose-800/70 dark:text-rose-700/70 mt-0.5">
                 {columns.length} columns · ready for extraction
               </p>
             </div>
@@ -362,7 +362,7 @@ export default function SchemaInspector({ id, data }: Props) {
                 setColumns(data.columns);
                 update(id, { schemaStatus: "proposed", status: "idle" });
               }}
-              className="text-[10px] text-teal-500 hover:text-teal-700 dark:hover:text-teal-300 font-medium transition-colors flex-shrink-0 ml-3"
+              className="text-[10px] text-rose-700 hover:text-rose-900 dark:hover:text-rose-300 font-medium transition-colors flex-shrink-0 ml-3"
             >
               Edit
             </button>
@@ -375,7 +375,7 @@ export default function SchemaInspector({ id, data }: Props) {
             className={[
               "w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors",
               canApprove
-                ? "bg-teal-600 hover:bg-teal-700 text-white"
+                ? "bg-rose-800 hover:bg-rose-900 text-white"
                 : "bg-stone-100 dark:bg-stone-800 text-stone-300 dark:text-stone-600 cursor-not-allowed",
             ].join(" ")}
           >

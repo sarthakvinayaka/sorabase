@@ -40,7 +40,7 @@ export default function Toolbar({ onRun }: Props) {
           href={isRecruiting ? "/candidates" : "/"}
           className="text-sm font-semibold tracking-tight text-stone-900 dark:text-stone-100 hover:opacity-60 transition-opacity"
         >
-          Pilot<span className="text-teal-600">.</span>
+          Pilot<span className="text-rose-800">.</span>
         </Link>
         <div className="h-3.5 w-px bg-stone-200 dark:bg-stone-700" />
         <span className="text-xs text-stone-400 dark:text-stone-500">{contextLabel}</span>
@@ -80,7 +80,7 @@ export default function Toolbar({ onRun }: Props) {
           className={[
             "flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs font-medium transition-colors border",
             isCompleted
-              ? "border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/20 hover:bg-teal-100 dark:hover:bg-teal-900/40"
+              ? "border-rose-300 dark:border-rose-900 text-rose-900 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-950/40"
               : "border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:border-stone-300 dark:hover:border-stone-600 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800",
           ].join(" ")}
         >
@@ -98,7 +98,7 @@ export default function Toolbar({ onRun }: Props) {
               "flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold transition-colors",
               isBlocked
                 ? "bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 cursor-not-allowed"
-                : "bg-teal-600 hover:bg-teal-700 text-white",
+                : "bg-rose-800 hover:bg-rose-900 text-white",
             ].join(" ")}
           >
             {isBlocked ? <SpinIcon /> : <PlayIcon />}

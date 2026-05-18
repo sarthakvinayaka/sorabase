@@ -6,8 +6,8 @@ import { NODE_PALETTE, GENERAL_NODE_PALETTE, type WorkflowNodeType } from "@/lib
 const ACCENT_TEXT: Record<WorkflowNodeType, string> = {
   source:     "text-stone-400",
   analysis:   "text-amber-600",
-  extraction: "text-teal-600",
-  output:     "text-emerald-600",
+  extraction: "text-rose-800",
+  output:     "text-rose-800",
   transcript: "text-blue-500",
   summary:    "text-amber-500",
   schema:     "text-violet-500",
@@ -16,8 +16,8 @@ const ACCENT_TEXT: Record<WorkflowNodeType, string> = {
 const ACCENT_BG: Record<WorkflowNodeType, string> = {
   source:     "bg-stone-100 dark:bg-stone-800",
   analysis:   "bg-amber-50 dark:bg-amber-900/20",
-  extraction: "bg-teal-50 dark:bg-teal-900/20",
-  output:     "bg-emerald-50 dark:bg-emerald-900/20",
+  extraction: "bg-rose-50 dark:bg-rose-950/20",
+  output:     "bg-rose-50 dark:bg-rose-950/20",
   transcript: "bg-blue-50 dark:bg-blue-900/20",
   summary:    "bg-amber-50 dark:bg-amber-900/20",
   schema:     "bg-violet-50 dark:bg-violet-900/20",

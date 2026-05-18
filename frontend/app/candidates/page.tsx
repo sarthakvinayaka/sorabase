@@ -86,7 +86,7 @@ export default function CandidatesPage() {
             className={[
               "px-3 py-1.5 text-xs font-medium rounded border transition-colors",
               filter === value
-                ? "bg-teal-600 text-white border-teal-600"
+                ? "bg-rose-800 text-white border-rose-800"
                 : "bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600",
             ].join(" ")}
           >
@@ -105,7 +105,7 @@ export default function CandidatesPage() {
       {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-20 gap-2 text-sm text-stone-400">
-          <span className="w-4 h-4 rounded-full border-2 border-teal-400 border-t-transparent animate-spin" />
+          <span className="w-4 h-4 rounded-full border-2 border-rose-400 border-t-transparent animate-spin" />
           Loading…
         </div>
       )}
@@ -120,11 +120,11 @@ export default function CandidatesPage() {
           </div>
           <p className="text-sm font-medium text-stone-500 dark:text-stone-400">No candidates found</p>
           {filter ? (
-            <button onClick={() => setFilterAndReset("")} className="text-xs text-teal-600 dark:text-teal-400 hover:underline">
+            <button onClick={() => setFilterAndReset("")} className="text-xs text-rose-800 dark:text-rose-400 hover:underline">
               Clear filter
             </button>
           ) : (
-            <Link href="/workflow" className="text-xs text-teal-600 dark:text-teal-400 hover:underline">
+            <Link href="/workflow" className="text-xs text-rose-800 dark:text-rose-400 hover:underline">
               Start a new screening →
             </Link>
           )}
@@ -186,7 +186,7 @@ export default function CandidatesPage() {
                     <td className="py-3.5 pr-6 text-right">
                       <Link
                         href={`/review/${item.id}`}
-                        className="text-xs font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+                        className="text-xs font-medium text-rose-800 dark:text-rose-400 hover:text-rose-900 dark:hover:text-rose-300 transition-colors"
                       >
                         Review →
                       </Link>

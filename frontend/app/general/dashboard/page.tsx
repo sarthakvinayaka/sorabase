@@ -43,7 +43,7 @@ function widgetKind(field: GeneralFieldStats): WidgetKind {
 
 const TYPE_COLORS: Record<string, string> = {
   boolean: "bg-amber-400",
-  list:    "bg-teal-500",
+  list:    "bg-rose-700",
   date:    "bg-orange-400",
   text:    "bg-stone-400",
   number:  "bg-violet-500",
@@ -59,7 +59,7 @@ function FillBar({ rate }: { rate: number }) {
     <div className="flex items-center gap-2 mt-2">
       <div className="flex-1 h-1.5 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all ${pct >= 80 ? "bg-teal-500" : pct >= 50 ? "bg-amber-400" : "bg-red-400"}`}
+          className={`h-full rounded-full transition-all ${pct >= 80 ? "bg-rose-700" : pct >= 50 ? "bg-amber-400" : "bg-red-400"}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -151,7 +151,7 @@ export default function GeneralDashboardPage() {
     return (
       <main className="page">
         <div className="flex items-center gap-2 text-sm text-stone-400">
-          <span className="w-4 h-4 rounded-full border-2 border-teal-400 border-t-transparent animate-spin inline-block" />
+          <span className="w-4 h-4 rounded-full border-2 border-rose-400 border-t-transparent animate-spin inline-block" />
           Loading…
         </div>
       </main>
@@ -253,7 +253,7 @@ export default function GeneralDashboardPage() {
             <Card title="Sessions by confidence band">
               <HorizontalBar
                 items={stats.confidence_distribution}
-                colorClass="bg-teal-500"
+                colorClass="bg-rose-700"
               />
             </Card>
           </div>

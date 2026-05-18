@@ -5,7 +5,7 @@ import BaseNode from "./BaseNode";
 const STATUS_CHIP: Record<string, { label: string; cls: string }> = {
   empty:    { label: "Not configured",  cls: "text-stone-400 dark:text-stone-500" },
   proposed: { label: "Pending review",  cls: "text-amber-600 dark:text-amber-400" },
-  approved: { label: "Approved",        cls: "text-teal-600 dark:text-teal-400"   },
+  approved: { label: "Approved",        cls: "text-rose-800 dark:text-rose-400"   },
 };
 
 export default function SchemaNode({ id, data: raw, selected }: NodeProps) {

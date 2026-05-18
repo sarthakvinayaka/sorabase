@@ -51,7 +51,7 @@ export default function TranscriptInput() {
           onChange={(e) => setText(e.target.value)}
           placeholder="Paste the full text of the recruiter screening call here…"
           rows={18}
-          className={`w-full rounded-xl border px-4 py-3 text-sm text-stone-900 placeholder-stone-400 font-mono leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+          className={`w-full rounded-xl border px-4 py-3 text-sm text-stone-900 placeholder-stone-400 font-mono leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-rose-700 ${
             overLimit
               ? "border-red-400 bg-red-50"
               : "border-stone-300 bg-white"
@@ -81,7 +81,7 @@ export default function TranscriptInput() {
           value={jobRef}
           onChange={(e) => setJobRef(e.target.value)}
           placeholder="e.g. JOB-4912 or Client Name"
-          className="w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+          className="w-full rounded-xl border border-stone-300 px-4 py-2.5 text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-rose-700"
         />
       </div>
 
@@ -92,7 +92,7 @@ export default function TranscriptInput() {
       )}
 
       {phase !== "idle" && (
-        <div className="rounded-xl bg-teal-50 border border-teal-50 px-4 py-3 text-sm text-teal-600 flex items-center gap-2">
+        <div className="rounded-xl bg-rose-50 border border-rose-50 px-4 py-3 text-sm text-rose-800 flex items-center gap-2">
           <svg className="animate-spin h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
@@ -106,7 +106,7 @@ export default function TranscriptInput() {
       <button
         onClick={handleSubmit}
         disabled={tooShort || overLimit || phase !== "idle"}
-        className="w-full rounded-xl bg-teal-600 text-white font-medium py-3 text-sm hover:bg-teal-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full rounded-xl bg-rose-800 text-white font-medium py-3 text-sm hover:bg-rose-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {phase === "idle" ? "Extract candidate profile →" : "Processing…"}
       </button>

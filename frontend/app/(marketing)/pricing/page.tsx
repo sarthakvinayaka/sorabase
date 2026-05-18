@@ -229,7 +229,7 @@ function PlanCard({ plan }: { plan: (typeof PLANS)[number] }) {
       className={[
         "rounded-xl border flex flex-col overflow-hidden",
         plan.primary
-          ? "border-teal-300 dark:border-teal-700 bg-white dark:bg-stone-900 ring-1 ring-teal-200/60 dark:ring-teal-800/40"
+          ? "border-rose-300 dark:border-rose-900 bg-white dark:bg-stone-900 ring-1 ring-rose-200/60 dark:ring-rose-900/40"
           : "border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900",
       ].join(" ")}
     >
@@ -238,7 +238,7 @@ function PlanCard({ plan }: { plan: (typeof PLANS)[number] }) {
         className={[
           "px-7 pt-7 pb-6 border-b",
           plan.primary
-            ? "border-teal-100 dark:border-teal-900/60"
+            ? "border-rose-100 dark:border-rose-950/60"
             : "border-stone-100 dark:border-stone-800",
         ].join(" ")}
       >
@@ -368,7 +368,7 @@ function ComparisonTable() {
                     <td className="px-4 py-3 text-center">
                       <TableCell value={row.free} />
                     </td>
-                    <td className="px-4 py-3 text-center bg-teal-50/20 dark:bg-teal-950/10">
+                    <td className="px-4 py-3 text-center bg-rose-50/20 dark:bg-rose-950/10">
                       <TableCell value={row.pro} />
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -389,7 +389,7 @@ function TableCell({ value }: { value: CellValue }) {
   if (typeof value === "boolean") {
     return value ? (
       <span className="inline-flex items-center justify-center">
-        <svg className="w-4 h-4 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <svg className="w-4 h-4 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </span>
@@ -430,8 +430,8 @@ function AccessModeSection() {
 
         <div className="px-8 py-8 lg:px-10">
           <div className="flex items-center gap-2 mb-5">
-            <span className="w-2 h-2 rounded-full bg-teal-500 flex-shrink-0" />
-            <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-teal-600 dark:text-teal-400">
+            <span className="w-2 h-2 rounded-full bg-rose-700 flex-shrink-0" />
+            <span className="text-[10px] font-semibold tracking-[0.12em] uppercase text-rose-800 dark:text-rose-400">
               Recruiter Mode
             </span>
           </div>
@@ -452,7 +452,7 @@ function AccessModeSection() {
               "JSON export or ATS push",
             ].map((item) => (
               <li key={item} className="flex items-center gap-2.5 text-[13px] text-stone-600 dark:text-stone-300">
-                <span className="w-1 h-1 rounded-full bg-teal-400 flex-shrink-0" />
+                <span className="w-1 h-1 rounded-full bg-rose-400 flex-shrink-0" />
                 {item}
               </li>
             ))}
@@ -568,7 +568,7 @@ function FAQSection() {
 
       <p className="text-center mt-10 text-xs text-stone-400 dark:text-stone-500">
         More questions?{" "}
-        <a href="mailto:hello@sorabase.com" className="text-teal-600 dark:text-teal-400 hover:underline underline-offset-2">
+        <a href="mailto:hello@sorabase.com" className="text-rose-800 dark:text-rose-400 hover:underline underline-offset-2">
           hello@sorabase.com
         </a>
       </p>
@@ -588,7 +588,7 @@ function BottomCTA() {
           <div key={i} className="flex-1 border-r border-stone-800/50 last:border-0" />
         ))}
       </div>
-      <div aria-hidden className="absolute left-0 top-0 bottom-0 w-px bg-teal-700/40" />
+      <div aria-hidden className="absolute left-0 top-0 bottom-0 w-px bg-rose-900/40" />
 
       <div className="relative px-10 py-16 lg:px-16 lg:py-20">
         <div className="grid lg:grid-cols-2 gap-10 items-center">
@@ -633,7 +633,7 @@ function BottomCTA() {
 function CheckIcon({ accent = false }: { accent?: boolean }) {
   return (
     <svg
-      className={["w-[14px] h-[14px] flex-shrink-0 mt-0.5", accent ? "text-teal-500" : "text-stone-400"].join(" ")}
+      className={["w-[14px] h-[14px] flex-shrink-0 mt-0.5", accent ? "text-rose-700" : "text-stone-400"].join(" ")}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"

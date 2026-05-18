@@ -136,9 +136,9 @@ export default function EntryPage() {
                 type="button"
                 disabled={granting !== null}
                 onClick={() => handleGrant("recruiter")}
-                className="flex flex-col items-start gap-1.5 rounded-lg border border-teal-200 dark:border-teal-800/60 bg-white dark:bg-stone-900 px-4 py-3 hover:border-teal-400 dark:hover:border-teal-600 hover:bg-teal-50/40 dark:hover:bg-teal-900/10 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="flex flex-col items-start gap-1.5 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-white dark:bg-stone-900 px-4 py-3 hover:border-rose-400 dark:hover:border-rose-800 hover:bg-rose-50/40 dark:hover:bg-rose-950/10 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
               >
-                <span className="text-[11px] font-semibold text-teal-700 dark:text-teal-400 group-hover:text-teal-800 dark:group-hover:text-teal-300 transition-colors">
+                <span className="text-[11px] font-semibold text-rose-900 dark:text-rose-400 group-hover:text-rose-900 dark:group-hover:text-rose-300 transition-colors">
                   {granting === "recruiter" ? "Granting…" : "Grant Recruiter"}
                 </span>
                 <span className="text-[10px] text-stone-400 dark:text-stone-500 leading-tight">
@@ -198,7 +198,7 @@ function LoadingShell() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950">
       <div className="flex flex-col items-center gap-4">
-        <svg className="w-5 h-5 animate-spin text-teal-500" fill="none" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 animate-spin text-rose-700" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
         </svg>

@@ -67,9 +67,9 @@ export default function OnboardingPage() {
                     className={[
                       "w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold transition-colors",
                       isCurrent
-                        ? "bg-teal-600 text-white"
+                        ? "bg-rose-800 text-white"
                         : isPast
-                        ? "bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400"
+                        ? "bg-rose-100 dark:bg-rose-950/30 text-rose-800 dark:text-rose-400"
                         : "bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500",
                     ].join(" ")}
                   >
@@ -80,7 +80,7 @@ export default function OnboardingPage() {
                     ) : i + 1}
                   </div>
                   {i < 2 && (
-                    <div className={["w-8 h-px transition-colors", isPast ? "bg-teal-200 dark:bg-teal-800" : "bg-stone-200 dark:bg-stone-700"].join(" ")} />
+                    <div className={["w-8 h-px transition-colors", isPast ? "bg-rose-200 dark:bg-rose-900" : "bg-stone-200 dark:bg-stone-700"].join(" ")} />
                   )}
                 </div>
               );
@@ -93,7 +93,7 @@ export default function OnboardingPage() {
               <div className={[
                 "w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-6",
                 isRecruiter
-                  ? "bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800"
+                  ? "bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900"
                   : "bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700",
               ].join(" ")}>
                 {isRecruiter ? <BriefcaseIcon /> : <GridIcon />}
@@ -133,7 +133,7 @@ export default function OnboardingPage() {
               <div className="space-y-4">
                 {(isRecruiter ? RECRUITER_TOUR : GENERAL_TOUR).map((item, i) => (
                   <div key={i} className="flex gap-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-5 py-4">
-                    <div className="w-9 h-9 flex-shrink-0 rounded-md bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 flex items-center justify-center text-teal-600 dark:text-teal-400">
+                    <div className="w-9 h-9 flex-shrink-0 rounded-md bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900 flex items-center justify-center text-rose-800 dark:text-rose-400">
                       {item.icon}
                     </div>
                     <div>
@@ -166,7 +166,7 @@ export default function OnboardingPage() {
           {/* Step: Done */}
           {step === "done" && (
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900 flex items-center justify-center mx-auto mb-6">
                 <CheckCircleIcon />
               </div>
               <h2 className="font-display italic text-stone-900 dark:text-stone-100 text-3xl mb-3">
@@ -233,7 +233,7 @@ const GENERAL_TOUR = [
   },
 ];
 
-function BriefcaseIcon()   { return <svg className="w-7 h-7 text-teal-600 dark:text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path strokeLinecap="round" strokeLinejoin="round" d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>; }
+function BriefcaseIcon()   { return <svg className="w-7 h-7 text-rose-800 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path strokeLinecap="round" strokeLinejoin="round" d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>; }
 function GridIcon()         { return <svg className="w-7 h-7 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>; }
 function NodeIcon()         { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><path strokeLinecap="round" d="M7 12h10"/></svg>; }
 function ExtractIcon()      { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h8M4 18h6"/></svg>; }
@@ -242,4 +242,4 @@ function DashboardIcon()    { return <svg className="w-4 h-4" fill="none" viewBo
 function SchemaIconSmall()  { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h8"/></svg>; }
 function TemplateIcon()     { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><rect x="3" y="3" width="18" height="18" rx="2"/><path strokeLinecap="round" d="M3 9h18"/><path strokeLinecap="round" d="M9 21V9"/></svg>; }
 function ExportIcon()       { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0-12l-4 4m4-4l4 4M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2"/></svg>; }
-function CheckCircleIcon()  { return <svg className="w-7 h-7 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>; }
+function CheckCircleIcon()  { return <svg className="w-7 h-7 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>; }

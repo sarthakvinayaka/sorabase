@@ -14,7 +14,7 @@ const TYPE_META: Record<ColumnType, { label: string; style: string }> = {
   text:    { label: "Text",   style: "bg-sky-50  dark:bg-sky-950/30  text-sky-700  dark:text-sky-400  border-sky-200  dark:border-sky-800"  },
   number:  { label: "Number", style: "bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-400 border-violet-200 dark:border-violet-800" },
   boolean: { label: "Yes/No", style: "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800" },
-  list:    { label: "List",   style: "bg-teal-50 dark:bg-teal-950/30 text-teal-700 dark:text-teal-400 border-teal-200 dark:border-teal-800" },
+  list:    { label: "List",   style: "bg-rose-50 dark:bg-rose-950/30 text-rose-900 dark:text-rose-400 border-rose-200 dark:border-rose-900" },
   date:    { label: "Date",   style: "bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800" },
 };
 
@@ -354,7 +354,7 @@ export default function SchemaReviewWorkspace({
       <div className="page">
         <div className="max-w-lg mx-auto mt-16">
           <div className="card p-5 flex items-center gap-3">
-            <Spinner className="text-teal-600 dark:text-teal-400" />
+            <Spinner className="text-rose-800 dark:text-rose-400" />
             <div>
               <p className="text-sm font-medium text-stone-800 dark:text-stone-200">
                 Analyzing transcript
@@ -422,7 +422,7 @@ export default function SchemaReviewWorkspace({
               </span>
             )}
             {customCount > 0 && (
-              <span className="badge bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400">
+              <span className="badge bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-400">
                 {customCount} custom
               </span>
             )}
@@ -509,15 +509,15 @@ export default function SchemaReviewWorkspace({
 
             {/* Applied template banner */}
             {appliedTemplate && templatePanel === null && (
-              <div className="px-5 py-2.5 bg-teal-50 dark:bg-teal-900/20 border-b border-teal-100 dark:border-teal-800 flex items-center justify-between gap-2">
-                <p className="text-xs text-teal-700 dark:text-teal-400">
+              <div className="px-5 py-2.5 bg-rose-50 dark:bg-rose-950/20 border-b border-rose-100 dark:border-rose-900 flex items-center justify-between gap-2">
+                <p className="text-xs text-rose-900 dark:text-rose-400">
                   Template: <span className="font-semibold">{appliedTemplate.name}</span>
-                  <span className="ml-1.5 text-teal-500 dark:text-teal-600">v{appliedTemplate.version}</span>
+                  <span className="ml-1.5 text-rose-700 dark:text-rose-800">v{appliedTemplate.version}</span>
                 </p>
                 <button
                   type="button"
                   onClick={() => setAppliedTemplate(null)}
-                  className="text-2xs text-teal-500 dark:text-teal-600 hover:text-teal-700 dark:hover:text-teal-400"
+                  className="text-2xs text-rose-700 dark:text-rose-800 hover:text-rose-900 dark:hover:text-rose-400"
                 >
                   clear
                 </button>
@@ -535,7 +535,7 @@ export default function SchemaReviewWorkspace({
                 </div>
                 {templatesLoading && (
                   <p className="text-xs text-stone-400 dark:text-stone-500 flex items-center gap-2">
-                    <Spinner className="text-teal-500" /> Loading templates…
+                    <Spinner className="text-rose-700" /> Loading templates…
                   </p>
                 )}
                 {!templatesLoading && templates && templates.length === 0 && (
@@ -558,7 +558,7 @@ export default function SchemaReviewWorkspace({
                             </span>
                             <span className={`text-2xs px-1 py-px rounded border ${
                               t.visibility === "workspace"
-                                ? "bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400"
+                                ? "bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-400"
                                 : "bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-400 dark:text-stone-500"
                             }`}>
                               {t.visibility}
@@ -593,7 +593,7 @@ export default function SchemaReviewWorkspace({
                 </div>
 
                 {saveTemplateDone ? (
-                  <p className="text-xs text-teal-600 dark:text-teal-400 flex items-center gap-1.5">
+                  <p className="text-xs text-rose-800 dark:text-rose-400 flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                     Saved as "{saveTemplateDone}"
                   </p>
@@ -622,7 +622,7 @@ export default function SchemaReviewWorkspace({
                             value="private"
                             checked={saveTemplateVis === "private"}
                             onChange={() => setSaveTemplateVis("private")}
-                            className="h-3 w-3 text-teal-600"
+                            className="h-3 w-3 text-rose-800"
                           />
                           Private
                         </label>
@@ -633,7 +633,7 @@ export default function SchemaReviewWorkspace({
                             value="workspace"
                             checked={saveTemplateVis === "workspace"}
                             onChange={() => setSaveTemplateVis("workspace")}
-                            className="h-3 w-3 text-teal-600"
+                            className="h-3 w-3 text-rose-800"
                           />
                           Workspace
                         </label>
@@ -854,7 +854,7 @@ function ColumnRow({ column, error, onToggle, onUpdate, onRemove }: RowProps) {
             type="checkbox"
             checked={column.selected}
             onChange={onToggle}
-            className="h-3.5 w-3.5 rounded border-stone-300 dark:border-stone-600 text-teal-600 focus:ring-teal-500 cursor-pointer"
+            className="h-3.5 w-3.5 rounded border-stone-300 dark:border-stone-600 text-rose-800 focus:ring-rose-700 cursor-pointer"
           />
         </div>
 
@@ -890,7 +890,7 @@ function ColumnRow({ column, error, onToggle, onUpdate, onRemove }: RowProps) {
                 className={[
                   "text-sm font-medium text-left leading-snug",
                   column.selected
-                    ? "text-stone-900 dark:text-stone-100 hover:text-teal-700 dark:hover:text-teal-400 cursor-text"
+                    ? "text-stone-900 dark:text-stone-100 hover:text-rose-900 dark:hover:text-rose-400 cursor-text"
                     : "text-stone-500 dark:text-stone-500 cursor-default",
                   !column.name ? "italic text-stone-400 dark:text-stone-600" : "",
                 ].join(" ")}
@@ -925,7 +925,7 @@ function ColumnRow({ column, error, onToggle, onUpdate, onRemove }: RowProps) {
 
             {/* Custom badge */}
             {column.isCustom && (
-              <span className="badge bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-400">
+              <span className="badge bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-400">
                 custom
               </span>
             )}

@@ -32,11 +32,11 @@
     --text-muted:      #A9A49D;
     --text-disabled:   #C4C0B9;
 
-    /* ── Accent ──────────────────────────────────── deep forest teal, not cyan */
-    --accent:          #1A6B5A;
-    --accent-hover:    #135246;
-    --accent-light:    #EDF6F3;
-    --accent-border:   #A9DAD0;
+    /* ── Accent ──────────────────────────────────── deep wine / burgundy */
+    --accent:          #9f1239;
+    --accent-hover:    #881337;
+    --accent-light:    #fff1f2;
+    --accent-border:   #fecdd3;
   }
 
   .dark {
@@ -54,10 +54,10 @@
     --text-muted:      #6B6863;
     --text-disabled:   #4A4845;
 
-    --accent:          #24897B;
-    --accent-hover:    #3FA396;
-    --accent-light:    #0D2420;
-    --accent-border:   #1A4A41;
+    --accent:          #be123c;
+    --accent-hover:    #9f1239;
+    --accent-light:    #4c0519;
+    --accent-border:   #881337;
   }
 
   html {
@@ -75,16 +75,16 @@
   .dark { color-scheme: dark; }
 
   /* Warm selection highlight */
-  ::selection       { background: #A9DAD0; color: #0E3D34; }
-  .dark ::selection { background: #1A4A41; color: #D3EDE6; }
+  ::selection       { background: #fecdd3; color: #4c0519; }
+  .dark ::selection { background: #881337; color: #ffe4e6; }
 
-  /* Teal focus ring — replaces browser default */
+  /* Wine focus ring — replaces browser default */
   *:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px #FAFAF9, 0 0 0 4px rgba(26, 107, 90, 0.35);
+    box-shadow: 0 0 0 2px #FAFAF9, 0 0 0 4px rgba(159, 18, 57, 0.35);
   }
   .dark *:focus-visible {
-    box-shadow: 0 0 0 2px #131211, 0 0 0 4px rgba(36, 137, 123, 0.45);
+    box-shadow: 0 0 0 2px #131211, 0 0 0 4px rgba(190, 18, 60, 0.45);
   }
 
   /* Thin warm scrollbar */
@@ -102,9 +102,9 @@
   /* ━━ App UI buttons ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
   .btn-primary {
-    @apply inline-flex items-center gap-1.5 rounded bg-teal-600 px-3.5 py-2
+    @apply inline-flex items-center gap-1.5 rounded bg-rose-800 px-3.5 py-2
            text-sm font-medium text-white
-           hover:bg-teal-700 active:bg-teal-800
+           hover:bg-rose-900 active:bg-rose-900
            transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
   }
 
@@ -135,11 +135,11 @@
 
   /* ━━ Marketing buttons ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-  /* Primary: filled teal — principal conversion CTA */
+  /* Primary: filled wine — principal conversion CTA */
   .btn-mkt-primary {
-    @apply inline-flex items-center gap-2 rounded bg-teal-600 px-5 py-2.5
+    @apply inline-flex items-center gap-2 rounded bg-rose-800 px-5 py-2.5
            text-[13px] font-semibold tracking-tight text-white
-           hover:bg-teal-700 active:bg-teal-800
+           hover:bg-rose-900 active:bg-rose-900
            transition-colors;
   }
 
@@ -171,7 +171,7 @@
            bg-white dark:bg-stone-900 px-3 py-2
            text-sm text-stone-900 dark:text-stone-100
            placeholder:text-stone-400 dark:placeholder:text-stone-600
-           focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10
+           focus:outline-none focus:border-rose-700 focus:ring-2 focus:ring-rose-700/10
            transition-colors;
   }
 
@@ -181,7 +181,7 @@
            bg-white dark:bg-stone-900 px-4 py-3
            text-sm text-stone-900 dark:text-stone-100
            placeholder:text-stone-400 dark:placeholder:text-stone-600
-           focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10
+           focus:outline-none focus:border-rose-700 focus:ring-2 focus:ring-rose-700/10
            transition-colors;
   }
 
@@ -212,7 +212,7 @@
   /* Eyebrow label above headings */
   .eyebrow {
     @apply text-[11px] font-semibold tracking-[0.1em] uppercase
-           text-teal-600 dark:text-teal-400;
+           text-rose-800 dark:text-rose-400;
   }
 
   .badge {
@@ -287,5 +287,5 @@
 .react-flow__background                { opacity: 0.5; }
 .react-flow__edge-path                 { stroke: #D4D1CB; stroke-width: 1.5; }
 .dark .react-flow__edge-path           { stroke: #3C3A36; }
-.react-flow__edge.selected .react-flow__edge-path { stroke: #1A6B5A; }
+.react-flow__edge.selected .react-flow__edge-path { stroke: #9f1239; }
 .react-flow__attribution               { display: none; }

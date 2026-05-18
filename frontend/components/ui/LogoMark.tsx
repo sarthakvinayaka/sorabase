@@ -2,22 +2,32 @@
  * LogoMark — the SoraBase waveform-to-lines mark.
  *
  * Two variants:
- *   <LogoMark />        — icon only, currentColor (for nav/auth, adapts to theme)
- *   <LogoIcon />        — icon inside the navy rounded square (for standalone / OG use)
+ *   <LogoMark />   — icon only, currentColor (nav/auth, adapts to theme)
+ *                    `size` controls the rendered HEIGHT; width scales from aspect ratio.
+ *   <LogoIcon />   — icon inside the navy square (favicon / standalone brand use)
+ *                    `size` controls width = height (square).
  */
 
+// Tight viewBox cropped to the actual mark content (stroke-aware padding).
+// Covers x: 8–92, y: 17–67 → 84 wide × 50 tall → aspect ratio 1.68
+const MARK_VIEWBOX = "8 17 84 50";
+const MARK_ASPECT  = 84 / 50; // ≈ 1.68
+
 export function LogoMark({
-  size = 26,
+  size = 28,
   className,
 }: {
   size?: number;
   className?: string;
 }) {
+  const h = size;
+  const w = Math.round(h * MARK_ASPECT);
+
   return (
     <svg
-      width={size}
-      height={size}
-      viewBox="0 0 100 100"
+      width={w}
+      height={h}
+      viewBox={MARK_VIEWBOX}
       fill="none"
       aria-hidden="true"
       className={className}

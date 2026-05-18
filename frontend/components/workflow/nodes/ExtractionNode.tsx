@@ -27,7 +27,7 @@ export default function ExtractionNode({ id, data: raw, selected }: NodeProps) {
   return (
     <BaseNode
       selected={selected}
-      accent="bg-teal-500"
+      accent="bg-rose-700"
       icon="⊞"
       typeLabel="Extraction"
       status={data.status}
@@ -45,7 +45,7 @@ export default function ExtractionNode({ id, data: raw, selected }: NodeProps) {
       </p>
       {data.status === "completed" && data.extractedCount !== undefined && (
         <div className="mt-2 flex items-center gap-2">
-          <span className="text-[10px] font-medium text-emerald-500">
+          <span className="text-[10px] font-medium text-rose-700">
             {data.extractedCount}/{activeFieldCount} extracted
           </span>
           {data.overallConfidence !== undefined && (

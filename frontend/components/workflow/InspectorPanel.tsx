@@ -37,7 +37,7 @@ const TYPE_LABEL: Record<WorkflowNodeType, string> = {
 
 const TYPE_META: Record<WorkflowNodeType, { icon: string; accent: string }> = {
   source:     { icon: "◎", accent: "text-stone-400"    },
-  extraction: { icon: "⊞", accent: "text-teal-600"     },
+  extraction: { icon: "⊞", accent: "text-rose-800"     },
   analysis:   { icon: "◈", accent: "text-amber-600"    },
   output:     { icon: "↑", accent: "text-positive-text" },
   transcript: { icon: "≡", accent: "text-blue-500"     },
@@ -93,7 +93,7 @@ export default function InspectorPanel() {
       {/* Drag handle */}
       <div
         onMouseDown={onMouseDown}
-        className="w-px flex-shrink-0 cursor-col-resize bg-stone-200 dark:bg-stone-700 hover:bg-teal-400 dark:hover:bg-teal-600 transition-colors relative"
+        className="w-px flex-shrink-0 cursor-col-resize bg-stone-200 dark:bg-stone-700 hover:bg-rose-400 dark:hover:bg-rose-800 transition-colors relative"
       >
         <div className="absolute inset-y-0 -left-2 -right-2" />
       </div>

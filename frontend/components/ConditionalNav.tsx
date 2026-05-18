@@ -37,7 +37,7 @@ export default function ConditionalNav() {
             className="flex items-center gap-2 hover:opacity-70 transition-opacity"
             aria-label="SoraBase home"
           >
-            <LogoMark size={18} className="text-stone-900 dark:text-stone-100" />
+            <LogoMark size={22} className="text-stone-900 dark:text-stone-100" />
             <span className="font-display italic text-[18px] leading-none text-stone-900 dark:text-stone-100">
               SoraBase
             </span>
@@ -51,7 +51,7 @@ export default function ConditionalNav() {
               className={[
                 "px-2 py-0.5 rounded transition-colors",
                 mode === "recruiting"
-                  ? "text-teal-700 dark:text-teal-400 font-semibold"
+                  ? "text-rose-900 dark:text-rose-400 font-semibold"
                   : "text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300",
               ].join(" ")}
             >
@@ -63,7 +63,7 @@ export default function ConditionalNav() {
               className={[
                 "px-2 py-0.5 rounded transition-colors",
                 mode === "general"
-                  ? "text-teal-700 dark:text-teal-400 font-semibold"
+                  ? "text-rose-900 dark:text-rose-400 font-semibold"
                   : "text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300",
               ].join(" ")}
             >
@@ -85,7 +85,7 @@ export default function ConditionalNav() {
               <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
               <Link
                 href="/workflow"
-                className="rounded bg-teal-600 text-white text-xs font-medium px-3 py-1.5 hover:bg-teal-700 transition-colors"
+                className="rounded bg-rose-800 text-white text-xs font-medium px-3 py-1.5 hover:bg-rose-900 transition-colors"
               >
                 Workflow
               </Link>

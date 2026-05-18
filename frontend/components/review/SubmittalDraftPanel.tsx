@@ -115,7 +115,7 @@ export function SubmittalDraftPanel({ candidateId, analysisRunId }: Props) {
               <button
                 onClick={handleSave}
                 disabled={isSaving || editContent.trim().length === 0}
-                className="text-xs px-3 py-1.5 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
+                className="text-xs px-3 py-1.5 bg-rose-800 text-white rounded hover:bg-rose-900 disabled:opacity-50"
               >
                 {isSaving ? "Saving…" : "Save"}
               </button>
@@ -177,7 +177,7 @@ export function SubmittalDraftPanel({ candidateId, analysisRunId }: Props) {
           value={editContent}
           onChange={(e) => setEditContent(e.target.value)}
           disabled={isSaving}
-          className="w-full min-h-[200px] rounded border border-teal-300 bg-white px-4 py-3 text-sm text-stone-800 leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-teal-400 disabled:opacity-50"
+          className="w-full min-h-[200px] rounded border border-rose-300 bg-white px-4 py-3 text-sm text-stone-800 leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-rose-400 disabled:opacity-50"
           placeholder="Write the submittal draft…"
         />
       )}

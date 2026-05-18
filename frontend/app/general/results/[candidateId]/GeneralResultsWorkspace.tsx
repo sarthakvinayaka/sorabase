@@ -57,7 +57,7 @@ const PRIORITY_GROUPS: Array<{
     label: "Reviewed",
     description: "Edited or confirmed",
     filter: (f) => ["edited", "confirmed", "reviewed"].includes(f.status),
-    headerBg: "bg-teal-50 dark:bg-teal-900/10 border-b border-teal-100 dark:border-teal-900 text-teal-700 dark:text-teal-400",
+    headerBg: "bg-rose-50 dark:bg-rose-950/10 border-b border-rose-100 dark:border-rose-950 text-rose-900 dark:text-rose-400",
   },
 ];
 
@@ -284,7 +284,7 @@ export default function GeneralResultsWorkspace({ initial }: Props) {
               </span>
             )}
             {editedCount > 0 && (
-              <span className="badge bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300">
+              <span className="badge bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900 text-rose-900 dark:text-rose-300">
                 {editedCount} edited
               </span>
             )}

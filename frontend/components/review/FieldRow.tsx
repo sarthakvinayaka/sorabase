@@ -17,11 +17,11 @@ interface Props {
 // ---------------------------------------------------------------------------
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string; border: string; bg: string }> = {
-  extracted:  { label: "AI",          dot: "bg-teal-400",           text: "text-teal-700 dark:text-teal-300",          border: "border-teal-200 dark:border-teal-800",     bg: "bg-teal-50 dark:bg-teal-900/20"     },
+  extracted:  { label: "AI",          dot: "bg-rose-400",           text: "text-rose-900 dark:text-rose-300",          border: "border-rose-200 dark:border-rose-900",     bg: "bg-rose-50 dark:bg-rose-950/20"     },
   missing:    { label: "Missing",     dot: "bg-stone-300",          text: "text-stone-500 dark:text-stone-400",         border: "border-stone-200 dark:border-stone-700",   bg: "bg-stone-50 dark:bg-stone-800"      },
   ambiguous:  { label: "Ambiguous",   dot: "bg-warning-DEFAULT",    text: "text-warning-text",                          border: "border-warning-border",                    bg: "bg-warning-light"                   },
   reviewed:   { label: "Reviewed",    dot: "bg-info-DEFAULT",       text: "text-info-text",                             border: "border-info-border",                       bg: "bg-info-light"                      },
-  edited:     { label: "Edited",      dot: "bg-teal-500",           text: "text-teal-700 dark:text-teal-300",           border: "border-teal-200 dark:border-teal-800",     bg: "bg-teal-50 dark:bg-teal-900/20"     },
+  edited:     { label: "Edited",      dot: "bg-rose-700",           text: "text-rose-900 dark:text-rose-300",           border: "border-rose-200 dark:border-rose-900",     bg: "bg-rose-50 dark:bg-rose-950/20"     },
   confirmed:  { label: "Confirmed",   dot: "bg-positive-DEFAULT",   text: "text-positive-text",                         border: "border-positive-border",                   bg: "bg-positive-light"                  },
   unresolved: { label: "Unresolved",  dot: "bg-negative-DEFAULT",   text: "text-negative-text",                         border: "border-negative-border",                   bg: "bg-negative-light"                  },
 };
@@ -153,7 +153,7 @@ export default function FieldRow({ field, candidateId, onUpdate }: Props) {
   }
 
   const confidencePct = Math.round(field.confidence * 100);
-  const inputCls = "w-full rounded border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-2.5 py-1.5 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:border-teal-500 transition-colors";
+  const inputCls = "w-full rounded border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-2.5 py-1.5 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:border-rose-700 transition-colors";
 
   return (
     <tr className="border-b border-stone-100 dark:border-stone-800 last:border-0 hover:bg-stone-50/60 dark:hover:bg-stone-800/30 transition-colors align-top">
@@ -226,7 +226,7 @@ export default function FieldRow({ field, candidateId, onUpdate }: Props) {
             <div className="h-1 w-10 rounded-full bg-stone-200 dark:bg-stone-700 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${
-                  confidencePct >= 85 ? "bg-teal-500" : confidencePct >= 60 ? "bg-amber-400" : "bg-red-400"
+                  confidencePct >= 85 ? "bg-rose-700" : confidencePct >= 60 ? "bg-amber-400" : "bg-red-400"
                 }`}
                 style={{ width: `${confidencePct}%` }}
               />
@@ -261,7 +261,7 @@ export default function FieldRow({ field, candidateId, onUpdate }: Props) {
                 {unresolving ? "…" : "Flag"}
               </button>
             )}
-            <button onClick={startEdit} disabled={anyBusy} className="text-xs font-medium text-teal-600 dark:text-teal-400 hover:opacity-70 transition-opacity disabled:opacity-30">
+            <button onClick={startEdit} disabled={anyBusy} className="text-xs font-medium text-rose-800 dark:text-rose-400 hover:opacity-70 transition-opacity disabled:opacity-30">
               Edit
             </button>
           </div>

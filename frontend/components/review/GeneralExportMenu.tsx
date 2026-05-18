@@ -223,7 +223,7 @@ function WebhookPanel({ candidateId, onClose }: { candidateId: string; onClose: 
             type="checkbox"
             checked={includeSummary}
             onChange={(e) => setIncludeSummary(e.target.checked)}
-            className="h-3 w-3 rounded text-teal-600"
+            className="h-3 w-3 rounded text-rose-800"
           />
           Include AI summary
         </label>
@@ -232,7 +232,7 @@ function WebhookPanel({ candidateId, onClose }: { candidateId: string; onClose: 
             type="checkbox"
             checked={includeTranscript}
             onChange={(e) => setIncludeTranscript(e.target.checked)}
-            className="h-3 w-3 rounded text-teal-600"
+            className="h-3 w-3 rounded text-rose-800"
           />
           Include transcript text
         </label>
@@ -337,7 +337,7 @@ function ApiPanel({ candidateId, onClose }: { candidateId: string; onClose: () =
             <span className={[
               "shrink-0 font-mono font-semibold text-2xs px-1 py-0.5 rounded",
               ep.method === "GET"
-                ? "bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-400"
+                ? "bg-rose-100 dark:bg-rose-950/40 text-rose-900 dark:text-rose-400"
                 : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
             ].join(" ")}>
               {ep.method}
@@ -433,7 +433,7 @@ function ClipboardIcon() {
 
 function CheckIcon() {
   return (
-    <svg className="w-3.5 h-3.5 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <svg className="w-3.5 h-3.5 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
     </svg>
   );

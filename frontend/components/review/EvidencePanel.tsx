@@ -8,7 +8,7 @@ export default function EvidencePanel({ snippet }: Props) {
   }
 
   return (
-    <blockquote className="border-l-2 border-teal-400 pl-3 text-xs text-stone-600 italic leading-relaxed max-w-sm">
+    <blockquote className="border-l-2 border-rose-400 pl-3 text-xs text-stone-600 italic leading-relaxed max-w-sm">
       "{snippet}"
     </blockquote>
   );
