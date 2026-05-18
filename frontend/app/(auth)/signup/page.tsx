@@ -74,7 +74,7 @@ export default function SignUpPage() {
   function handleOAuth(provider: "google" | "microsoft") {
     setFormState("loading");
     nextAuthSignIn(provider === "google" ? "google" : "azure-ad", {
-      callbackUrl: "/app/onboarding",
+      callbackUrl: "/onboarding",
     });
   }
 

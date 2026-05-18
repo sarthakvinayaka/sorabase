@@ -20,7 +20,7 @@ export default function OnboardingPage() {
     }
     // Pending users have no workspace to onboard into
     if (user.access === "pending") {
-      router.replace("/app/entry");
+      router.replace("/entry");
       return;
     }
     // Already onboarded → skip straight to their workspace
