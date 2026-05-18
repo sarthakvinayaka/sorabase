@@ -94,8 +94,7 @@ export default function SignInPage() {
         <>
           {/* OAuth buttons */}
           <div className="space-y-2.5 mb-5">
-            <OAuthButton provider="google"    onClick={() => handleOAuth("google")} />
-            <OAuthButton provider="microsoft" onClick={() => handleOAuth("microsoft")} />
+            <OAuthButton provider="google" onClick={() => handleOAuth("google")} />
           </div>
 
           {/* Divider */}
@@ -110,34 +109,36 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {/* Demo credentials hint */}
-          <div className="mb-6 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-stone-100 dark:border-stone-800">
-              <p className="text-[10px] font-semibold tracking-[0.1em] uppercase text-stone-400 dark:text-stone-500">
-                Demo — click to fill credentials
-              </p>
+          {/* Demo credentials hint — dev only, never shown in production */}
+          {process.env.NODE_ENV === "development" && (
+            <div className="mb-6 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
+              <div className="px-4 py-2.5 border-b border-stone-100 dark:border-stone-800">
+                <p className="text-[10px] font-semibold tracking-[0.1em] uppercase text-stone-400 dark:text-stone-500">
+                  Demo — click to fill credentials
+                </p>
+              </div>
+              {[
+                { email: "recruiter@sorabase.com", label: "Recruiter workspace", dot: "bg-teal-500",  color: "text-teal-600 dark:text-teal-400"  },
+                { email: "general@sorabase.com",   label: "General workspace",   dot: "bg-stone-400", color: "text-stone-500 dark:text-stone-300" },
+                { email: "demo@sorabase.com",       label: "Pending access",      dot: "bg-amber-400", color: "text-amber-600 dark:text-amber-400" },
+              ].map(({ email: demoEmail, label, dot, color }) => (
+                <button
+                  key={demoEmail}
+                  type="button"
+                  onClick={() => { setEmail(demoEmail); setPassword("demo"); setError(""); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 border-b border-stone-50 dark:border-stone-800/60 last:border-0 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors text-left group"
+                >
+                  <span className={["w-1.5 h-1.5 rounded-full flex-shrink-0", dot].join(" ")} />
+                  <span className="flex-1 text-[11px] font-mono text-stone-500 dark:text-stone-400 group-hover:text-stone-700 dark:group-hover:text-stone-200 transition-colors">
+                    {demoEmail}
+                  </span>
+                  <span className={["text-[10px] font-medium flex-shrink-0", color].join(" ")}>
+                    {label}
+                  </span>
+                </button>
+              ))}
             </div>
-            {[
-              { email: "recruiter@sorabase.com", label: "Recruiter workspace", dot: "bg-teal-500",  color: "text-teal-600 dark:text-teal-400"  },
-              { email: "general@sorabase.com",   label: "General workspace",   dot: "bg-stone-400", color: "text-stone-500 dark:text-stone-300" },
-              { email: "demo@sorabase.com",       label: "Pending access",      dot: "bg-amber-400", color: "text-amber-600 dark:text-amber-400" },
-            ].map(({ email: demoEmail, label, dot, color }) => (
-              <button
-                key={demoEmail}
-                type="button"
-                onClick={() => { setEmail(demoEmail); setPassword("demo"); setError(""); }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 border-b border-stone-50 dark:border-stone-800/60 last:border-0 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors text-left group"
-              >
-                <span className={["w-1.5 h-1.5 rounded-full flex-shrink-0", dot].join(" ")} />
-                <span className="flex-1 text-[11px] font-mono text-stone-500 dark:text-stone-400 group-hover:text-stone-700 dark:group-hover:text-stone-200 transition-colors">
-                  {demoEmail}
-                </span>
-                <span className={["text-[10px] font-medium flex-shrink-0", color].join(" ")}>
-                  {label}
-                </span>
-              </button>
-            ))}
-          </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
