@@ -2,9 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "SoraBase — Meeting Workflow Platform",
+  title: "SoraBase — Meeting Intelligence Platform",
   description:
-    "SoraBase turns every call, meeting, and transcript into structured, actionable data. Reusable schemas, AI extraction, workflow outputs, and integrations for every team.",
+    "SoraBase turns every call, meeting, and transcript into structured, actionable data. Reusable schemas, AI extraction, workflow outputs — for recruiting, sales, and any team.",
+  alternates: {
+    canonical: "https://www.sorabase.org/",
+  },
+  openGraph: {
+    title:       "SoraBase — Meeting Intelligence Platform",
+    description: "From every meeting, a structured workflow. AI-powered extraction for every call.",
+    url:         "https://www.sorabase.org/",
+    type:        "website",
+  },
+  twitter: {
+    card:        "summary",
+    title:       "SoraBase — Meeting Intelligence Platform",
+    description: "From every meeting, a structured workflow.",
+  },
 };
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

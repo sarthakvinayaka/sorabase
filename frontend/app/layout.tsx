@@ -4,7 +4,11 @@ import { AuthProvider }              from "@/lib/auth-context";
 import { ThemeProvider, ThemeScript } from "@/components/marketing/ThemeProvider";
 import ConditionalNav                 from "@/components/ConditionalNav";
 
+const BASE = "https://www.sorabase.org";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE),
+
   title: {
     default:  "SoraBase — Meeting Intelligence Platform",
     template: "%s | SoraBase",
@@ -15,16 +19,42 @@ export const metadata: Metadata = {
     "meeting intelligence", "transcript extraction", "structured data",
     "recruiting workflow", "meeting automation",
   ],
+
+  alternates: {
+    canonical: BASE,
+  },
+
   openGraph: {
     siteName:    "SoraBase",
     type:        "website",
+    url:         BASE,
     title:       "SoraBase — Meeting Intelligence Platform",
     description: "From every meeting, a structured record.",
-    images:      [{ url: "/logo.svg", width: 100, height: 100 }],
+    images:      [{ url: "/logo.svg", width: 200, height: 200, alt: "SoraBase" }],
+    locale:      "en_US",
   },
+
+  twitter: {
+    card:        "summary",
+    title:       "SoraBase — Meeting Intelligence Platform",
+    description: "From every meeting, a structured record.",
+    images:      ["/logo.svg"],
+  },
+
   icons: {
-    icon:        [{ url: "/logo.svg", type: "image/svg+xml" }],
-    apple:       [{ url: "/logo.svg" }],
+    icon:  [{ url: "/logo.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/logo.svg" }],
+  },
+
+  robots: {
+    index:             true,
+    follow:            true,
+    googleBot: {
+      index:             true,
+      follow:            true,
+      "max-snippet":     -1,
+      "max-image-preview": "large",
+    },
   },
 };
 
