@@ -22,11 +22,10 @@ export interface AuthUser {
 // Single source of truth: every post-auth redirect goes through here.
 
 export function getRedirectForUser(user: AuthUser): string {
-  if (user.access === "pending")   return "/entry";
   if (!user.onboarded)             return "/onboarding";
   if (user.access === "recruiter") return "/workflow";
   if (user.access === "general")   return "/general";
-  return "/entry";
+  return "/onboarding";
 }
 
 export function getWorkspaceForUser(user: Pick<AuthUser, "access">): string {
