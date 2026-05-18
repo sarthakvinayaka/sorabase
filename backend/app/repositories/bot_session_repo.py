@@ -39,8 +39,13 @@ def create(
     return session
 
 
-def get(db: Session, bot_session_id: uuid.UUID) -> BotSession | None:
-    return db.get(BotSession, bot_session_id)
+def get(db: Session, bot_session_id: uuid.UUID, org_id: uuid.UUID | None = None) -> BotSession | None:
+    session = db.get(BotSession, bot_session_id)
+    if session is None:
+        return None
+    if org_id is not None and session.org_id != org_id:
+        return None
+    return session
 
 
 def get_by_provider_bot_id(db: Session, provider_bot_id: str) -> BotSession | None:
@@ -97,10 +102,11 @@ def append_webhook_event(
 def list_recent(
     db: Session,
     *,
+    org_id: uuid.UUID,
     limit: int = 20,
     status: str | None = None,
 ) -> list[BotSession]:
-    q = db.query(BotSession)
+    q = db.query(BotSession).filter(BotSession.org_id == org_id)
     if status is not None:
         q = q.filter(BotSession.status == status)
     return q.order_by(desc(BotSession.created_at)).limit(limit).all()

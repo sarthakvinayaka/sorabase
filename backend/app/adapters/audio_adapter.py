@@ -10,7 +10,6 @@ import uuid
 from sqlalchemy.orm import Session
 
 from app.adapters.base import AudioPayload, IngestionResult
-from app.config import settings
 from app.db.models import Conversation, MediaReference, SourceEvent
 from app.repositories import media_ref_repo
 from app.services import storage_service, whisper_client
@@ -25,11 +24,10 @@ class AudioAdapter:
         payload: AudioPayload,
         db: Session,
         actor_id: str = "system",
+        org_id: uuid.UUID | None = None,
     ) -> IngestionResult:
-        org = uuid.UUID(settings.default_org_id)
-
         conversation = Conversation(
-            org_id=org,
+            org_id=org_id,
             source_type="audio",
             transcript_status="pending",
             status="raw",
@@ -42,7 +40,7 @@ class AudioAdapter:
         db.flush()
 
         event = SourceEvent(
-            org_id=org,
+            org_id=org_id,
             source_type="audio",
             raw_payload={
                 "storage_key": payload.storage_key,
@@ -56,7 +54,7 @@ class AudioAdapter:
         db.flush()
 
         media = MediaReference(
-            org_id=org,
+            org_id=org_id,
             conversation_id=conversation.id,
             source_event_id=event.id,
             ref_type="audio_upload",

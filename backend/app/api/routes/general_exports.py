@@ -13,11 +13,13 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse, PlainTextResponse
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_org_id
 from app.db.session import get_db
 from app.domain.general_export_schemas import (
     WebhookDeliveryRequest,
     WebhookDeliveryResult,
 )
+from app.repositories import candidate_repo
 from app.services import audit_service
 from app.services.general_export_service import build_general_export, render_csv
 from app.services import webhook_delivery_service
@@ -25,7 +27,18 @@ from app.services import webhook_delivery_service
 router = APIRouter()
 
 
-def _get_export_or_404(db: Session, candidate_id: uuid.UUID, include_transcript: bool = False):
+def _get_export_or_404(
+    db: Session,
+    candidate_id: uuid.UUID,
+    org_id: uuid.UUID,
+    include_transcript: bool = False,
+):
+    # Validate ownership first
+    if candidate_repo.get(db, candidate_id, org_id=org_id) is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Session not found or no extraction available.",
+        )
     export = build_general_export(db, candidate_id, include_transcript=include_transcript)
     if export is None:
         raise HTTPException(
@@ -57,8 +70,9 @@ def export_general_json(
     candidate_id: uuid.UUID,
     include_transcript: bool = Query(False),
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
-    export = _get_export_or_404(db, candidate_id, include_transcript=include_transcript)
+    export = _get_export_or_404(db, candidate_id, org_id, include_transcript=include_transcript)
     _log_export(db, candidate_id, "json")
     return JSONResponse(
         content=export.model_dump(mode="json"),
@@ -77,8 +91,9 @@ def export_general_payload(
     candidate_id: uuid.UUID,
     include_transcript: bool = Query(False),
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
-    export = _get_export_or_404(db, candidate_id, include_transcript=include_transcript)
+    export = _get_export_or_404(db, candidate_id, org_id, include_transcript=include_transcript)
     return export.model_dump(mode="json")
 
 
@@ -91,8 +106,9 @@ def export_general_csv(
     candidate_id: uuid.UUID,
     include_transcript: bool = Query(False),
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
-    export = _get_export_or_404(db, candidate_id, include_transcript=include_transcript)
+    export = _get_export_or_404(db, candidate_id, org_id, include_transcript=include_transcript)
     _log_export(db, candidate_id, "csv")
     csv_text = render_csv(export)
     return PlainTextResponse(
@@ -116,8 +132,9 @@ def send_general_webhook(
     candidate_id: uuid.UUID,
     body: WebhookDeliveryRequest,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
-    export = _get_export_or_404(db, candidate_id, include_transcript=body.include_transcript)
+    export = _get_export_or_404(db, candidate_id, org_id, include_transcript=body.include_transcript)
 
     if not body.include_summary:
         export = export.model_copy(update={"summary": None})

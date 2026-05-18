@@ -3,6 +3,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_org_id
 from app.config import settings
 from app.db.session import get_db
 from app.adapters.transcript_adapter import TranscriptAdapter
@@ -35,10 +36,11 @@ def list_conversations(
     transcript_status: str | None = "ready",
     limit: int = 30,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
     if source_type is not None:
         convs = conversation_repo.list_by_source_type(
-            db, source_type=source_type, transcript_status=transcript_status, limit=limit
+            db, source_type=source_type, org_id=org_id, transcript_status=transcript_status, limit=limit
         )
     else:
         convs = []
@@ -46,7 +48,11 @@ def list_conversations(
 
 
 @router.post("/conversations", response_model=ConversationRead, status_code=201)
-def create_conversation(body: ConversationCreate, db: Session = Depends(get_db)):
+def create_conversation(
+    body: ConversationCreate,
+    db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+):
     if len(body.raw_text) > settings.max_transcript_chars:
         raise HTTPException(
             status_code=400,
@@ -71,13 +77,17 @@ def create_conversation(body: ConversationCreate, db: Session = Depends(get_db))
         job_id=body.job_id,
         job_reference=body.job_reference,
     )
-    result = _transcript_adapter.ingest(payload, db)
+    result = _transcript_adapter.ingest(payload, db, org_id=org_id)
     return conversation_repo.get(db, result.conversation_id)
 
 
 @router.get("/conversations/{conversation_id}", response_model=ConversationRead)
-def get_conversation(conversation_id: uuid.UUID, db: Session = Depends(get_db)):
-    conversation = conversation_repo.get(db, conversation_id)
+def get_conversation(
+    conversation_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+):
+    conversation = conversation_repo.get(db, conversation_id, org_id=org_id)
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found.")
     return conversation
@@ -88,7 +98,15 @@ def get_conversation(conversation_id: uuid.UUID, db: Session = Depends(get_db)):
     response_model=ExtractionCreatedResponse,
     status_code=201,
 )
-def extract_conversation(conversation_id: uuid.UUID, db: Session = Depends(get_db)):
+def extract_conversation(
+    conversation_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+):
+    # Validate ownership before running extraction
+    if conversation_repo.get(db, conversation_id, org_id=org_id) is None:
+        raise HTTPException(status_code=404, detail="Conversation not found.")
+
     try:
         candidate, extraction_run = run_extraction(db, conversation_id)
     except ConversationNotFoundError as exc:
@@ -117,7 +135,12 @@ def extract_general_conversation(
     conversation_id: uuid.UUID,
     body: GeneralExtractRequest,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
+    # Validate ownership before running extraction
+    if conversation_repo.get(db, conversation_id, org_id=org_id) is None:
+        raise HTTPException(status_code=404, detail="Conversation not found.")
+
     try:
         candidate, extraction_run = run_general_extraction(
             db,

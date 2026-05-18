@@ -3,12 +3,11 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from app.db.models import Job
 from app.domain.schemas import JobCreate, JobUpdate
-from app.config import settings
 
 
-def create(db: Session, body: JobCreate) -> Job:
+def create(db: Session, body: JobCreate, org_id: uuid.UUID) -> Job:
     job = Job(
-        org_id=uuid.UUID(settings.default_org_id),
+        org_id=org_id,
         title=body.title,
         description=body.description,
         requirements=body.requirements,
@@ -19,12 +18,17 @@ def create(db: Session, body: JobCreate) -> Job:
     return job
 
 
-def get(db: Session, job_id: uuid.UUID) -> Job | None:
-    return db.get(Job, job_id)
+def get(db: Session, job_id: uuid.UUID, org_id: uuid.UUID | None = None) -> Job | None:
+    job = db.get(Job, job_id)
+    if job is None:
+        return None
+    if org_id is not None and job.org_id != org_id:
+        return None
+    return job
 
 
-def list_all(db: Session) -> list[Job]:
-    return db.query(Job).order_by(Job.created_at.desc()).all()
+def list_all(db: Session, org_id: uuid.UUID) -> list[Job]:
+    return db.query(Job).filter(Job.org_id == org_id).order_by(Job.created_at.desc()).all()
 
 
 def update(db: Session, job: Job, body: JobUpdate) -> Job:

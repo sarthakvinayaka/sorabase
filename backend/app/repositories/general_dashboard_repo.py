@@ -6,6 +6,7 @@ completed run per candidate, then aggregates field-level statistics.
 """
 
 import re
+import uuid
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 
@@ -28,7 +29,7 @@ _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 # Public entry point
 # ---------------------------------------------------------------------------
 
-def compute_general_stats(db: Session) -> GeneralDashboardStats:
+def compute_general_stats(db: Session, org_id: uuid.UUID) -> GeneralDashboardStats:
     # ------------------------------------------------------------------ #
     # 1. Latest completed general extraction run per candidate             #
     # ------------------------------------------------------------------ #
@@ -36,6 +37,7 @@ def compute_general_stats(db: Session) -> GeneralDashboardStats:
         select(ExtractionRun)
         .where(ExtractionRun.template_id == GENERAL_MODE_TAG)
         .where(ExtractionRun.status == "completed")
+        .where(ExtractionRun.org_id == org_id)
         .order_by(ExtractionRun.created_at.desc())
     ).all()
 

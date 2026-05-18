@@ -4,7 +4,6 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
-from app.config import settings
 from app.db.models import AuditLog, Candidate, Conversation, ExtractionRun, ExtractedField
 from app.domain.api_schemas import (
     CandidateDetail,
@@ -17,8 +16,13 @@ from app.domain.api_schemas import (
 )
 
 
-def get(db: Session, candidate_id: uuid.UUID) -> Candidate | None:
-    return db.get(Candidate, candidate_id)
+def get(db: Session, candidate_id: uuid.UUID, org_id: uuid.UUID | None = None) -> Candidate | None:
+    candidate = db.get(Candidate, candidate_id)
+    if candidate is None:
+        return None
+    if org_id is not None and candidate.org_id != org_id:
+        return None
+    return candidate
 
 
 def get_or_create_for_conversation(
@@ -37,14 +41,17 @@ def get_or_create_for_conversation(
     if existing:
         return existing
 
-    candidate = Candidate(org_id=uuid.UUID(settings.default_org_id))
+    conv = db.get(Conversation, conversation_id)
+    candidate = Candidate(org_id=conv.org_id if conv else None)
     db.add(candidate)
     db.flush()
     return candidate
 
 
-def get_detail(db: Session, candidate_id: uuid.UUID) -> CandidateDetail | None:
+def get_detail(db: Session, candidate_id: uuid.UUID, org_id: uuid.UUID | None = None) -> CandidateDetail | None:
     candidate = db.get(Candidate, candidate_id)
+    if candidate is not None and org_id is not None and candidate.org_id != org_id:
+        return None
     if candidate is None:
         return None
 
@@ -76,11 +83,12 @@ def get_detail(db: Session, candidate_id: uuid.UUID) -> CandidateDetail | None:
 def list_candidates(
     db: Session,
     *,
+    org_id: uuid.UUID,
     page: int = 1,
     limit: int = 20,
     approval_status: str | None = None,
 ) -> CandidateListResponse:
-    query = db.query(Candidate).order_by(Candidate.created_at.desc())
+    query = db.query(Candidate).filter(Candidate.org_id == org_id).order_by(Candidate.created_at.desc())
 
     if approval_status:
         query = query.filter(Candidate.approval_status == approval_status)
@@ -140,6 +148,7 @@ def list_candidates(
 def get_audit_log(
     db: Session,
     candidate_id: uuid.UUID,
+    org_id: uuid.UUID | None = None,
 ) -> list[tuple["AuditLog", str | None]]:
     """
     Return all audit entries relevant to this candidate, newest first.
@@ -149,6 +158,8 @@ def get_audit_log(
     """
     candidate = db.get(Candidate, candidate_id)
     if candidate is None:
+        return []
+    if org_id is not None and candidate.org_id != org_id:
         return []
 
     entity_ids: list[uuid.UUID] = [candidate_id]

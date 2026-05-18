@@ -11,7 +11,6 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.adapters.base import IngestionResult, TranscriptPayload
-from app.config import settings
 from app.db.models import Conversation, SourceEvent
 
 
@@ -24,11 +23,10 @@ class TranscriptAdapter:
         payload: TranscriptPayload,
         db: Session,
         actor_id: str = "system",
+        org_id: uuid.UUID | None = None,
     ) -> IngestionResult:
-        org = uuid.UUID(settings.default_org_id)
-
         conversation = Conversation(
-            org_id=org,
+            org_id=org_id,
             source_type="transcript",
             transcript_status="ready",
             status="raw",
@@ -42,7 +40,7 @@ class TranscriptAdapter:
         db.flush()
 
         event = SourceEvent(
-            org_id=org,
+            org_id=org_id,
             source_type="transcript",
             # raw_payload stores metadata only — the text already lives in Conversation.raw_text.
             raw_payload={"char_count": len(payload.raw_text)},

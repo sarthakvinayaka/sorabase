@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_org_id
 from app.db.session import get_db
 from app.domain.api_schemas import BotSessionCreate, BotSessionRead
 from app.repositories import bot_session_repo
@@ -24,7 +25,11 @@ router = APIRouter()
 
 
 @router.post("/bot-sessions", response_model=BotSessionRead, status_code=201)
-def create_bot_session(body: BotSessionCreate, db: Session = Depends(get_db)):
+def create_bot_session(
+    body: BotSessionCreate,
+    db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+):
     """
     Send a meeting bot into the specified Zoom/Meet/Teams URL.
     Returns immediately with a BotSession in status='joining'.
@@ -51,6 +56,7 @@ def create_bot_session(body: BotSessionCreate, db: Session = Depends(get_db)):
         job_reference=body.job_reference,
         auto_run=body.auto_run,
         mode=body.mode,
+        org_id=org_id,
     )
     logger.info(
         "Bot session created: id=%s provider_bot_id=%s url=%s",
@@ -64,25 +70,34 @@ def list_bot_sessions(
     limit: int = 20,
     status: str | None = None,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
-    return bot_session_repo.list_recent(db, limit=limit, status=status)
+    return bot_session_repo.list_recent(db, org_id=org_id, limit=limit, status=status)
 
 
 @router.get("/bot-sessions/{session_id}", response_model=BotSessionRead)
-def get_bot_session(session_id: uuid.UUID, db: Session = Depends(get_db)):
-    session = bot_session_repo.get(db, session_id)
+def get_bot_session(
+    session_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+):
+    session = bot_session_repo.get(db, session_id, org_id=org_id)
     if session is None:
         raise HTTPException(status_code=404, detail="Bot session not found")
     return session
 
 
 @router.delete("/bot-sessions/{session_id}", status_code=204)
-def cancel_bot_session(session_id: uuid.UUID, db: Session = Depends(get_db)):
+def cancel_bot_session(
+    session_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+):
     """
     Cancel the bot and mark the session as failed.
     Best-effort — if the bot is already done, this is a no-op.
     """
-    session = bot_session_repo.get(db, session_id)
+    session = bot_session_repo.get(db, session_id, org_id=org_id)
     if session is None:
         raise HTTPException(status_code=404, detail="Bot session not found")
 

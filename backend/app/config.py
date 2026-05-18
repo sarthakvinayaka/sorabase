@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     # Public base URL of this server — used to build the Recall webhook callback URL.
     # Example: https://abc123.ngrok.io  (no trailing slash)
     app_base_url: str = "http://localhost:8000"
+    backend_api_secret: str = ""  # set BACKEND_API_SECRET in .env
 
 
 settings = Settings()

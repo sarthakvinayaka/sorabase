@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_org_id
 from app.db.models import Candidate, ExtractionRun
 from app.db.session import get_db
 from app.domain.schema_proposal_schemas import SchemaProposalResponse
@@ -35,6 +36,7 @@ router = APIRouter()
 def propose_conversation_schema(
     conversation_id: uuid.UUID,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ) -> SchemaProposalResponse:
     """
     Generate an AI-suggested extraction schema for the given conversation.
@@ -46,7 +48,7 @@ def propose_conversation_schema(
     Returns a list of proposed columns (5–15) for the user to review and edit
     before running a custom extraction.
     """
-    conversation = conversation_repo.get(db, conversation_id)
+    conversation = conversation_repo.get(db, conversation_id, org_id=org_id)
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found.")
 

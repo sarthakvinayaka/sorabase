@@ -3,9 +3,10 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_org_id
 from app.db.session import get_db
 from app.domain.api_schemas import AnalysisRunRead, AnalysisTriggerRequest, ScoreOverrideRequest
-from app.repositories import analysis_repo
+from app.repositories import analysis_repo, candidate_repo
 from app.services import analysis_service
 from app.services.analysis_client import AnalysisError
 from app.services.analysis_service import (
@@ -26,7 +27,11 @@ def trigger_analysis(
     candidate_id: uuid.UUID,
     body: AnalysisTriggerRequest,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
+    if candidate_repo.get(db, candidate_id, org_id=org_id) is None:
+        raise HTTPException(status_code=404, detail="Candidate not found.")
+
     try:
         run = analysis_service.run_analysis(
             db,
@@ -50,7 +55,14 @@ def trigger_analysis(
     "/candidates/{candidate_id}/analyses",
     response_model=list[AnalysisRunRead],
 )
-def list_analyses(candidate_id: uuid.UUID, db: Session = Depends(get_db)):
+def list_analyses(
+    candidate_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+):
+    if candidate_repo.get(db, candidate_id, org_id=org_id) is None:
+        raise HTTPException(status_code=404, detail="Candidate not found.")
+
     runs = analysis_repo.list_for_candidate(db, candidate_id)
     return [AnalysisRunRead.model_validate(r) for r in runs]
 
@@ -63,7 +75,11 @@ def get_analysis(
     candidate_id: uuid.UUID,
     analysis_id: uuid.UUID,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
+    if candidate_repo.get(db, candidate_id, org_id=org_id) is None:
+        raise HTTPException(status_code=404, detail="Candidate not found.")
+
     run = analysis_repo.get(db, analysis_id)
     if run is None or run.candidate_id != candidate_id:
         raise HTTPException(status_code=404, detail="Analysis not found.")
@@ -79,7 +95,11 @@ def override_score(
     analysis_id: uuid.UUID,
     body: ScoreOverrideRequest,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
+    if candidate_repo.get(db, candidate_id, org_id=org_id) is None:
+        raise HTTPException(status_code=404, detail="Candidate not found.")
+
     run = analysis_repo.get(db, analysis_id)
     if run is None or run.candidate_id != candidate_id:
         raise HTTPException(status_code=404, detail="Analysis not found.")

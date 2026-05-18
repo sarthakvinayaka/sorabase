@@ -3,6 +3,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_org_id
 from app.db.session import get_db
 from app.domain.api_schemas import (
     ApprovalUpdateRequest,
@@ -30,15 +31,20 @@ def list_candidates(
         description="Filter by approval status: needs_review | approved | rejected",
     ),
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
     return candidate_repo.list_candidates(
-        db, page=page, limit=limit, approval_status=approval_status
+        db, org_id=org_id, page=page, limit=limit, approval_status=approval_status
     )
 
 
 @router.get("/candidates/{candidate_id}", response_model=CandidateDetail)
-def get_candidate(candidate_id: uuid.UUID, db: Session = Depends(get_db)):
-    detail = candidate_repo.get_detail(db, candidate_id)
+def get_candidate(
+    candidate_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+):
+    detail = candidate_repo.get_detail(db, candidate_id, org_id=org_id)
     if detail is None:
         raise HTTPException(status_code=404, detail="Candidate not found.")
     return detail
@@ -49,8 +55,9 @@ def update_approval(
     candidate_id: uuid.UUID,
     body: ApprovalUpdateRequest,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
-    candidate = candidate_repo.get(db, candidate_id)
+    candidate = candidate_repo.get(db, candidate_id, org_id=org_id)
     if candidate is None:
         raise HTTPException(status_code=404, detail="Candidate not found.")
 
@@ -81,7 +88,12 @@ def edit_field(
     field_id: uuid.UUID,
     body: FieldEditRequest,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
+    # Validate candidate ownership before accessing field
+    if candidate_repo.get(db, candidate_id, org_id=org_id) is None:
+        raise HTTPException(status_code=404, detail="Candidate not found.")
+
     field = extraction_repo.get_field(db, field_id, candidate_id=candidate_id)
     if field is None:
         raise HTTPException(status_code=404, detail="Field not found.")
@@ -115,12 +127,17 @@ def confirm_field(
     field_id: uuid.UUID,
     body: FieldActionRequest,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
     """
     Recruiter confirms the current value is correct. Status → confirmed.
     The raw/normalized/reviewed values are preserved exactly as-is.
     Audit records what was confirmed (the effective value at confirmation time).
     """
+    # Validate candidate ownership before accessing field
+    if candidate_repo.get(db, candidate_id, org_id=org_id) is None:
+        raise HTTPException(status_code=404, detail="Candidate not found.")
+
     field = extraction_repo.get_field(db, field_id, candidate_id=candidate_id)
     if field is None:
         raise HTTPException(status_code=404, detail="Field not found.")
@@ -158,11 +175,16 @@ def unresolve_field(
     field_id: uuid.UUID,
     body: FieldActionRequest,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
     """
     Recruiter marks a field as unresolved — cannot be determined from available info.
     Status → unresolved. Values preserved. Audit records the transition.
     """
+    # Validate candidate ownership before accessing field
+    if candidate_repo.get(db, candidate_id, org_id=org_id) is None:
+        raise HTTPException(status_code=404, detail="Candidate not found.")
+
     field = extraction_repo.get_field(db, field_id, candidate_id=candidate_id)
     if field is None:
         raise HTTPException(status_code=404, detail="Field not found.")
@@ -189,15 +211,16 @@ def unresolve_field(
 def get_audit_log(
     candidate_id: uuid.UUID,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ):
     """
     Full audit trail for this candidate: the candidate entity, its extraction run,
     and all fields from the latest extraction run. Sorted newest → oldest.
     """
-    if candidate_repo.get(db, candidate_id) is None:
+    if candidate_repo.get(db, candidate_id, org_id=org_id) is None:
         raise HTTPException(status_code=404, detail="Candidate not found.")
 
-    enriched = candidate_repo.get_audit_log(db, candidate_id)
+    enriched = candidate_repo.get_audit_log(db, candidate_id, org_id=org_id)
     entries = [
         AuditLogEntry(
             id=entry.id,

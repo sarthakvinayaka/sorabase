@@ -5,6 +5,7 @@ All metrics are computed at read time from persisted typed fields.
 Effective value precedence: reviewed_value (if edited) → normalized_value → raw_value.
 """
 
+import uuid
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 
@@ -44,13 +45,14 @@ def _eff(field: ExtractedField):
 
 def compute_stats(
     db: Session,
+    org_id: "uuid.UUID",
     from_date: datetime | None = None,
     to_date: datetime | None = None,
 ) -> DashboardStats:
     # ------------------------------------------------------------------ #
     # 1. Candidate counts                                                  #
     # ------------------------------------------------------------------ #
-    cand_q = select(Candidate)
+    cand_q = select(Candidate).where(Candidate.org_id == org_id)
     if from_date:
         cand_q = cand_q.where(Candidate.created_at >= from_date)
     if to_date:

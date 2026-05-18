@@ -13,20 +13,32 @@ from app.db.models import SchemaTemplate
 from app.domain.template_schemas import SchemaTemplateCreate, SchemaTemplateUpdate
 
 
-def list_templates(db: Session) -> Sequence[SchemaTemplate]:
-    return db.query(SchemaTemplate).order_by(SchemaTemplate.updated_at.desc()).all()
+def list_templates(db: Session, org_id: uuid.UUID) -> Sequence[SchemaTemplate]:
+    return (
+        db.query(SchemaTemplate)
+        .filter(SchemaTemplate.org_id == org_id)
+        .order_by(SchemaTemplate.updated_at.desc())
+        .all()
+    )
 
 
-def get_template(db: Session, template_id: uuid.UUID) -> SchemaTemplate | None:
-    return db.get(SchemaTemplate, template_id)
+def get_template(db: Session, template_id: uuid.UUID, org_id: uuid.UUID | None = None) -> SchemaTemplate | None:
+    template = db.get(SchemaTemplate, template_id)
+    if template is None:
+        return None
+    if org_id is not None and template.org_id != org_id:
+        return None
+    return template
 
 
 def create_template(
     db: Session,
     body: SchemaTemplateCreate,
+    org_id: uuid.UUID,
     created_by: str = "recruiter",
 ) -> SchemaTemplate:
     template = SchemaTemplate(
+        org_id=org_id,
         name=body.name,
         description=body.description,
         visibility=body.visibility,

@@ -9,11 +9,14 @@ Flow:
   5. Return AudioIngestResponse with conversation_id for the frontend to redirect.
 """
 
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.adapters.audio_adapter import AudioAdapter
 from app.adapters.base import AudioPayload
+from app.api.deps import get_current_org_id
 from app.config import settings
 from app.db.session import get_db
 from app.domain.api_schemas import AudioIngestResponse
@@ -45,6 +48,7 @@ async def upload_audio(
     job_id: str | None = None,
     recruiter_id: str | None = None,
     db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
 ) -> AudioIngestResponse:
     content_type = (file.content_type or "").lower()
     if content_type not in _ALLOWED_MIME_TYPES:
@@ -69,8 +73,7 @@ async def upload_audio(
     storage = get_audio_storage()
     storage_key = storage.save(data, file.filename or "upload.audio")
 
-    import uuid as _uuid
-    parsed_job_id = _uuid.UUID(job_id) if job_id else None
+    parsed_job_id = uuid.UUID(job_id) if job_id else None
 
     payload = AudioPayload(
         storage_key=storage_key,
@@ -80,7 +83,7 @@ async def upload_audio(
         job_id=parsed_job_id,
     )
 
-    ingest_result = _audio_adapter.ingest(payload, db)
+    ingest_result = _audio_adapter.ingest(payload, db, org_id=org_id)
 
     try:
         _audio_adapter.produce_transcript(ingest_result.source_event_id, db)

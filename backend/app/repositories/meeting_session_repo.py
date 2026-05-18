@@ -54,14 +54,20 @@ def set_status(
 def list_recent(
     db: Session,
     *,
+    org_id: uuid.UUID,
     limit: int = 20,
     status: str | None = None,
 ) -> list[MeetingSession]:
-    q = db.query(MeetingSession)
+    q = db.query(MeetingSession).filter(MeetingSession.org_id == org_id)
     if status is not None:
         q = q.filter(MeetingSession.status == status)
     return q.order_by(desc(MeetingSession.created_at)).limit(limit).all()
 
 
-def get(db: Session, session_id: uuid.UUID) -> MeetingSession | None:
-    return db.get(MeetingSession, session_id)
+def get(db: Session, session_id: uuid.UUID, org_id: uuid.UUID | None = None) -> MeetingSession | None:
+    session = db.get(MeetingSession, session_id)
+    if session is None:
+        return None
+    if org_id is not None and session.org_id != org_id:
+        return None
+    return session
