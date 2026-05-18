@@ -7,12 +7,17 @@ import type { DataSource, ExtraOutputFormat, OutputNodeData } from "@/lib/workfl
 interface Props { id: string; data: OutputNodeData }
 
 const EXTRA_FORMATS: { value: ExtraOutputFormat; label: string; desc: string; implemented: boolean }[] = [
-  { value: "json", label: "JSON",     desc: "Structured candidate record",   implemented: true  },
+  { value: "json", label: "JSON",     desc: "Structured data record",        implemented: true  },
   { value: "csv",  label: "CSV",      desc: "Spreadsheet-compatible export", implemented: false },
   { value: "api",  label: "API POST", desc: "Deliver to a webhook URL",      implemented: false },
 ];
 
-const DATA_SOURCES: { value: DataSource; label: string }[] = [
+const DATA_SOURCES_GENERAL: { value: DataSource; label: string }[] = [
+  { value: "reviewed",  label: "Human reviewed (preferred)" },
+  { value: "extracted", label: "AI extracted only" },
+];
+
+const DATA_SOURCES_RECRUITING: { value: DataSource; label: string }[] = [
   { value: "reviewed",  label: "Recruiter reviewed (preferred)" },
   { value: "extracted", label: "AI extracted only" },
 ];
@@ -36,6 +41,7 @@ export default function OutputInspector({ id, data }: Props) {
   const isGeneral    = mode === "general";
   const extraFormats = (data.extraFormats ?? []) as ExtraOutputFormat[];
   const contentToggles = isGeneral ? CONTENT_TOGGLES_GENERAL : CONTENT_TOGGLES_RECRUITING;
+  const dataSources    = isGeneral ? DATA_SOURCES_GENERAL    : DATA_SOURCES_RECRUITING;
 
   function toggleFormat(fmt: ExtraOutputFormat) {
     const next = extraFormats.includes(fmt)
@@ -157,7 +163,7 @@ export default function OutputInspector({ id, data }: Props) {
       {/* ── Data source ───────────────────────────────────────────────────── */}
       <Field label="Data source">
         <div className="flex flex-col gap-1.5">
-          {DATA_SOURCES.map((s) => (
+          {dataSources.map((s) => (
             <label key={s.value} className="flex items-center gap-2.5 cursor-pointer group">
               <input
                 type="radio"
@@ -188,7 +194,7 @@ export default function OutputInspector({ id, data }: Props) {
             "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
             "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
           ].join(" ")}
-          placeholder="e.g. candidate-export"
+          placeholder={isGeneral ? "e.g. data-export" : "e.g. candidate-export"}
           value={data.exportLabel ?? ""}
           onChange={(e) => update(id, { exportLabel: e.target.value })}
         />

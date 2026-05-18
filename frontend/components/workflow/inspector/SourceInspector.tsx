@@ -214,7 +214,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
     if (!sessionId) return;
     try {
       await cancelBotSession(sessionId);
-      update(id, { botStatus: "failed", botErrorMessage: "Cancelled by recruiter", status: "idle" });
+      update(id, { botStatus: "failed", botErrorMessage: "Cancelled by user", status: "idle" });
     } catch {
       // best-effort
     }
@@ -267,10 +267,10 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
               <div className="flex-shrink-0 flex flex-col items-end gap-1">
                 {botStatus === "complete" && data.botCandidateId && (
                   <a
-                    href={`/review/${data.botCandidateId}`}
+                    href={isGeneral ? `/general/results/${data.botCandidateId}` : `/review/${data.botCandidateId}`}
                     className="text-[10px] font-medium text-aubergine-800 hover:text-aubergine-900"
                   >
-                    Review →
+                    {isGeneral ? "Results →" : "Review →"}
                   </a>
                 )}
                 {isActive && (
@@ -294,8 +294,8 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
           </div>
         </Field>
 
-        {/* Job reference visible for bot sessions too */}
-        <Field label="Job reference" hint="optional">
+        {/* Reference field visible for bot sessions too */}
+        <Field label={isGeneral ? "Session reference" : "Job reference"} hint="optional">
           <input
             type="text"
             className={[
@@ -303,7 +303,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
               "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
               "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
             ].join(" ")}
-            placeholder="e.g. REQ-1042"
+            placeholder={isGeneral ? "e.g. PROJ-2024" : "e.g. REQ-1042"}
             value={data.jobReference}
             onChange={(e) => update(id, { jobReference: e.target.value })}
           />
@@ -337,13 +337,13 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
             "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
             "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
           ].join(" ")}
-          placeholder="e.g. Acme Corp – Eng screen"
+          placeholder={isGeneral ? "e.g. Q4 planning sync" : "e.g. Acme Corp – Eng screen"}
           value={label}
           onChange={(e) => setLabel(e.target.value)}
         />
       </Field>
 
-      <Field label="Job reference" hint="optional">
+      <Field label={isGeneral ? "Session reference" : "Job reference"} hint="optional">
         <input
           type="text"
           className={[
@@ -351,7 +351,7 @@ function ZoomBotPanel({ id, data, update, mode }: ZoomBotPanelProps) {
             "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
             "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
           ].join(" ")}
-          placeholder="e.g. REQ-1042"
+          placeholder={isGeneral ? "e.g. PROJ-2024" : "e.g. REQ-1042"}
           value={data.jobReference}
           onChange={(e) => update(id, { jobReference: e.target.value })}
         />
@@ -579,6 +579,8 @@ const STATUS_META: Record<MeetingSession["status"], { dot: string; label: string
 const TERMINAL = new Set<MeetingSession["status"]>(["complete", "failed"]);
 
 function AutoSessionsPanel() {
+  const { mode }    = useWorkflowMode();
+  const isGeneral   = mode === "general";
   const [sessions, setSessions] = useState<MeetingSession[]>([]);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -636,8 +638,11 @@ function AutoSessionsPanel() {
                   {meta.label}
                 </p>
                 {s.status === "complete" && s.candidate_id && (
-                  <a href={`/review/${s.candidate_id}`} className="text-[10px] text-aubergine-800 hover:text-aubergine-900 font-medium">
-                    Review →
+                  <a
+                    href={isGeneral ? `/general/results/${s.candidate_id}` : `/review/${s.candidate_id}`}
+                    className="text-[10px] text-aubergine-800 hover:text-aubergine-900 font-medium"
+                  >
+                    {isGeneral ? "Results →" : "Review →"}
                   </a>
                 )}
               </div>
