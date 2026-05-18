@@ -48,7 +48,7 @@ function Hero() {
       />
 
       <div className="relative mkt-section">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-24 items-center">
 
           {/* Left: copy */}
           <div className="max-w-xl">
@@ -249,14 +249,14 @@ function PlatformFlow() {
             <div
               key={step.n}
               className={[
-                "relative p-8 lg:px-8",
+                "relative p-5 sm:p-7 lg:px-8",
                 i === 0 ? "lg:pl-0" : "",
                 i === 3 ? "lg:pr-0" : "",
               ].join(" ")}
             >
               <span
                 className="block font-display italic text-stone-200 dark:text-stone-800 leading-none mb-5 select-none"
-                style={{ fontSize: "3.25rem" }}
+                style={{ fontSize: "clamp(2rem, 5vw, 3.25rem)" }}
               >
                 {step.n}
               </span>
@@ -365,7 +365,7 @@ function WorkflowCanvas() {
               }}
             />
 
-            <div className="relative bg-stone-50/80 dark:bg-stone-950/80 px-8 py-10">
+            <div className="relative bg-stone-50/80 dark:bg-stone-950/80 px-4 sm:px-8 py-8 sm:py-10 overflow-x-auto">
               <div className="flex items-center gap-0 min-w-max mx-auto w-fit">
                 {WORKFLOW_NODES.map((node, i) => (
                   <div key={node.id} className="flex items-center">
@@ -878,7 +878,7 @@ function Integrations() {
   return (
     <section id="integrations" className="py-24 lg:py-32 bg-stone-50 dark:bg-stone-950">
       <div className="mkt-section">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-24 items-start">
 
           {/* Left: copy */}
           <div>
@@ -899,7 +899,7 @@ function Integrations() {
           </div>
 
           {/* Right: two-column source / output */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
 
             {/* Sources */}
             <div>
@@ -1005,7 +1005,7 @@ function Templates() {
   return (
     <section className="py-24 lg:py-32 bg-white dark:bg-stone-900">
       <div className="mkt-section">
-        <div className="grid lg:grid-cols-[1fr_2fr] gap-16 items-start">
+        <div className="grid lg:grid-cols-[1fr_2fr] gap-8 lg:gap-16 items-start">
 
           {/* Left: copy */}
           <div className="lg:sticky lg:top-28">
@@ -1050,7 +1050,7 @@ function Templates() {
                 <div className="divide-y divide-stone-50 dark:divide-stone-800/60">
                   {tmpl.fields.map(({ name, note }) => (
                     <div key={name} className="flex items-center gap-4 px-6 py-2.5">
-                      <span className="text-xs font-mono text-stone-500 dark:text-stone-400 w-40 flex-shrink-0">{name}</span>
+                      <span className="text-xs font-mono text-stone-500 dark:text-stone-400 w-28 sm:w-40 flex-shrink-0">{name}</span>
                       <span className="text-xs text-stone-400 dark:text-stone-500 leading-relaxed">{note}</span>
                     </div>
                   ))}
@@ -1336,7 +1336,7 @@ function FinalCTA() {
   return (
     <section className="py-24 lg:py-32 bg-white dark:bg-stone-900">
       <div className="mkt-section">
-        <div className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 px-10 py-16 lg:px-20 lg:py-20">
+        <div className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 px-6 py-12 sm:px-10 sm:py-16 lg:px-20 lg:py-20">
           <div className="max-w-xl">
             <p className="eyebrow mb-5">Ready to start?</p>
             <h2

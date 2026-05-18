@@ -531,7 +531,7 @@ function FAQSection() {
                 id={btnId}
                 type="button"
                 onClick={() => setOpen(isOpen ? null : i)}
-                className="w-full text-left flex items-start justify-between gap-6 py-5 group"
+                className="w-full text-left flex items-start justify-between gap-4 sm:gap-6 py-5 group"
                 aria-expanded={isOpen}
                 aria-controls={panelId}
               >
@@ -555,7 +555,7 @@ function FAQSection() {
                 role="region"
                 aria-labelledby={btnId}
                 hidden={!isOpen}
-                className="pb-5 pr-10"
+                className="pb-5 pr-0 sm:pr-10"
               >
                 <p className="text-[13px] text-stone-500 dark:text-stone-400 leading-relaxed">
                   {item.a}
@@ -590,7 +590,7 @@ function BottomCTA() {
       </div>
       <div aria-hidden className="absolute left-0 top-0 bottom-0 w-px bg-aubergine-900/40" />
 
-      <div className="relative px-10 py-16 lg:px-16 lg:py-20">
+      <div className="relative px-6 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
         <div className="grid lg:grid-cols-2 gap-10 items-center">
           <div>
             <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-stone-600 mb-6">

@@ -65,7 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Synchronous theme application — prevents flash of unstyled content */}
         <ThemeScript />
       </head>
-      <body className="bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 min-h-screen antialiased">
+      <body className="bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 min-h-screen antialiased overflow-x-hidden">
         {/* Skip link — only visible on keyboard focus */}
         <a
           href="#main-content"
