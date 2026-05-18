@@ -61,7 +61,11 @@ export default function SourceInspector({ id, data }: Props) {
             ].join(" ")}
             rows={10}
             maxLength={50000}
-            placeholder={"Recruiter: Tell me about yourself.\nCandidate: Sure, I've been…"}
+            placeholder={
+              mode === "general"
+                ? "Speaker A: Let's go through the agenda.\nSpeaker B: Sure, I'd like to start with…"
+                : "Recruiter: Tell me about yourself.\nCandidate: Sure, I've been…"
+            }
             value={data.transcript}
             onChange={(e) => update(id, { transcript: e.target.value })}
           />
@@ -91,9 +95,9 @@ export default function SourceInspector({ id, data }: Props) {
         </>
       )}
 
-      {/* Job reference — shown for all transcript modes */}
+      {/* Reference field — shown for all transcript modes */}
       {data.inputMode !== "zoom_bot" && (
-        <Field label="Job reference" hint="optional">
+        <Field label={mode === "general" ? "Session label" : "Job reference"} hint="optional">
           <input
             type="text"
             className={[
@@ -101,7 +105,7 @@ export default function SourceInspector({ id, data }: Props) {
               "text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400",
               "border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700",
             ].join(" ")}
-            placeholder="e.g. REQ-1042"
+            placeholder={mode === "general" ? "e.g. Q4 planning call" : "e.g. REQ-1042"}
             value={data.jobReference}
             onChange={(e) => update(id, { jobReference: e.target.value })}
           />
@@ -123,7 +127,7 @@ const BOT_STATUS_META: Record<string, { dot: string; label: string; hint: string
   transcribing:          { dot: "bg-aubergine-400 animate-pulse",  label: "Transcribing…",        hint: "Call ended. Generating transcript." },
   ready:                 { dot: "bg-aubergine-700",                label: "Transcript ready",     hint: "Running extraction pipeline." },
   extracting:            { dot: "bg-aubergine-400 animate-pulse",  label: "Extracting…",         hint: "Running AI extraction." },
-  complete:              { dot: "bg-aubergine-700",             label: "Complete",             hint: "Workflow finished. Candidate ready." },
+  complete:              { dot: "bg-aubergine-700",             label: "Complete",             hint: "Workflow finished. Results ready." },
   failed:                { dot: "bg-red-500",                 label: "Failed",               hint: "Something went wrong." },
 };
 

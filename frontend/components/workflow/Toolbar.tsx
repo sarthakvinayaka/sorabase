@@ -84,7 +84,7 @@ export default function Toolbar({ onRun }: Props) {
               : "border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:border-stone-300 dark:hover:border-stone-600 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800",
           ].join(" ")}
         >
-          <PersonPlusIcon />
+          {isRecruiting ? <PersonPlusIcon /> : <NewSessionIcon />}
           {newLabel}
         </button>
 
@@ -164,6 +164,15 @@ function PersonPlusIcon() {
   return (
     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h11m3-4v6m3-3h-6" />
+    </svg>
+  );
+}
+
+function NewSessionIcon() {
+  return (
+    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h5" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 9a9 9 0 1 1 2.6 6.4" />
     </svg>
   );
 }

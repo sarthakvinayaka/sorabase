@@ -5,6 +5,7 @@ import {
   type ExtractionFieldGroup,
   type ExtractionNodeData,
 } from "@/lib/workflow-types";
+import { useWorkflowMode } from "@/lib/workflow-store-context";
 import BaseNode from "./BaseNode";
 
 const THRESHOLD_LABEL: Record<string, string> = {
@@ -12,7 +13,9 @@ const THRESHOLD_LABEL: Record<string, string> = {
 };
 
 export default function ExtractionNode({ id, data: raw, selected }: NodeProps) {
-  const data = raw as unknown as ExtractionNodeData;
+  const data      = raw as unknown as ExtractionNodeData;
+  const { mode }  = useWorkflowMode();
+  const isGeneral = mode === "general";
 
   const groups = (data.fieldGroups ?? []) as ExtractionFieldGroup[];
   const activeGroups = groups.filter((g) => g.active);
@@ -21,8 +24,8 @@ export default function ExtractionNode({ id, data: raw, selected }: NodeProps) {
     return sum + (def?.fieldCount ?? 0);
   }, 0);
 
-  const templateDef = EXTRACTION_TEMPLATES.find((t) => t.id === data.template);
-  const templateLabel = templateDef?.label ?? data.label;
+  const templateDef   = EXTRACTION_TEMPLATES.find((t) => t.id === data.template);
+  const recruitLabel  = templateDef?.label ?? data.label;
 
   return (
     <BaseNode
@@ -34,16 +37,27 @@ export default function ExtractionNode({ id, data: raw, selected }: NodeProps) {
       nodeId={id}
     >
       <p className="text-sm font-medium text-stone-800 dark:text-stone-100 leading-tight truncate">
-        {templateLabel}
+        {isGeneral ? "Schema Extraction" : recruitLabel}
       </p>
-      <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-        {activeGroups.length} groups · {activeFieldCount} fields
-      </p>
+
+      {isGeneral ? (
+        <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
+          {data.status === "completed" && data.extractedCount !== undefined
+            ? `${data.extractedCount} fields extracted`
+            : "Schema-driven · configurable"}
+        </p>
+      ) : (
+        <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
+          {activeGroups.length} groups · {activeFieldCount} fields
+        </p>
+      )}
+
       <p className="text-[10px] text-stone-300 dark:text-stone-600 mt-0.5">
         {THRESHOLD_LABEL[data.confidenceThreshold] ?? "Med. conf."}
         {data.flagLowConfidence ? " · flag low" : ""}
       </p>
-      {data.status === "completed" && data.extractedCount !== undefined && (
+
+      {!isGeneral && data.status === "completed" && data.extractedCount !== undefined && (
         <div className="mt-2 flex items-center gap-2">
           <span className="text-[10px] font-medium text-aubergine-700">
             {data.extractedCount}/{activeFieldCount} extracted
@@ -53,6 +67,14 @@ export default function ExtractionNode({ id, data: raw, selected }: NodeProps) {
               {Math.round(data.overallConfidence * 100)}% conf.
             </span>
           )}
+        </div>
+      )}
+
+      {isGeneral && data.status === "completed" && data.overallConfidence !== undefined && (
+        <div className="mt-2">
+          <span className="text-[10px] font-medium text-aubergine-700">
+            {Math.round(data.overallConfidence * 100)}% confidence
+          </span>
         </div>
       )}
     </BaseNode>

@@ -165,7 +165,7 @@ export default function ExtractionInspector({ id, data }: Props) {
           ))}
         </div>
         <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-1.5">
-          Fields below this threshold are flagged for recruiter review.
+          Fields below this threshold are flagged for manual review.
         </p>
       </Field>
 
