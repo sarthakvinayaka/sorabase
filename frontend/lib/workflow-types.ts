@@ -7,7 +7,11 @@ export type WorkflowNodeType =
   // Recruiting Mode nodes
   | "source" | "extraction" | "analysis" | "output"
   // General Mode additions
-  | "transcript" | "summary" | "schema";
+  | "transcript" | "summary" | "schema"
+  // Study Mode nodes
+  | "lec_capture" | "lec_upload" | "transcript_cleaner"
+  | "concept_extractor" | "definition_extractor" | "formula_extractor"
+  | "question_gen" | "flashcard_gen" | "quiz_gen" | "study_output";
 
 export type NodeStatus = "idle" | "configured" | "running" | "completed" | "error";
 
@@ -210,7 +214,18 @@ export type AnyNodeData =
   | OutputNodeData
   | TranscriptNodeData
   | SummaryNodeData
-  | SchemaNodeData;
+  | SchemaNodeData
+  // Study Mode
+  | LecCaptureNodeData
+  | LecUploadNodeData
+  | TranscriptCleanerNodeData
+  | ConceptExtractorNodeData
+  | DefinitionExtractorNodeData
+  | FormulaExtractorNodeData
+  | QuestionGenNodeData
+  | FlashcardGenNodeData
+  | QuizGenNodeData
+  | StudyOutputNodeData;
 
 // ─── React Flow node / edge aliases ─────────────────────────────────────────
 
@@ -330,4 +345,164 @@ export const VALID_CONNECTIONS: Record<WorkflowNodeType, WorkflowNodeType[]> = {
   transcript: ["schema", "extraction", "summary"],
   schema:     ["extraction"],
   summary:    ["output"],
+  // Study Mode
+  lec_capture:         ["transcript_cleaner", "concept_extractor", "definition_extractor", "formula_extractor", "question_gen", "flashcard_gen", "study_output"],
+  lec_upload:          ["transcript_cleaner", "concept_extractor", "definition_extractor", "formula_extractor", "question_gen", "flashcard_gen", "study_output"],
+  transcript_cleaner:  ["concept_extractor", "definition_extractor", "formula_extractor", "question_gen", "flashcard_gen", "study_output"],
+  concept_extractor:   ["question_gen", "flashcard_gen", "quiz_gen", "study_output"],
+  definition_extractor:["flashcard_gen", "quiz_gen", "study_output"],
+  formula_extractor:   ["flashcard_gen", "quiz_gen", "study_output"],
+  question_gen:        ["flashcard_gen", "quiz_gen", "study_output"],
+  flashcard_gen:       ["quiz_gen", "study_output"],
+  quiz_gen:            ["study_output"],
+  study_output:        [],
 };
+
+// ─── Study Mode node data ────────────────────────────────────────────────────
+
+// Lecture Capture — live / paste
+export type LecCaptureMode = "paste" | "browser_capture" | "zoom_bot";
+export interface LecCaptureNodeData extends Record<string, unknown> {
+  nodeType: "lec_capture";
+  label: string;
+  status: NodeStatus;
+  captureMode: LecCaptureMode;
+  transcript: string;
+  lectureTitle: string;
+  courseName: string;
+  lectureDate: string;     // YYYY-MM-DD or ""
+  conversationId?: string;
+  charCount?: number;
+}
+
+// Lecture Upload — file-based
+export type LecUploadFormat = "audio" | "pdf" | "markdown";
+export interface LecUploadNodeData extends Record<string, unknown> {
+  nodeType: "lec_upload";
+  label: string;
+  status: NodeStatus;
+  format: LecUploadFormat;
+  lectureTitle: string;
+  courseName: string;
+  lectureDate: string;
+  fileName?: string;
+  fileSizeBytes?: number;
+  conversationId?: string;
+}
+
+// Transcript Cleaner
+export type CleanerPreset = "lecture" | "seminar" | "verbatim";
+export interface TranscriptCleanerNodeData extends Record<string, unknown> {
+  nodeType: "transcript_cleaner";
+  label: string;
+  status: NodeStatus;
+  preset: CleanerPreset;
+  removeFiller: boolean;
+  fixSpeakerLabels: boolean;
+  collapseRepetitions: boolean;
+  charCount?: number;
+}
+
+// Concept Extractor
+export interface ConceptExtractorNodeData extends Record<string, unknown> {
+  nodeType: "concept_extractor";
+  label: string;
+  status: NodeStatus;
+  maxConcepts: number;
+  confidenceThreshold: ConfidenceThreshold;
+  includeEvidence: boolean;
+  conceptCount?: number;
+}
+
+// Definition Extractor
+export interface DefinitionExtractorNodeData extends Record<string, unknown> {
+  nodeType: "definition_extractor";
+  label: string;
+  status: NodeStatus;
+  maxDefinitions: number;
+  includeContext: boolean;
+  definitionCount?: number;
+}
+
+// Formula Extractor
+export interface FormulaExtractorNodeData extends Record<string, unknown> {
+  nodeType: "formula_extractor";
+  label: string;
+  status: NodeStatus;
+  includeDerivations: boolean;
+  includeUnits: boolean;
+  formulaCount?: number;
+}
+
+// Important Questions Generator
+export type StudyQuestionTemplate = "exam_prep" | "lecture_notes" | "deep_study" | "quick_review";
+export interface QuestionGenNodeData extends Record<string, unknown> {
+  nodeType: "question_gen";
+  label: string;
+  status: NodeStatus;
+  template: StudyQuestionTemplate;
+  maxQuestions: number;
+  includeShortAnswer: boolean;
+  includeExamQ: boolean;
+  includeCompare: boolean;
+  includeApplied: boolean;
+  questionCount?: number;
+}
+
+// Flashcard Generator
+export interface FlashcardGenNodeData extends Record<string, unknown> {
+  nodeType: "flashcard_gen";
+  label: string;
+  status: NodeStatus;
+  includeConcepts: boolean;
+  includeDefinitions: boolean;
+  includeFormulas: boolean;
+  includeQuestions: boolean;
+  includeTopics: boolean;
+  maxCards: number;
+  flashcardCount?: number;
+}
+
+// Quiz Generator
+export type QuizDifficultyMix = "easy_heavy" | "balanced" | "hard_heavy";
+export interface QuizGenNodeData extends Record<string, unknown> {
+  nodeType: "quiz_gen";
+  label: string;
+  status: NodeStatus;
+  includeMcq: boolean;
+  includeTrueFalse: boolean;
+  includeShortAnswer: boolean;
+  includeMatching: boolean;
+  includeFillBlank: boolean;
+  maxQuestions: number;
+  difficultyMix: QuizDifficultyMix;
+  quizItemCount?: number;
+}
+
+// Study Pack Output
+export interface StudyOutputNodeData extends Record<string, unknown> {
+  nodeType: "study_output";
+  label: string;
+  status: NodeStatus;
+  autoArchive: boolean;
+  exportJson: boolean;
+  exportCsv: boolean;
+  exportAnki: boolean;
+  packTitle: string;
+  lectureId?: string;
+}
+
+// ─── Study Mode palette ──────────────────────────────────────────────────────
+
+export const STUDY_NODE_PALETTE: PaletteItem[] = [
+  { type: "lec_capture",          label: "Lecture Capture",   description: "Paste, record, or live-capture a lecture",          accent: "bg-stone-400",    icon: "◎"  },
+  { type: "lec_upload",           label: "Lecture Upload",    description: "Upload an audio file, PDF, or markdown transcript", accent: "bg-stone-500",    icon: "⇡"  },
+  { type: "transcript_cleaner",   label: "Transcript Cleaner",description: "Remove filler, fix speaker labels, normalise text", accent: "bg-sky-400",      icon: "≋"  },
+  { type: "concept_extractor",    label: "Concept Extractor", description: "Extract key concepts with definitions and evidence", accent: "bg-violet-500",   icon: "◈"  },
+  { type: "definition_extractor", label: "Definition Extractor",description: "Extract term → definition pairs",                 accent: "bg-violet-400",   icon: "⊟"  },
+  { type: "formula_extractor",    label: "Formula Extractor", description: "Extract formulas with notation and explanations",   accent: "bg-violet-500",   icon: "∑"  },
+  { type: "question_gen",         label: "Questions",         description: "Generate exam, short-answer, and applied questions",accent: "bg-aubergine-600", icon: "?"  },
+  { type: "flashcard_gen",        label: "Flashcard Generator",description: "Build a flashcard deck from extracted content",    accent: "bg-aubergine-600", icon: "⊞"  },
+  { type: "quiz_gen",             label: "Quiz Generator",    description: "Create MCQ, true/false, matching, and fill-blank quizzes", accent: "bg-aubergine-600", icon: "✦" },
+  { type: "study_output",         label: "Study Pack Output", description: "Archive the lecture and export study materials",   accent: "bg-emerald-500",  icon: "↑"  },
+];

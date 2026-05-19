@@ -346,7 +346,7 @@ function QuestionRow({ q, index }: { q: StudyQuestion; index: number }) {
       </button>
       {open && (
         <div className="px-5 pb-3.5 pl-13">
-          <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed ml-8">{q.answer}</p>
+          <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed ml-8">{q.answer_exam}</p>
         </div>
       )}
     </div>

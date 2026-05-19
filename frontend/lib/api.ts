@@ -30,6 +30,8 @@ import type {
   SchemaTemplateCreate,
   SchemaTemplateUpdate,
   SchemasListResponse,
+  MCQOption,
+  QuestionDifficulty,
   StudyArchiveStatus,
   StudyCourseDetail,
   StudyExtractionCreatedResponse,
@@ -512,7 +514,15 @@ export async function updateStudyFlashcard(
 export async function updateStudyQuestion(
   lectureId: string,
   questionId: string,
-  data: { question?: string; answer?: string },
+  data: {
+    question?:        string;
+    answer_short?:    string;
+    answer_exam?:     string;
+    answer_detailed?: string;
+    options?:         MCQOption[];
+    difficulty?:      QuestionDifficulty;
+    is_hidden?:       boolean;
+  },
 ): Promise<StudyQuestion> {
   return request(`/api/study/lectures/${lectureId}/questions/${questionId}`, {
     method: "PATCH",

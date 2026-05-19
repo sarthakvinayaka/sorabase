@@ -16,6 +16,8 @@ import type {
   StudyFlashcard,
   StudyQuestion,
   StudyArchiveStatus,
+  MCQOption,
+  QuestionDifficulty,
 } from "@/lib/types";
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -679,6 +681,108 @@ function FlashcardsTab({
 
 // ─── Questions tab ────────────────────────────────────────────────────────────
 
+type AnswerLength = "short" | "exam" | "detailed";
+
+function resolveAnswer(q: StudyQuestion, length: AnswerLength): string {
+  if (length === "short")    return q.answer_short    ?? q.answer_exam;
+  if (length === "detailed") return q.answer_detailed ?? q.answer_exam;
+  return q.answer_exam;
+}
+
+const QTYPE_LABELS: Record<string, string> = {
+  important:           "Important",
+  exam:                "Exam",
+  short_answer:        "Short answer",
+  multiple_choice:     "MCQ",
+  concept_explanation: "Concept",
+  compare_contrast:    "Compare",
+  applied_scenario:    "Applied",
+};
+
+function McqDisplay({ options }: { options: MCQOption[] }) {
+  const [revealed, setRevealed] = useState(false);
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {options.map((opt) => {
+          const showCorrect = revealed && opt.is_correct;
+          const showWrong   = revealed && !opt.is_correct;
+          return (
+            <button
+              key={opt.label}
+              onClick={() => setRevealed(true)}
+              className={[
+                "text-left px-3 py-2 rounded border text-sm transition-colors",
+                showCorrect
+                  ? "bg-positive-light border-positive-border text-positive-text"
+                  : showWrong
+                  ? "bg-stone-50 border-stone-200 text-stone-400 dark:bg-stone-800/30 dark:border-stone-700 dark:text-stone-500 line-through"
+                  : "bg-stone-50 dark:bg-stone-800/40 border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-aubergine-800/40",
+              ].join(" ")}
+            >
+              <span className="font-semibold mr-1.5">{opt.label}.</span>
+              {opt.text}
+            </button>
+          );
+        })}
+      </div>
+      {!revealed && (
+        <p className="text-2xs text-stone-400 dark:text-stone-500">Click any option to reveal answer</p>
+      )}
+      {revealed && (
+        <button
+          onClick={() => setRevealed(false)}
+          className="text-2xs text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+        >
+          Reset
+        </button>
+      )}
+    </div>
+  );
+}
+
+function McqEditForm({
+  options,
+  onChange,
+}: {
+  options: MCQOption[];
+  onChange: (opts: MCQOption[]) => void;
+}) {
+  function updateText(label: string, text: string) {
+    onChange(options.map((o) => o.label === label ? { ...o, text } : o));
+  }
+  function setCorrect(label: string) {
+    onChange(options.map((o) => ({ ...o, is_correct: o.label === label })));
+  }
+  return (
+    <div className="space-y-2">
+      <label className="section-label block mb-1">Options</label>
+      {options.map((opt) => (
+        <div key={opt.label} className="flex items-start gap-2">
+          <div className="flex items-center gap-1.5 pt-2 flex-shrink-0">
+            <input
+              type="radio"
+              name="mcq-correct"
+              checked={opt.is_correct}
+              onChange={() => setCorrect(opt.label)}
+              className="accent-aubergine-800"
+              title="Mark as correct"
+            />
+            <span className="text-xs font-semibold text-stone-500 dark:text-stone-400 w-4">{opt.label}.</span>
+          </div>
+          <textarea
+            value={opt.text}
+            onChange={(e) => updateText(opt.label, e.target.value)}
+            rows={2}
+            className="flex-1 text-sm bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-aubergine-800/30 text-stone-900 dark:text-stone-100"
+          />
+        </div>
+      ))}
+      <p className="text-2xs text-stone-400 dark:text-stone-500">Select the radio button next to the correct option</p>
+    </div>
+  );
+}
+
 function QuestionsTab({
   detail,
   lectureId,
@@ -688,37 +792,70 @@ function QuestionsTab({
   lectureId: string;
   onUpdate: (d: StudyLectureDetail) => void;
 }) {
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const [editing,  setEditing]  = useState<string | null>(null);
-  const [editQ,    setEditQ]    = useState("");
-  const [editA,    setEditA]    = useState("");
-  const [saving,   setSaving]   = useState(false);
-  const [saveErr,  setSaveErr]  = useState<string | null>(null);
+  const [answerLength, setAnswerLength] = useState<AnswerLength>("exam");
+  const [expanded,     setExpanded]     = useState<Set<string>>(new Set());
+  const [editing,      setEditing]      = useState<string | null>(null);
+  const [saving,       setSaving]       = useState(false);
+  const [saveErr,      setSaveErr]      = useState<string | null>(null);
+  const [hidingSaving, setHidingSaving] = useState<string | null>(null);
+
+  // Per-question edit state
+  const [editQ,          setEditQ]          = useState("");
+  const [editShort,      setEditShort]      = useState("");
+  const [editExam,       setEditExam]       = useState("");
+  const [editDetailed,   setEditDetailed]   = useState("");
+  const [editDifficulty, setEditDifficulty] = useState<QuestionDifficulty | null>(null);
+  const [editOptions,    setEditOptions]    = useState<MCQOption[]>([]);
 
   function startEdit(q: StudyQuestion) {
     setEditing(q.id);
     setEditQ(q.question);
-    setEditA(q.answer);
+    setEditShort(q.answer_short    ?? "");
+    setEditExam(q.answer_exam);
+    setEditDetailed(q.answer_detailed ?? "");
+    setEditDifficulty(q.difficulty);
+    setEditOptions(q.options ? [...q.options] : []);
     setSaveErr(null);
     setExpanded((s) => { const n = new Set(s); n.add(q.id); return n; });
   }
 
-  async function saveEdit(qId: string) {
+  async function saveEdit(q: StudyQuestion) {
     setSaving(true);
     try {
-      const updated = await updateStudyQuestion(lectureId, qId, {
-        question: editQ,
-        answer:   editA,
-      });
+      const payload: Parameters<typeof updateStudyQuestion>[2] = {
+        question:   editQ,
+        answer_exam: editExam,
+        difficulty: editDifficulty ?? undefined,
+      };
+      if (editShort.trim())    payload.answer_short    = editShort;
+      if (editDetailed.trim()) payload.answer_detailed = editDetailed;
+      if (q.question_type === "multiple_choice") payload.options = editOptions;
+
+      const updated = await updateStudyQuestion(lectureId, q.id, payload);
       onUpdate({
         ...detail,
-        questions: detail.questions.map((q) => (q.id === qId ? updated : q)),
+        questions: detail.questions.map((x) => (x.id === q.id ? updated : x)),
       });
       setEditing(null);
     } catch (err) {
       setSaveErr(err instanceof ApiError ? err.detail : "Save failed.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function showHidden(q: StudyQuestion) {
+    setHidingSaving(q.id);
+    try {
+      const updated = await updateStudyQuestion(lectureId, q.id, { is_hidden: false });
+      onUpdate({
+        ...detail,
+        questions: detail.questions.map((x) => (x.id === q.id ? updated : x)),
+      });
+    } catch {
+      // silently fail — user can retry
+    } finally {
+      setHidingSaving(null);
     }
   }
 
@@ -730,11 +867,38 @@ function QuestionsTab({
     );
   }
 
+  const isMcq = (q: StudyQuestion) => q.question_type === "multiple_choice";
+
   return (
     <div className="space-y-3">
-      <p className="text-xs text-stone-400 dark:text-stone-500">
-        {detail.questions.length} questions · Click to reveal answer
-      </p>
+      {/* Header row */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-stone-400 dark:text-stone-500">
+          {detail.questions.filter((q) => !q.is_hidden).length} questions
+          {detail.questions.some((q) => q.is_hidden) && (
+            <span className="ml-1 text-stone-300 dark:text-stone-600">
+              · {detail.questions.filter((q) => q.is_hidden).length} hidden
+            </span>
+          )}
+        </p>
+        {/* Answer length toggle — only meaningful for non-MCQ */}
+        <div className="flex items-center gap-0.5 bg-stone-100 dark:bg-stone-800 rounded p-0.5">
+          {(["short", "exam", "detailed"] as AnswerLength[]).map((len) => (
+            <button
+              key={len}
+              onClick={() => setAnswerLength(len)}
+              className={[
+                "text-2xs px-2 py-0.5 rounded transition-colors capitalize",
+                answerLength === len
+                  ? "bg-white dark:bg-stone-700 text-stone-800 dark:text-stone-100 shadow-sm font-medium"
+                  : "text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300",
+              ].join(" ")}
+            >
+              {len}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {detail.questions.map((q, i) => {
         const isExpanded = expanded.has(q.id);
@@ -743,8 +907,30 @@ function QuestionsTab({
         return (
           <div
             key={q.id}
-            className="bg-white dark:bg-stone-900 rounded-lg border border-stone-200 dark:border-stone-700 shadow-card overflow-hidden"
+            className={[
+              "bg-white dark:bg-stone-900 rounded-lg border shadow-card overflow-hidden",
+              q.is_hidden
+                ? "border-warning-border opacity-70"
+                : "border-stone-200 dark:border-stone-700",
+            ].join(" ")}
           >
+            {/* Hidden banner */}
+            {q.is_hidden && (
+              <div className="px-5 py-2 bg-warning-light border-b border-warning-border flex items-center justify-between gap-3">
+                <p className="text-2xs text-warning-text">
+                  Auto-hidden — low transcript coverage
+                </p>
+                <button
+                  onClick={() => showHidden(q)}
+                  disabled={hidingSaving === q.id}
+                  className="text-2xs font-medium text-warning-text underline hover:no-underline disabled:opacity-50"
+                >
+                  {hidingSaving === q.id ? "Showing…" : "Show"}
+                </button>
+              </div>
+            )}
+
+            {/* Question header */}
             <div
               className="px-5 py-3.5 flex items-start gap-3 cursor-pointer hover:bg-stone-50/60 dark:hover:bg-stone-800/30 transition-colors"
               onClick={() => !isEditing && setExpanded((s) => {
@@ -764,10 +950,19 @@ function QuestionsTab({
                   <p className="text-sm font-medium text-stone-900 dark:text-stone-100 leading-snug">
                     {q.question}
                   </p>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {/* Question type badge */}
+                    <span className="badge text-2xs bg-aubergine-50 border-aubergine-200 text-aubergine-800 dark:bg-aubergine-950/30 dark:border-aubergine-900 dark:text-aubergine-400">
+                      {QTYPE_LABELS[q.question_type] ?? q.question_type}
+                    </span>
                     {q.difficulty && (
                       <span className={`badge text-2xs ${DIFFICULTY_STYLES[q.difficulty] ?? ""}`}>
                         {q.difficulty}
+                      </span>
+                    )}
+                    {q.source_coverage !== null && q.source_coverage < 0.70 && (
+                      <span className="badge text-2xs bg-warning-light border-warning-border text-warning-text">
+                        Low coverage
                       </span>
                     )}
                     <ChevronIcon open={isExpanded} />
@@ -776,10 +971,12 @@ function QuestionsTab({
               </div>
             </div>
 
+            {/* Expanded content */}
             {(isExpanded || isEditing) && (
               <div className="border-t border-stone-100 dark:border-stone-800 px-5 py-3.5">
                 {isEditing ? (
                   <div className="space-y-3">
+                    {/* Question text */}
                     <div>
                       <label className="section-label block mb-1">Question</label>
                       <textarea
@@ -789,19 +986,70 @@ function QuestionsTab({
                         className="w-full text-sm bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-aubergine-800/30 text-stone-900 dark:text-stone-100"
                       />
                     </div>
+
+                    {/* Difficulty */}
                     <div>
-                      <label className="section-label block mb-1">Answer</label>
-                      <textarea
-                        value={editA}
-                        onChange={(e) => setEditA(e.target.value)}
-                        rows={4}
-                        className="w-full text-sm bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-aubergine-800/30 text-stone-900 dark:text-stone-100"
-                      />
+                      <label className="section-label block mb-1">Difficulty</label>
+                      <div className="flex gap-1.5">
+                        {(["easy", "medium", "hard"] as QuestionDifficulty[]).map((d) => (
+                          <button
+                            key={d}
+                            onClick={() => setEditDifficulty(editDifficulty === d ? null : d)}
+                            className={[
+                              "badge text-2xs capitalize",
+                              editDifficulty === d
+                                ? DIFFICULTY_STYLES[d]
+                                : "bg-stone-100 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-400 dark:text-stone-500",
+                            ].join(" ")}
+                          >
+                            {d}
+                          </button>
+                        ))}
+                      </div>
                     </div>
+
+                    {/* MCQ options or multi-length answers */}
+                    {isMcq(q) ? (
+                      <McqEditForm options={editOptions} onChange={setEditOptions} />
+                    ) : (
+                      <div className="space-y-2">
+                        <label className="section-label block">Answers</label>
+                        <div>
+                          <p className="text-2xs text-stone-400 dark:text-stone-500 mb-0.5">Short (15–25 words)</p>
+                          <textarea
+                            value={editShort}
+                            onChange={(e) => setEditShort(e.target.value)}
+                            rows={2}
+                            placeholder="Leave blank to inherit exam answer"
+                            className="w-full text-sm bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-aubergine-800/30 text-stone-900 dark:text-stone-100 placeholder:text-stone-300 dark:placeholder:text-stone-600"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-2xs text-stone-400 dark:text-stone-500 mb-0.5">Exam (50–150 words) — default</p>
+                          <textarea
+                            value={editExam}
+                            onChange={(e) => setEditExam(e.target.value)}
+                            rows={4}
+                            className="w-full text-sm bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-aubergine-800/30 text-stone-900 dark:text-stone-100"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-2xs text-stone-400 dark:text-stone-500 mb-0.5">Detailed (200–500 words)</p>
+                          <textarea
+                            value={editDetailed}
+                            onChange={(e) => setEditDetailed(e.target.value)}
+                            rows={5}
+                            placeholder="Leave blank to inherit exam answer"
+                            className="w-full text-sm bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-aubergine-800/30 text-stone-900 dark:text-stone-100 placeholder:text-stone-300 dark:placeholder:text-stone-600"
+                          />
+                        </div>
+                      </div>
+                    )}
+
                     {saveErr && <p className="text-xs text-negative-text">{saveErr}</p>}
                     <div className="flex gap-2">
                       <button
-                        onClick={() => saveEdit(q.id)}
+                        onClick={() => saveEdit(q)}
                         disabled={saving}
                         className="btn-primary text-xs py-1 flex-1 justify-center"
                       >
@@ -817,14 +1065,26 @@ function QuestionsTab({
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed">{q.answer}</p>
+                    {/* Answer display */}
+                    {isMcq(q) && q.options ? (
+                      <McqDisplay options={q.options} />
+                    ) : (
+                      <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed">
+                        {resolveAnswer(q, answerLength)}
+                      </p>
+                    )}
+
                     {q.evidence_snippet && (
                       <EvidencePill snippet={q.evidence_snippet} />
                     )}
+
+                    {/* Footer row */}
                     <div className="flex items-center justify-between pt-1">
-                      <div className="flex items-center gap-2">
-                        {q.question_type && (
-                          <span className="text-2xs text-stone-400 dark:text-stone-500">{q.question_type.replace(/_/g, " ")}</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {q.topic_tags.length > 0 && (
+                          <span className="text-2xs text-stone-300 dark:text-stone-600">
+                            {q.topic_tags.slice(0, 2).join(" · ")}
+                          </span>
                         )}
                         {q.edited && (
                           <span className="text-2xs text-aubergine-800 dark:text-aubergine-400">edited</span>
@@ -832,7 +1092,7 @@ function QuestionsTab({
                       </div>
                       <button
                         onClick={(e) => { e.stopPropagation(); startEdit(q); }}
-                        className="text-xs text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                        className="text-xs text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors flex-shrink-0"
                       >
                         Edit
                       </button>

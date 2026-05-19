@@ -661,17 +661,42 @@ export interface StudyFlashcard {
 }
 
 export type QuestionDifficulty = "easy" | "medium" | "hard";
-export type QuestionType = "short_answer" | "multiple_choice" | "conceptual";
+
+export type QuestionType =
+  | "important"
+  | "exam"
+  | "short_answer"
+  | "multiple_choice"
+  | "concept_explanation"
+  | "compare_contrast"
+  | "applied_scenario";
+
+export interface MCQOption {
+  label: "A" | "B" | "C" | "D";
+  text: string;
+  is_correct: boolean;
+  distractor_rationale: string | null;
+}
 
 export interface StudyQuestion {
   id: string;
   question: string;
-  answer: string;
+  question_type: QuestionType;
   difficulty: QuestionDifficulty | null;
-  question_type: QuestionType | null;
+  /** One declarative sentence (15–25 words). Used in flashcard backs. */
+  answer_short: string | null;
+  /** Concise exam-appropriate answer (50–150 words). Default display. */
+  answer_exam: string;
+  /** Full pedagogical explanation with examples (200–500 words). */
+  answer_detailed: string | null;
+  /** MCQ options — only present when question_type === "multiple_choice". */
+  options: MCQOption[] | null;
   confidence: number;
+  source_coverage: number | null;
   evidence_snippet: string | null;
+  topic_tags: string[];
   edited: boolean;
+  is_hidden: boolean;
 }
 
 export interface StudyLectureDetail {

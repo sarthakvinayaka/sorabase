@@ -1,7 +1,7 @@
 "use client";
 
 import { useWorkflowStoreContext, useWorkflowMode } from "@/lib/workflow-store-context";
-import { NODE_PALETTE, GENERAL_NODE_PALETTE, type WorkflowNodeType } from "@/lib/workflow-types";
+import { NODE_PALETTE, GENERAL_NODE_PALETTE, STUDY_NODE_PALETTE, type WorkflowNodeType } from "@/lib/workflow-types";
 
 const ACCENT_TEXT: Record<WorkflowNodeType, string> = {
   source:     "text-stone-400",
@@ -11,6 +11,17 @@ const ACCENT_TEXT: Record<WorkflowNodeType, string> = {
   transcript: "text-blue-500",
   summary:    "text-amber-500",
   schema:     "text-violet-500",
+  // Study Mode
+  lec_capture:          "text-stone-400",
+  lec_upload:           "text-stone-500",
+  transcript_cleaner:   "text-sky-500",
+  concept_extractor:    "text-violet-500",
+  definition_extractor: "text-violet-400",
+  formula_extractor:    "text-violet-500",
+  question_gen:         "text-aubergine-600",
+  flashcard_gen:        "text-aubergine-600",
+  quiz_gen:             "text-aubergine-600",
+  study_output:         "text-emerald-600",
 };
 
 const ACCENT_BG: Record<WorkflowNodeType, string> = {
@@ -21,6 +32,17 @@ const ACCENT_BG: Record<WorkflowNodeType, string> = {
   transcript: "bg-blue-50 dark:bg-blue-900/20",
   summary:    "bg-amber-50 dark:bg-amber-900/20",
   schema:     "bg-violet-50 dark:bg-violet-900/20",
+  // Study Mode
+  lec_capture:          "bg-stone-100 dark:bg-stone-800",
+  lec_upload:           "bg-stone-100 dark:bg-stone-800",
+  transcript_cleaner:   "bg-sky-50 dark:bg-sky-900/20",
+  concept_extractor:    "bg-violet-50 dark:bg-violet-900/20",
+  definition_extractor: "bg-violet-50 dark:bg-violet-900/20",
+  formula_extractor:    "bg-violet-50 dark:bg-violet-900/20",
+  question_gen:         "bg-aubergine-50 dark:bg-aubergine-950/20",
+  flashcard_gen:        "bg-aubergine-50 dark:bg-aubergine-950/20",
+  quiz_gen:             "bg-aubergine-50 dark:bg-aubergine-950/20",
+  study_output:         "bg-emerald-50 dark:bg-emerald-900/20",
 };
 
 export default function NodeLibrary() {
@@ -28,7 +50,7 @@ export default function NodeLibrary() {
   const selectedLibraryNodeType   = useWorkflowStoreContext((s) => s.selectedLibraryNodeType);
   const resetWorkflow             = useWorkflowStoreContext((s) => s.resetWorkflow);
   const { mode }                  = useWorkflowMode();
-  const palette                   = mode === "general" ? GENERAL_NODE_PALETTE : NODE_PALETTE;
+  const palette = mode === "study" ? STUDY_NODE_PALETTE : mode === "general" ? GENERAL_NODE_PALETTE : NODE_PALETTE;
 
   function onDragStart(e: React.DragEvent, type: WorkflowNodeType) {
     e.dataTransfer.setData("application/reactflow", type);
@@ -95,9 +117,7 @@ export default function NodeLibrary() {
 
       <div className="px-3 py-3 space-y-3">
         <p className="text-2xs text-stone-400 dark:text-stone-500 leading-relaxed">
-          {mode === "general"
-            ? "Click to preview · drag to canvas."
-            : "Click to preview · drag to canvas."}
+          Click to preview · drag to canvas.
         </p>
         <button
           type="button"

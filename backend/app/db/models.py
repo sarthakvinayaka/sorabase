@@ -394,3 +394,151 @@ class AuditLog(Base):
     new_value = Column(JSON, nullable=True)
     source = Column(String(50), nullable=False, default="system")  # system | human
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+# ---------------------------------------------------------------------------
+# Study Mode
+# ---------------------------------------------------------------------------
+
+class StudyLecture(Base):
+    """
+    Primary Study Mode entity. One row per lecture ingested by a user.
+    org_id is the isolation boundary — every query must filter by it.
+    Child records (concepts, definitions, formulas, flashcards, questions)
+    inherit isolation through their lecture_id FK; no direct org_id needed
+    on child tables because ownership is always verified via the parent lecture.
+    """
+
+    __tablename__ = "study_lectures"
+
+    id              = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    org_id          = Column(UUID(as_uuid=True), nullable=False, index=True)
+    conversation_id = Column(UUID(as_uuid=True), ForeignKey("conversations.id"), nullable=False)
+    title           = Column(String(500), nullable=True)
+    course          = Column(String(255), nullable=True, index=True)
+    lecture_date    = Column(String(20),  nullable=True)   # ISO date "YYYY-MM-DD"
+    template_slug   = Column(String(100), nullable=False, default="lecture_notes")
+    archive_status  = Column(String(50),  nullable=False, default="needs_review")  # needs_review | archived | discarded
+    summary         = Column(Text, nullable=True)
+    topics              = Column(JSON, nullable=False, default=list)   # list[str]
+    learning_objectives = Column(JSON, nullable=False, default=list)   # list[str]
+    transcript      = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+    extraction_runs = relationship(
+        "StudyExtractionRun", back_populates="lecture",
+        order_by="desc(StudyExtractionRun.created_at)",
+    )
+    concepts    = relationship("StudyConcept",    back_populates="lecture", cascade="all, delete-orphan")
+    definitions = relationship("StudyDefinition", back_populates="lecture", cascade="all, delete-orphan")
+    formulas    = relationship("StudyFormula",    back_populates="lecture", cascade="all, delete-orphan")
+    flashcards  = relationship("StudyFlashcard",  back_populates="lecture", cascade="all, delete-orphan")
+    questions   = relationship("StudyQuestion",   back_populates="lecture", cascade="all, delete-orphan")
+
+
+class StudyExtractionRun(Base):
+    """
+    Tracks one AI extraction job against a StudyLecture.
+    org_id is stored directly so processing jobs can be looked up without
+    joining through the lecture (e.g. polling endpoint, background worker).
+    """
+
+    __tablename__ = "study_extraction_runs"
+
+    id         = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    org_id     = Column(UUID(as_uuid=True), nullable=False, index=True)
+    lecture_id = Column(UUID(as_uuid=True), ForeignKey("study_lectures.id"), nullable=False, index=True)
+    status     = Column(String(50), nullable=False, default="pending")  # pending | running | done | error
+    model_used = Column(String(100), nullable=True)
+    error_message     = Column(Text,    nullable=True)
+    prompt_tokens     = Column(Integer, nullable=True)
+    completion_tokens = Column(Integer, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+    lecture = relationship("StudyLecture", back_populates="extraction_runs")
+
+
+class StudyConcept(Base):
+    __tablename__ = "study_concepts"
+
+    id               = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    lecture_id       = Column(UUID(as_uuid=True), ForeignKey("study_lectures.id"), nullable=False, index=True)
+    concept          = Column(String(500), nullable=False)
+    explanation      = Column(Text,        nullable=False)
+    confidence       = Column(Float,       nullable=False, default=0.0)
+    evidence_snippet = Column(Text,        nullable=True)
+    created_at       = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+    lecture = relationship("StudyLecture", back_populates="concepts")
+
+
+class StudyDefinition(Base):
+    __tablename__ = "study_definitions"
+
+    id               = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    lecture_id       = Column(UUID(as_uuid=True), ForeignKey("study_lectures.id"), nullable=False, index=True)
+    term             = Column(String(500), nullable=False)
+    definition       = Column(Text,        nullable=False)
+    confidence       = Column(Float,       nullable=False, default=0.0)
+    evidence_snippet = Column(Text,        nullable=True)
+    created_at       = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+    lecture = relationship("StudyLecture", back_populates="definitions")
+
+
+class StudyFormula(Base):
+    __tablename__ = "study_formulas"
+
+    id               = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    lecture_id       = Column(UUID(as_uuid=True), ForeignKey("study_lectures.id"), nullable=False, index=True)
+    notation         = Column(Text,  nullable=False)
+    description      = Column(Text,  nullable=False)
+    example          = Column(Text,  nullable=True)
+    confidence       = Column(Float, nullable=False, default=0.0)
+    evidence_snippet = Column(Text,  nullable=True)
+    created_at       = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+    lecture = relationship("StudyLecture", back_populates="formulas")
+
+
+class StudyFlashcard(Base):
+    __tablename__ = "study_flashcards"
+
+    id               = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    lecture_id       = Column(UUID(as_uuid=True), ForeignKey("study_lectures.id"), nullable=False, index=True)
+    front            = Column(Text,        nullable=False)
+    back             = Column(Text,        nullable=False)
+    concept_tag      = Column(String(255), nullable=True)
+    confidence       = Column(Float,       nullable=False, default=0.0)
+    evidence_snippet = Column(Text,        nullable=True)
+    edited           = Column(Boolean,     nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+    lecture = relationship("StudyLecture", back_populates="flashcards")
+
+
+class StudyQuestion(Base):
+    __tablename__ = "study_questions"
+
+    id               = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    lecture_id       = Column(UUID(as_uuid=True), ForeignKey("study_lectures.id"), nullable=False, index=True)
+    question         = Column(Text,        nullable=False)
+    question_type    = Column(String(50),  nullable=False, default="important")
+    difficulty       = Column(String(50),  nullable=True)
+    answer_short     = Column(Text,        nullable=True)
+    answer_exam      = Column(Text,        nullable=False)
+    answer_detailed  = Column(Text,        nullable=True)
+    options          = Column(JSON,        nullable=True)   # list[MCQOption dict] | null
+    confidence       = Column(Float,       nullable=False, default=0.0)
+    source_coverage  = Column(Float,       nullable=True)
+    evidence_snippet = Column(Text,        nullable=True)
+    topic_tags       = Column(JSON,        nullable=False, default=list)   # list[str]
+    edited           = Column(Boolean,     nullable=False, default=False)
+    is_hidden        = Column(Boolean,     nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+    lecture = relationship("StudyLecture", back_populates="questions")

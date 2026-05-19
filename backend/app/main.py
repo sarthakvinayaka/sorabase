@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import analyses, audio, bot_sessions, candidates, conversations, dashboard, drafts, exports, general_dashboard, general_data, general_exports, jobs, meeting_sessions, schema_proposals, templates, webhooks
+from app.api.routes import analyses, audio, bot_sessions, candidates, conversations, dashboard, drafts, exports, general_dashboard, general_data, general_exports, jobs, meeting_sessions, schema_proposals, study, templates, webhooks
 
 app = FastAPI(
     title="Staffing Recruiter API",
@@ -37,6 +37,7 @@ app.include_router(general_dashboard.router,  prefix="/api", tags=["general-dash
 app.include_router(general_data.router,       prefix="/api", tags=["general-data"])
 app.include_router(templates.router,          prefix="/api", tags=["templates"])
 app.include_router(general_exports.router,    prefix="/api", tags=["general-exports"])
+app.include_router(study.router,              prefix="/api", tags=["study"])
 
 
 @app.get("/health", tags=["health"])

@@ -12,8 +12,19 @@ import type {
   SummaryNodeData,
   SchemaNodeData,
   WorkflowNodeType,
+  // Study Mode types
+  LecCaptureNodeData,
+  LecUploadNodeData,
+  TranscriptCleanerNodeData,
+  ConceptExtractorNodeData,
+  DefinitionExtractorNodeData,
+  FormulaExtractorNodeData,
+  QuestionGenNodeData,
+  FlashcardGenNodeData,
+  QuizGenNodeData,
+  StudyOutputNodeData,
 } from "@/lib/workflow-types";
-import { NODE_PALETTE, GENERAL_NODE_PALETTE } from "@/lib/workflow-types";
+import { NODE_PALETTE, GENERAL_NODE_PALETTE, STUDY_NODE_PALETTE } from "@/lib/workflow-types";
 import SourceInspector from "./inspector/SourceInspector";
 import ExtractionInspector from "./inspector/ExtractionInspector";
 import AnalysisInspector from "./inspector/AnalysisInspector";
@@ -21,6 +32,17 @@ import OutputInspector from "./inspector/OutputInspector";
 import TranscriptInspector from "./inspector/TranscriptInspector";
 import SummaryInspector from "./inspector/SummaryInspector";
 import SchemaInspector from "./inspector/SchemaInspector";
+// Study Mode inspectors
+import LecCaptureInspector from "./inspector/LecCaptureInspector";
+import LecUploadInspector from "./inspector/LecUploadInspector";
+import TranscriptCleanerInspector from "./inspector/TranscriptCleanerInspector";
+import ConceptExtractorInspector from "./inspector/ConceptExtractorInspector";
+import DefinitionExtractorInspector from "./inspector/DefinitionExtractorInspector";
+import FormulaExtractorInspector from "./inspector/FormulaExtractorInspector";
+import QuestionGenInspector from "./inspector/QuestionGenInspector";
+import FlashcardGenInspector from "./inspector/FlashcardGenInspector";
+import QuizGenInspector from "./inspector/QuizGenInspector";
+import StudyOutputInspector from "./inspector/StudyOutputInspector";
 
 const MIN_WIDTH = 240;
 const MAX_WIDTH = 580;
@@ -34,6 +56,17 @@ const TYPE_LABEL: Record<WorkflowNodeType, string> = {
   transcript: "Transcript",
   summary:    "Summary",
   schema:     "Schema",
+  // Study Mode
+  lec_capture:          "Lecture Capture",
+  lec_upload:           "Lecture Upload",
+  transcript_cleaner:   "Transcript Cleaner",
+  concept_extractor:    "Concept Extractor",
+  definition_extractor: "Definition Extractor",
+  formula_extractor:    "Formula Extractor",
+  question_gen:         "Questions",
+  flashcard_gen:        "Flashcard Generator",
+  quiz_gen:             "Quiz Generator",
+  study_output:         "Study Pack Output",
 };
 
 const TYPE_META: Record<WorkflowNodeType, { icon: string; accent: string }> = {
@@ -44,6 +77,17 @@ const TYPE_META: Record<WorkflowNodeType, { icon: string; accent: string }> = {
   transcript: { icon: "≡", accent: "text-blue-500"     },
   summary:    { icon: "◈", accent: "text-amber-500"    },
   schema:     { icon: "⊟", accent: "text-violet-500"   },
+  // Study Mode
+  lec_capture:          { icon: "◎", accent: "text-stone-400"    },
+  lec_upload:           { icon: "⇡", accent: "text-stone-500"    },
+  transcript_cleaner:   { icon: "≋", accent: "text-sky-500"      },
+  concept_extractor:    { icon: "◈", accent: "text-violet-500"   },
+  definition_extractor: { icon: "⊟", accent: "text-violet-400"   },
+  formula_extractor:    { icon: "∑", accent: "text-violet-500"   },
+  question_gen:         { icon: "?", accent: "text-aubergine-600" },
+  flashcard_gen:        { icon: "⊞", accent: "text-aubergine-600" },
+  quiz_gen:             { icon: "✦", accent: "text-aubergine-600" },
+  study_output:         { icon: "↑", accent: "text-emerald-600"  },
 };
 
 export default function InspectorPanel() {
@@ -145,13 +189,24 @@ const NODE_DESCRIPTIONS: Record<WorkflowNodeType, string[]> = {
   transcript: ["Holds the cleaned conversation text.", "Feeds downstream schema and extraction nodes."],
   summary:    ["Generates an AI narrative summary of the conversation.", "Appears in the results view alongside extracted data."],
   schema:     ["Proposes structured columns based on the transcript.", "Columns can be reviewed and edited before extraction runs."],
+  // Study Mode
+  lec_capture:          ["Accepts a lecture transcript via paste, browser capture extension, or Zoom bot.", "Set the lecture title, course name, and date before connecting downstream nodes."],
+  lec_upload:           ["Upload an audio recording, PDF lecture notes, or a Markdown document.", "The file is transcribed automatically before reaching extraction nodes."],
+  transcript_cleaner:   ["Normalises the raw lecture transcript before extraction.", "Choose a preset — Lecture, Seminar, or Verbatim — and configure filler removal and speaker label fixing."],
+  concept_extractor:    ["Identifies the most important concepts discussed in the lecture.", "Configure the maximum count and confidence threshold. Evidence snippets attach the supporting transcript passage."],
+  definition_extractor: ["Extracts term → definition pairs: formal definitions, glossary terms, and explained jargon.", "Connect to Flashcard Generator or Quiz Generator to turn definitions into study material."],
+  formula_extractor:    ["Pulls mathematical formulas and symbolic notation from the lecture.", "Optionally includes units and step-by-step derivations where the lecturer walks through the proof."],
+  question_gen:         ["Generates exam-style, short-answer, compare/contrast, and applied-scenario questions.", "Choose a template (Exam prep, Lecture notes, Deep study, Quick review) and configure which question types to include."],
+  flashcard_gen:        ["Builds a flashcard deck from all upstream extracted content.", "Select which sources (concepts, definitions, formulas, Q&A, topics) contribute to the deck and set the card cap."],
+  quiz_gen:             ["Creates a multi-format quiz from extracted content.", "Supports MCQ, True/False, Short answer, Matching, and Fill in the blank. Configure difficulty mix and question count."],
+  study_output:         ["Archives the lecture and packages all study materials.", "Optionally auto-archives on run and exports to JSON, CSV, or Anki deck format."],
 };
 
 function LibraryNodePreview({ type, mode }: LibraryNodePreviewProps) {
   const addNodeAuto            = useWorkflowStoreContext((s) => s.addNodeAuto);
   const setSelectedLibraryNode = useWorkflowStoreContext((s) => s.setSelectedLibraryNode);
-  const palette                = mode === "general" ? GENERAL_NODE_PALETTE : NODE_PALETTE;
-  const item                   = palette.find((p) => p.type === type);
+  const palette = mode === "study" ? STUDY_NODE_PALETTE : mode === "general" ? GENERAL_NODE_PALETTE : NODE_PALETTE;
+  const item    = palette.find((p) => p.type === type);
   const meta                   = TYPE_META[type];
   const descriptions           = NODE_DESCRIPTIONS[type];
 
@@ -296,13 +351,24 @@ function SelectedState({ id, type, data }: SelectedStateProps) {
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {type === "source"     && <SourceInspector     id={id} data={data as SourceNodeData}     />}
-        {type === "extraction" && <ExtractionInspector id={id} data={data as ExtractionNodeData} />}
-        {type === "analysis"   && <AnalysisInspector   id={id} data={data as AnalysisNodeData}   />}
-        {type === "output"     && <OutputInspector     id={id} data={data as OutputNodeData}      />}
-        {type === "transcript" && <TranscriptInspector id={id} data={data as TranscriptNodeData} />}
-        {type === "summary"    && <SummaryInspector    id={id} data={data as SummaryNodeData}    />}
-        {type === "schema"     && <SchemaInspector     id={id} data={data as SchemaNodeData}     />}
+        {type === "source"              && <SourceInspector              id={id} data={data as SourceNodeData}              />}
+        {type === "extraction"         && <ExtractionInspector         id={id} data={data as ExtractionNodeData}         />}
+        {type === "analysis"           && <AnalysisInspector           id={id} data={data as AnalysisNodeData}           />}
+        {type === "output"             && <OutputInspector             id={id} data={data as OutputNodeData}             />}
+        {type === "transcript"         && <TranscriptInspector         id={id} data={data as TranscriptNodeData}         />}
+        {type === "summary"            && <SummaryInspector            id={id} data={data as SummaryNodeData}            />}
+        {type === "schema"             && <SchemaInspector             id={id} data={data as SchemaNodeData}             />}
+        {/* Study Mode */}
+        {type === "lec_capture"          && <LecCaptureInspector          id={id} data={data as LecCaptureNodeData}          />}
+        {type === "lec_upload"           && <LecUploadInspector           id={id} data={data as LecUploadNodeData}           />}
+        {type === "transcript_cleaner"   && <TranscriptCleanerInspector   id={id} data={data as TranscriptCleanerNodeData}   />}
+        {type === "concept_extractor"    && <ConceptExtractorInspector    id={id} data={data as ConceptExtractorNodeData}    />}
+        {type === "definition_extractor" && <DefinitionExtractorInspector id={id} data={data as DefinitionExtractorNodeData} />}
+        {type === "formula_extractor"    && <FormulaExtractorInspector    id={id} data={data as FormulaExtractorNodeData}    />}
+        {type === "question_gen"         && <QuestionGenInspector         id={id} data={data as QuestionGenNodeData}         />}
+        {type === "flashcard_gen"        && <FlashcardGenInspector        id={id} data={data as FlashcardGenNodeData}        />}
+        {type === "quiz_gen"             && <QuizGenInspector             id={id} data={data as QuizGenNodeData}             />}
+        {type === "study_output"         && <StudyOutputInspector         id={id} data={data as StudyOutputNodeData}         />}
       </div>
     </>
   );

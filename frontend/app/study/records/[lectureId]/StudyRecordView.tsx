@@ -139,7 +139,7 @@ function QuestionPreviewRow({ q, index }: { q: StudyQuestion; index: number }) {
       </button>
       {open && (
         <div className="px-5 pb-3.5 pl-12">
-          <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed">{q.answer}</p>
+          <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed">{q.answer_exam}</p>
         </div>
       )}
     </div>

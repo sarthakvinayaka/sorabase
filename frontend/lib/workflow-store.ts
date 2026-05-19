@@ -28,6 +28,17 @@ import {
   type WorkflowEdge,
   type WorkflowNode,
   type WorkflowNodeType,
+  // Study Mode types
+  type LecCaptureNodeData,
+  type LecUploadNodeData,
+  type TranscriptCleanerNodeData,
+  type ConceptExtractorNodeData,
+  type DefinitionExtractorNodeData,
+  type FormulaExtractorNodeData,
+  type QuestionGenNodeData,
+  type FlashcardGenNodeData,
+  type QuizGenNodeData,
+  type StudyOutputNodeData,
 } from "./workflow-types";
 
 // ─── Default node data ────────────────────────────────────────────────────────
@@ -219,6 +230,27 @@ function makeDefaultData(type: WorkflowNodeType, label: string): AnyNodeData {
       return { nodeType: "summary", label, status: "idle" };
     case "schema":
       return { nodeType: "schema", label, status: "idle", schemaStatus: "empty", columns: [] };
+    // ── Study Mode ──────────────────────────────────────────────────────────
+    case "lec_capture":
+      return { nodeType: "lec_capture", label, status: "idle", captureMode: "paste", transcript: "", lectureTitle: "", courseName: "", lectureDate: "" } satisfies LecCaptureNodeData;
+    case "lec_upload":
+      return { nodeType: "lec_upload", label, status: "idle", format: "audio", lectureTitle: "", courseName: "", lectureDate: "" } satisfies LecUploadNodeData;
+    case "transcript_cleaner":
+      return { nodeType: "transcript_cleaner", label, status: "idle", preset: "lecture", removeFiller: true, fixSpeakerLabels: true, collapseRepetitions: true } satisfies TranscriptCleanerNodeData;
+    case "concept_extractor":
+      return { nodeType: "concept_extractor", label, status: "idle", maxConcepts: 15, confidenceThreshold: "medium", includeEvidence: true } satisfies ConceptExtractorNodeData;
+    case "definition_extractor":
+      return { nodeType: "definition_extractor", label, status: "idle", maxDefinitions: 20, includeContext: true } satisfies DefinitionExtractorNodeData;
+    case "formula_extractor":
+      return { nodeType: "formula_extractor", label, status: "idle", includeDerivations: false, includeUnits: true } satisfies FormulaExtractorNodeData;
+    case "question_gen":
+      return { nodeType: "question_gen", label, status: "idle", template: "lecture_notes", maxQuestions: 20, includeShortAnswer: true, includeExamQ: true, includeCompare: true, includeApplied: false } satisfies QuestionGenNodeData;
+    case "flashcard_gen":
+      return { nodeType: "flashcard_gen", label, status: "idle", includeConcepts: true, includeDefinitions: true, includeFormulas: true, includeQuestions: true, includeTopics: true, maxCards: 50 } satisfies FlashcardGenNodeData;
+    case "quiz_gen":
+      return { nodeType: "quiz_gen", label, status: "idle", includeMcq: true, includeTrueFalse: true, includeShortAnswer: true, includeMatching: true, includeFillBlank: true, maxQuestions: 20, difficultyMix: "balanced" } satisfies QuizGenNodeData;
+    case "study_output":
+      return { nodeType: "study_output", label, status: "idle", autoArchive: false, exportJson: false, exportCsv: false, exportAnki: false, packTitle: "" } satisfies StudyOutputNodeData;
   }
 }
 
@@ -275,6 +307,11 @@ function createWorkflowStore({
             source: "Source", extraction: "Extraction",
             analysis: "AI Scoring", output: "Output",
             transcript: "Transcript", summary: "Summary", schema: "Schema",
+            lec_capture: "Lecture Capture", lec_upload: "Lecture Upload",
+            transcript_cleaner: "Transcript Cleaner", concept_extractor: "Concept Extractor",
+            definition_extractor: "Definition Extractor", formula_extractor: "Formula Extractor",
+            question_gen: "Questions", flashcard_gen: "Flashcard Generator",
+            quiz_gen: "Quiz Generator", study_output: "Study Pack Output",
           };
           const id      = `${type}-${nanoid()}`;
           const newNode: WorkflowNode = { id, type, position, data: makeDefaultData(type, labels[type]) };
@@ -287,6 +324,11 @@ function createWorkflowStore({
             source: "Source", extraction: "Extraction",
             analysis: "AI Scoring", output: "Output",
             transcript: "Transcript", summary: "Summary", schema: "Schema",
+            lec_capture: "Lecture Capture", lec_upload: "Lecture Upload",
+            transcript_cleaner: "Transcript Cleaner", concept_extractor: "Concept Extractor",
+            definition_extractor: "Definition Extractor", formula_extractor: "Formula Extractor",
+            question_gen: "Questions", flashcard_gen: "Flashcard Generator",
+            quiz_gen: "Quiz Generator", study_output: "Study Pack Output",
           };
           const { nodes } = get();
           const maxX  = nodes.reduce((m, n) => Math.max(m, n.position.x), 0);
@@ -456,4 +498,39 @@ export const useGeneralWorkflowStore = createWorkflowStore({
   initialEdges: GENERAL_INITIAL_EDGES,
   coreNodeIds:  GENERAL_CORE_NODE_IDS,
   coreEdgeIds:  GENERAL_CORE_EDGE_IDS,
+});
+
+// ─── Study Mode ───────────────────────────────────────────────────────────────
+
+const STUDY_INITIAL_NODES: WorkflowNode[] = [
+  { id: "lec-capture-1",    type: "lec_capture",        position: { x: 60,   y: 180 }, data: makeDefaultData("lec_capture",        "Lecture Capture")    },
+  { id: "transcript-cln-1", type: "transcript_cleaner", position: { x: 320,  y: 180 }, data: makeDefaultData("transcript_cleaner", "Transcript Cleaner") },
+  { id: "concept-ext-1",    type: "concept_extractor",  position: { x: 580,  y: 180 }, data: makeDefaultData("concept_extractor",  "Concept Extractor")  },
+  { id: "question-gen-1",   type: "question_gen",       position: { x: 840,  y: 180 }, data: makeDefaultData("question_gen",       "Questions")          },
+  { id: "flashcard-gen-1",  type: "flashcard_gen",      position: { x: 1100, y: 180 }, data: makeDefaultData("flashcard_gen",      "Flashcard Generator") },
+  { id: "study-output-1",   type: "study_output",       position: { x: 1360, y: 180 }, data: makeDefaultData("study_output",       "Study Pack Output")  },
+];
+
+const STUDY_INITIAL_EDGES: WorkflowEdge[] = [
+  { id: "e-cap-cln",  source: "lec-capture-1",    target: "transcript-cln-1", type: "smoothstep" },
+  { id: "e-cln-cxt",  source: "transcript-cln-1", target: "concept-ext-1",   type: "smoothstep" },
+  { id: "e-cxt-qgen", source: "concept-ext-1",    target: "question-gen-1",  type: "smoothstep" },
+  { id: "e-qgen-fgen",source: "question-gen-1",   target: "flashcard-gen-1", type: "smoothstep" },
+  { id: "e-fgen-out", source: "flashcard-gen-1",  target: "study-output-1",  type: "smoothstep" },
+];
+
+export const STUDY_CORE_NODE_IDS = new Set([
+  "lec-capture-1", "transcript-cln-1", "concept-ext-1",
+  "question-gen-1", "flashcard-gen-1", "study-output-1",
+]);
+export const STUDY_CORE_EDGE_IDS = new Set([
+  "e-cap-cln", "e-cln-cxt", "e-cxt-qgen", "e-qgen-fgen", "e-fgen-out",
+]);
+
+export const useStudyWorkflowStore = createWorkflowStore({
+  storageKey:   "sorabase-study-workflow-v1",
+  initialNodes: STUDY_INITIAL_NODES,
+  initialEdges: STUDY_INITIAL_EDGES,
+  coreNodeIds:  STUDY_CORE_NODE_IDS,
+  coreEdgeIds:  STUDY_CORE_EDGE_IDS,
 });

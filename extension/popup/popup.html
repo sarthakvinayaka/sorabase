@@ -74,6 +74,35 @@
               <span class="radio-dot"></span>
               <span>Recruiting</span>
             </label>
+            <label class="radio-option">
+              <input type="radio" name="mode" value="study" id="mode-study" />
+              <span class="radio-dot"></span>
+              <span>Study</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Study Mode extra fields (shown when Study is selected) -->
+        <div id="study-fields" class="hidden">
+          <div class="field">
+            <label class="field-label" for="study-title">Lecture title <span class="optional">optional</span></label>
+            <input
+              type="text"
+              id="study-title"
+              class="text-input"
+              placeholder="e.g. Introduction to Thermodynamics"
+              maxlength="200"
+            />
+          </div>
+          <div class="field">
+            <label class="field-label" for="study-course">Course <span class="optional">optional</span></label>
+            <input
+              type="text"
+              id="study-course"
+              class="text-input"
+              placeholder="e.g. PHYS 201"
+              maxlength="120"
+            />
           </div>
         </div>
 
