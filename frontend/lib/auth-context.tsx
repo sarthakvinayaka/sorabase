@@ -10,13 +10,15 @@ import type { AuthUser, AccessType } from "./auth";
 // accommodate the DB round-trip; the two call sites are updated accordingly.
 
 interface AuthContextValue {
-  user:          AuthUser | null;
-  isLoading:     boolean;
-  signIn:        (email: string, password: string) => Promise<void>;
-  signUp:        (name: string, email: string, password: string, intent?: "recruiter" | "general") => Promise<void>;
-  signOut:       () => void;
-  markOnboarded: () => Promise<AuthUser | null>;
-  grantAccess:   (access: Exclude<AccessType, "pending">) => Promise<AuthUser | null>;
+  user:           AuthUser | null;
+  isLoading:      boolean;
+  signIn:         (email: string, password: string) => Promise<void>;
+  signUp:         (name: string, email: string, password: string, intent?: "recruiter" | "general") => Promise<void>;
+  signOut:        () => void;
+  markOnboarded:  () => Promise<AuthUser | null>;
+  grantAccess:    (access: Exclude<AccessType, "pending">) => Promise<AuthUser | null>;
+  /** Change the user's home workspace without re-triggering onboarding. */
+  switchHomeMode: (mode: Exclude<AccessType, "pending">) => Promise<AuthUser | null>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -106,8 +108,25 @@ function AuthContextInner({ children }: { children: React.ReactNode }) {
     return { ...user, access, onboarded: false };
   }, [user, update]);
 
+  // ── Switch home workspace (already-onboarded user) ───────────────────────
+  const switchHomeMode = useCallback(async (
+    mode: Exclude<AccessType, "pending">,
+  ): Promise<AuthUser | null> => {
+    if (!user) return null;
+
+    await fetch("/api/user/profile", {
+      method:  "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ accessType: mode, keepOnboarded: true }),
+    });
+
+    await update();
+
+    return { ...user, access: mode };
+  }, [user, update]);
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signOut, markOnboarded, grantAccess }}>
+    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signOut, markOnboarded, grantAccess, switchHomeMode }}>
       {children}
     </AuthContext.Provider>
   );

@@ -22,16 +22,22 @@ export async function PATCH(req: NextRequest) {
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json() as {
-    onboarded?:  boolean;
-    accessType?: "recruiter" | "general" | "pending";
+    onboarded?:    boolean;
+    accessType?:   "recruiter" | "general" | "study" | "pending";
+    // Set keepOnboarded=true when switching home workspace for an already-
+    // onboarded user.  Without it, accessType changes reset onboarded so the
+    // user sees the workspace tour again (intended for first-time access grants).
+    keepOnboarded?: boolean;
   };
 
   const data: Record<string, unknown> = {};
   if (typeof body.onboarded  === "boolean") data.onboarded  = body.onboarded;
   if (body.accessType)                      data.accessType = body.accessType;
 
-  // When access is granted, reset onboarded so user sees workspace onboarding
-  if (body.accessType && body.accessType !== "pending") {
+  // When access is granted for the first time, reset onboarded so user sees
+  // workspace onboarding.  Skip the reset when switching home workspace for an
+  // already-onboarded user (keepOnboarded=true).
+  if (body.accessType && body.accessType !== "pending" && !body.keepOnboarded) {
     data.onboarded = false;
   }
 

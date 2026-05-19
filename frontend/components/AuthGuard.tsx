@@ -7,21 +7,27 @@ import { getRedirectForUser } from "@/lib/auth";
 import type { AccessType } from "@/lib/auth";
 
 interface Props {
+  // Kept for documentation — marks which workspace this layout belongs to.
+  // No longer restricts access: all authenticated, onboarded users can visit
+  // any workspace regardless of which mode they chose at signup.
   required: Exclude<AccessType, "pending">;
   children: React.ReactNode;
 }
 
 /**
- * Wraps a workspace page and enforces access type.
- * - Not logged in → /signin
- * - Wrong access type or pending → getRedirectForUser (their correct destination)
- * - Correct access → renders children
+ * Wraps a workspace page.
+ * - Not signed in → /signin
+ * - Pending or not yet onboarded → /onboarding (or /entry)
+ * - Any non-pending, onboarded user → renders children
+ *
+ * Cross-workspace navigation is intentionally unrestricted: a user who signed
+ * up for General Mode can freely visit the Recruiter or Study workspaces.
+ * The mode they chose at signup is their *home* (default landing page), not
+ * a hard access gate.
  */
-export default function AuthGuard({ required, children }: Props) {
+export default function AuthGuard({ required: _required, children }: Props) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
-
-  const wrongMode = !isLoading && !!user && user.access !== required;
 
   useEffect(() => {
     if (isLoading) return;
@@ -29,17 +35,19 @@ export default function AuthGuard({ required, children }: Props) {
       router.replace("/signin");
       return;
     }
-    if (user.access !== required) {
+    // Pending users and users who haven't completed onboarding go to the
+    // appropriate gate page.  Everyone else may access any workspace.
+    if (user.access === "pending" || !user.onboarded) {
       router.replace(getRedirectForUser(user));
     }
-  }, [user, isLoading, required, router]);
+  }, [user, isLoading, router]);
 
   if (isLoading || !user) {
     return <LoadingShell message="Loading workspace…" />;
   }
 
-  if (wrongMode) {
-    return <LoadingShell message="This workspace isn't available for your account. Redirecting…" />;
+  if (user.access === "pending" || !user.onboarded) {
+    return <LoadingShell message="Setting up your workspace…" />;
   }
 
   return <>{children}</>;
