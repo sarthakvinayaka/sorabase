@@ -17,8 +17,8 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth-config";
 
-const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:8000";
-const BACKEND_API_SECRET = process.env.BACKEND_API_SECRET ?? "";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
+const BACKEND_API_SECRET = process.env.BACKEND_API_SECRET || "";
 
 async function handle(
   req: NextRequest,
