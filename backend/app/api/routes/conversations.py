@@ -146,6 +146,7 @@ def extract_general_conversation(
             db,
             conversation_id,
             body.columns,
+            org_id=org_id,
             template_id=body.template_id,
             template_version=body.template_version,
         )

@@ -34,6 +34,7 @@ def run_general_extraction(
     db: Session,
     conversation_id: uuid.UUID,
     columns: list[ApprovedColumn],
+    org_id: uuid.UUID | None = None,
     actor_id: str = "system",
     template_id: str | None = None,
     template_version: int | None = None,
@@ -76,10 +77,11 @@ def run_general_extraction(
 
     extraction_run = _persist_extraction_run(
         db, conversation_id, candidate.id, result,
+        org_id=org_id,
         template_id=template_id,
         template_version=template_version,
     )
-    _persist_fields(db, extraction_run.id, result, columns)
+    _persist_fields(db, extraction_run.id, result, columns, org_id=org_id)
 
     candidate.latest_extraction_run_id = extraction_run.id
     candidate.updated_at = datetime.now(timezone.utc)
@@ -112,13 +114,14 @@ def _persist_extraction_run(
     conversation_id: uuid.UUID,
     candidate_id: uuid.UUID,
     result: GeneralExtractionResult,
+    org_id: uuid.UUID | None = None,
     template_id: str | None = None,
     template_version: int | None = None,
 ) -> ExtractionRun:
     overall_confidence = _compute_overall_confidence(result.fields)
 
     extraction_run = ExtractionRun(
-        org_id=uuid.UUID(settings.default_org_id),
+        org_id=org_id or uuid.UUID(settings.default_org_id),
         conversation_id=conversation_id,
         candidate_id=candidate_id,
         template_id=str(template_id) if template_id else GENERAL_MODE_TAG,
@@ -148,13 +151,14 @@ def _persist_fields(
     extraction_run_id: uuid.UUID,
     result: GeneralExtractionResult,
     columns: list[ApprovedColumn],
+    org_id: uuid.UUID | None = None,
 ) -> None:
     for col in columns:
         field_data: dict[str, Any] = result.fields.get(col.name, {})
         raw_value = field_data.get("value")
 
         extracted_field = ExtractedField(
-            org_id=uuid.UUID(settings.default_org_id),
+            org_id=org_id or uuid.UUID(settings.default_org_id),
             extraction_run_id=extraction_run_id,
             field_name=col.name,
             raw_value=raw_value,
