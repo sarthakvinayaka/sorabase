@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m ' *)",
+      "Bash(mkdir -p /Users/sarthakvinayaka/Desktop/sorabase/frontend/app/general/records/\\\\[candidateId\\\\])",
+      "Bash(git -C /Users/sarthakvinayaka/Desktop/sorabase status --short)",
+      "Bash(mkdir -p /Users/sarthakvinayaka/Desktop/sorabase/frontend/app/study/processing/\\\\[lectureId\\\\] /Users/sarthakvinayaka/Desktop/sorabase/frontend/app/study/review/\\\\[lectureId\\\\])",
+      "Bash(mkdir -p /Users/sarthakvinayaka/Desktop/sorabase/frontend/app/study/records/\\\\[lectureId\\\\])",
+      "Bash(mkdir -p \"/Users/sarthakvinayaka/Desktop/sorabase/frontend/app/study/courses/[slug]\")",
+      "Bash(python -c ' *)",
+      "Bash(.venv/bin/python -c ' *)",
+      "Bash(git rm *)",
+      "Bash(git -C /Users/sarthakvinayaka/Desktop/sorabase add backend/app/api/routes/study.py frontend/app/\\\\\\(auth\\\\\\)/signup/page.tsx frontend/app/api/auth/register/route.ts frontend/components/ConditionalNav.tsx frontend/lib/api.ts frontend/lib/auth-config.ts frontend/lib/auth-context.tsx frontend/app/study/dashboard/)",
+      "Bash(git -C /Users/sarthakvinayaka/Desktop/sorabase commit -m ' *)",
+      "Bash(git -C /Users/sarthakvinayaka/Desktop/sorabase add frontend/components/ConditionalNav.tsx)",
+      "Bash(git -C /Users/sarthakvinayaka/Desktop/sorabase log --oneline -5)"
+    ],
+    "additionalDirectories": [
+      "/Users/sarthakvinayaka/Desktop/sorabase/frontend/app/general/records",
+      "/Users/sarthakvinayaka/Desktop/sorabase/frontend/app/study/processing",
+      "/Users/sarthakvinayaka/Desktop/sorabase/frontend/app/study/records",
+      "/Users/sarthakvinayaka/Desktop/sorabase/frontend/app/study/courses"
+    ]
+  }
+}

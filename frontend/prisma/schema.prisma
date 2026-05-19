@@ -94,6 +94,7 @@ model UserProfile {
 enum AccessType {
   recruiter
   general
+  study
   pending
 }
 
