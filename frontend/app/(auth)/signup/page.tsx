@@ -34,7 +34,7 @@ export default function SignUpPage() {
   const [name,      setName]      = useState("");
   const [email,     setEmail]     = useState("");
   const [password,  setPassword]  = useState("");
-  const [intent,    setIntent]    = useState<AccessIntent>("recruiter");
+  const [intent,    setIntent]    = useState<AccessIntent>("general");
   const [formState, setFormState] = useState<FormState>("idle");
   const [error,     setError]     = useState("");
   const [pwVisible, setPwVisible] = useState(false);

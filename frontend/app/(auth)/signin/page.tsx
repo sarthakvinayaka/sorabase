@@ -49,7 +49,7 @@ export default function SignInPage() {
     setFormState("loading");
     // Redirect to OAuth provider; NextAuth handles the callback and session creation
     nextAuthSignIn(provider === "google" ? "google" : "azure-ad", {
-      callbackUrl: "/app/onboarding",
+      callbackUrl: "/onboarding",
     });
   }
 
