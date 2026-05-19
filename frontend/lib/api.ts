@@ -51,7 +51,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     let detail = `HTTP ${res.status}`;
     try {
       const body = await res.json();
-      detail = body.detail ?? detail;
+      detail = body.detail ?? body.message ?? detail;
     } catch {
       // ignore parse failure
     }

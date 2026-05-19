@@ -24,6 +24,18 @@ async function handle(
   req: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
+  try {
+    return await proxyRequest(req, context);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ detail: `Proxy error: ${message}` }, { status: 500 });
+  }
+}
+
+async function proxyRequest(
+  req: NextRequest,
+  context: { params: Promise<{ path: string[] }> },
+) {
   const { path } = await context.params;
   const pathStr = path.join("/");
 
