@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { getRedirectForUser } from "@/lib/auth";
 
 type FormState = "idle" | "loading" | "success";
-type AccessIntent = "recruiter" | "general";
+type AccessIntent = "recruiter" | "general" | "study";
 
 const ACCESS_OPTIONS: {
   id:      AccessIntent;
@@ -27,6 +27,12 @@ const ACCESS_OPTIONS: {
     label:   "General Mode",
     tagline: "Configurable for any meeting",
     bullets: ["Custom schemas", "AI field proposals", "JSON / webhook output"],
+  },
+  {
+    id:      "study",
+    label:   "Study Mode",
+    tagline: "Turn lectures into study materials",
+    bullets: ["AI notes & flashcards", "Q&A practice sets", "Course library"],
   },
 ];
 
@@ -144,7 +150,7 @@ export default function SignUpPage() {
               <p className="text-[12px] font-semibold text-stone-600 dark:text-stone-400 mb-2.5">
                 Which workspace do you need?
               </p>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-3 gap-2.5">
                 {ACCESS_OPTIONS.map((opt) => (
                   <button
                     key={opt.id}
@@ -153,9 +159,7 @@ export default function SignUpPage() {
                     className={[
                       "relative text-left rounded-lg border px-3.5 py-3 transition-colors",
                       intent === opt.id
-                        ? opt.id === "recruiter"
-                          ? "border-aubergine-300 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/30"
-                          : "border-stone-400 dark:border-stone-500 bg-stone-100 dark:bg-stone-800/60"
+                        ? "border-aubergine-300 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/30"
                         : "border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600",
                     ].join(" ")}
                     aria-pressed={intent === opt.id}
@@ -165,9 +169,7 @@ export default function SignUpPage() {
                       className={[
                         "absolute top-2.5 right-2.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center transition-colors",
                         intent === opt.id
-                          ? opt.id === "recruiter"
-                            ? "border-aubergine-700 bg-aubergine-700"
-                            : "border-stone-500 bg-stone-500"
+                          ? "border-aubergine-700 bg-aubergine-700"
                           : "border-stone-300 dark:border-stone-600",
                       ].join(" ")}
                       aria-hidden
@@ -179,7 +181,7 @@ export default function SignUpPage() {
 
                     <p className={[
                       "text-[12px] font-semibold mb-0.5 pr-4",
-                      intent === opt.id && opt.id === "recruiter"
+                      intent === opt.id
                         ? "text-aubergine-900 dark:text-aubergine-300"
                         : "text-stone-800 dark:text-stone-200",
                     ].join(" ")}>
@@ -193,7 +195,7 @@ export default function SignUpPage() {
                         <li key={b} className="text-[10px] text-stone-500 dark:text-stone-400 flex items-center gap-1.5">
                           <span className={[
                             "w-1 h-1 rounded-full flex-shrink-0",
-                            intent === opt.id && opt.id === "recruiter"
+                            intent === opt.id
                               ? "bg-aubergine-400"
                               : "bg-stone-400 dark:bg-stone-500",
                           ].join(" ")} />

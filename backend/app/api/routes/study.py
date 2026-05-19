@@ -58,6 +58,15 @@ router = APIRouter()
 # Extraction — creates a lecture + queues an extraction run
 # ---------------------------------------------------------------------------
 
+@router.get("/study/lectures", response_model=list[StudyLectureRead])
+def list_study_lectures(
+    db:     Session   = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+) -> list[StudyLectureRead]:
+    lectures = study_repo.list_lectures(db, org_id, limit=50)
+    return [StudyLectureRead.model_validate(lec) for lec in lectures]
+
+
 @router.post("/study/extract", response_model=StudyExtractionCreatedResponse, status_code=201)
 def extract_study_lecture(
     body:             StudyExtractRequest,

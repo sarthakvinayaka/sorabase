@@ -486,6 +486,10 @@ export async function extractStudyLecture(params: {
   });
 }
 
+export async function listStudyLectures(): Promise<StudyLecture[]> {
+  return request("/api/study/lectures");
+}
+
 export async function getStudyLecture(lectureId: string): Promise<StudyLectureDetail> {
   return request(`/api/study/lectures/${lectureId}`);
 }

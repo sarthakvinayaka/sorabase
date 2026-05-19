@@ -101,7 +101,7 @@ export default function ConditionalNav() {
             </Link>
             <span className="text-stone-300 dark:text-stone-600 select-none">/</span>
             <Link
-              href="/study"
+              href="/study/dashboard"
               className={[
                 "px-2 py-0.5 rounded transition-colors",
                 mode === "study"
@@ -125,8 +125,7 @@ export default function ConditionalNav() {
 
           {mode === "study" ? (
             <>
-              <NavLink href="/study/dashboard">Dashboard</NavLink>
-              <NavLink href="/study/dashboard?tab=library">Library</NavLink>
+              <NavLink href="/study/dashboard">Library</NavLink>
               <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
               <Link
                 href="/study"
@@ -172,7 +171,7 @@ export default function ConditionalNav() {
 const HOME_MODES: { id: Exclude<AccessType, "pending">; label: string; href: string }[] = [
   { id: "recruiter", label: "Recruiter", href: "/workflow" },
   { id: "general",   label: "General",  href: "/general"  },
-  { id: "study",     label: "Study",    href: "/study"    },
+  { id: "study",     label: "Study",    href: "/study/dashboard" },
 ];
 
 function UserMenu() {

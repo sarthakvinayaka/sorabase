@@ -128,7 +128,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id        = token.id as string;
-        session.user.access    = token.access    as "recruiter" | "general" | "pending";
+        session.user.access    = token.access    as "recruiter" | "general" | "study" | "pending";
         session.user.onboarded = token.onboarded as boolean;
         session.user.plan      = token.plan      as "free" | "pro" | "custom";
       }

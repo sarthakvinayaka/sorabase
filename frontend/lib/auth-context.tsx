@@ -13,7 +13,7 @@ interface AuthContextValue {
   user:           AuthUser | null;
   isLoading:      boolean;
   signIn:         (email: string, password: string) => Promise<void>;
-  signUp:         (name: string, email: string, password: string, intent?: "recruiter" | "general") => Promise<void>;
+  signUp:         (name: string, email: string, password: string, intent?: "recruiter" | "general" | "study") => Promise<void>;
   signOut:        () => void;
   markOnboarded:  () => Promise<AuthUser | null>;
   grantAccess:    (access: Exclude<AccessType, "pending">) => Promise<AuthUser | null>;
@@ -50,7 +50,7 @@ function AuthContextInner({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Sign up then immediately sign in ──────────────────────────────────────
-  const signUp = useCallback(async (name: string, email: string, password: string, intent?: "recruiter" | "general") => {
+  const signUp = useCallback(async (name: string, email: string, password: string, intent?: "recruiter" | "general" | "study") => {
     const res = await fetch("/api/auth/register", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },

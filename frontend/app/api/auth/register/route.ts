@@ -8,13 +8,14 @@ export async function POST(req: NextRequest) {
       name?: string;
       email?: string;
       password?: string;
-      intent?: "recruiter" | "general";
+      intent?: "recruiter" | "general" | "study";
     };
     const name   = (body.name  ?? "").trim();
     const email  = (body.email ?? "").toLowerCase().trim();
     const pass   = body.password ?? "";
     const access = body.intent === "recruiter" ? "recruiter" as const
                  : body.intent === "general"   ? "general"   as const
+                 : body.intent === "study"     ? "study"     as const
                  : "general" as const; // default: general (self-serve, no approval gate)
 
     if (!name)        return NextResponse.json({ error: "Full name is required." },              { status: 400 });
