@@ -16,15 +16,17 @@ Two-layer ownership check for child records (flashcards, questions):
      caller cannot forge a lecture_id they do not own).
 """
 
+import logging
 import uuid
 from collections import Counter
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_org_id
 from app.db.session import get_db
 from app.repositories import conversation_repo, study_repo
+from app.services.study_extraction_service import run_study_extraction
 from app.domain.study_schemas import (
     CourseLectureItem,
     CourseRepeatedConcept,
@@ -40,11 +42,14 @@ from app.domain.study_schemas import (
     StudyFormulaRead,
     StudyLectureDetailResponse,
     StudyLectureRead,
+    StudyLectureStatusResponse,
     StudyOverviewUpdateRequest,
     StudyExtractRequest,
     StudyQuestionRead,
     StudyQuestionUpdateRequest,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -55,20 +60,27 @@ router = APIRouter()
 
 @router.post("/study/extract", response_model=StudyExtractionCreatedResponse, status_code=201)
 def extract_study_lecture(
-    body:   StudyExtractRequest,
-    db:     Session   = Depends(get_db),
-    org_id: uuid.UUID = Depends(get_current_org_id),
+    body:             StudyExtractRequest,
+    background_tasks: BackgroundTasks,
+    db:               Session   = Depends(get_db),
+    org_id:           uuid.UUID = Depends(get_current_org_id),
 ):
     """
-    Create a StudyLecture and a pending StudyExtractionRun.
+    Create a StudyLecture + pending StudyExtractionRun, then kick off the
+    extraction pipeline as a BackgroundTask.
 
     Ownership check: the conversation must belong to the calling user before we
-    accept it as the source for a new lecture. This prevents a user from
-    pointing extraction at another user's conversation by guessing its UUID.
+    accept it as the source for a new lecture.
     """
     conversation = conversation_repo.get(db, body.conversation_id, org_id=org_id)
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found.")
+
+    if not conversation.raw_text:
+        raise HTTPException(
+            status_code=422,
+            detail="Conversation transcript is not ready yet. Wait for transcription to complete.",
+        )
 
     lecture = study_repo.create_lecture(
         db,
@@ -80,7 +92,24 @@ def extract_study_lecture(
         template_slug=body.template_slug,
     )
     run = study_repo.create_extraction_run(db, org_id=org_id, lecture_id=lecture.id)
-    return StudyExtractionCreatedResponse(lecture_id=lecture.id, extraction_id=run.id)
+
+    # Capture IDs before the session closes at end of request.
+    lecture_id = lecture.id
+    run_id = run.id
+
+    # The extraction service creates its own DB session so it is safe to run
+    # after this request's session closes.
+    background_tasks.add_task(
+        run_study_extraction,
+        lecture_id=lecture_id,
+        run_id=run_id,
+        org_id=org_id,
+    )
+
+    logger.info(
+        "study: queued extraction background task lecture=%s run=%s", lecture_id, run_id
+    )
+    return StudyExtractionCreatedResponse(lecture_id=lecture_id, extraction_id=run_id)
 
 
 # ---------------------------------------------------------------------------
@@ -113,6 +142,77 @@ def get_study_lecture(
         flashcards=[StudyFlashcardRead.model_validate(fc) for fc in lecture.flashcards],
         questions=[StudyQuestionRead.model_validate(q) for q in lecture.questions],
         transcript=lecture.transcript,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Lecture status polling
+# ---------------------------------------------------------------------------
+
+# Map extraction run status → percent-complete estimate shown to the user.
+_STATUS_PERCENT: dict[str, int] = {
+    "pending":              5,
+    "running":             10,
+    "extracting_content":  35,
+    "generating_questions": 70,
+    "completed":          100,
+    "failed":               0,
+}
+
+
+@router.get("/study/lectures/{lecture_id}/status", response_model=StudyLectureStatusResponse)
+def get_study_lecture_status(
+    lecture_id: uuid.UUID,
+    db:         Session   = Depends(get_db),
+    org_id:     uuid.UUID = Depends(get_current_org_id),
+):
+    """
+    Polling endpoint for the Study Mode processing page.
+
+    Returns the current status of the most recent extraction run for this lecture.
+    The frontend should poll every poll_interval_ms milliseconds until
+    is_ready=True (redirect to redirect_url) or status="failed".
+
+    Auth: same ownership check as all other lecture endpoints — returns 404
+    on ownership mismatch so callers cannot probe another user's lecture IDs.
+
+    Future SSE/WebSocket upgrade: this response shape is the event payload
+    contract.  Clients that switch to a push model need no response-parsing changes.
+    """
+    lecture = study_repo.get_lecture(db, lecture_id, org_id)
+    if lecture is None:
+        raise HTTPException(status_code=404, detail="Lecture not found.")
+
+    run = study_repo.get_latest_extraction_run(db, lecture_id, org_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail="No extraction run found.")
+
+    status = run.status
+    is_terminal = status in ("completed", "failed")
+    is_ready = status == "completed"
+    percent = _STATUS_PERCENT.get(status, None)
+
+    # Only expose the error message string — no internal tracebacks.
+    safe_error: str | None = None
+    if status == "failed" and run.error_message:
+        msg = run.error_message
+        # Strip anything after the first newline to avoid leaking stack frames.
+        safe_error = msg.split("\n")[0][:300]
+
+    redirect_url: str | None = None
+    if is_ready:
+        redirect_url = f"/study/records/{lecture_id}"
+
+    return StudyLectureStatusResponse(
+        lecture_id=lecture_id,
+        status=status,
+        current_stage=status,
+        percent_complete=percent,
+        error_message=safe_error,
+        is_ready=is_ready,
+        last_updated_at=run.updated_at,
+        redirect_url=redirect_url,
+        poll_interval_ms=None if is_terminal else 3000,
     )
 
 

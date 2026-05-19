@@ -158,6 +158,41 @@ class StudyArchiveResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Status polling response — used by GET /study/lectures/{id}/status
+# ---------------------------------------------------------------------------
+
+class StudyLectureStatusResponse(BaseModel):
+    """
+    Stable polling contract for the Study Mode processing page.
+
+    status values (in order):
+      pending              — job created, extraction not yet started
+      running              — extraction service has picked up the job
+      extracting_content   — Pass 1 in progress (summary, concepts, definitions)
+      generating_questions — Pass 2 in progress (questions, flashcards)
+      completed            — all outputs saved, ready for review
+      failed               — unrecoverable error; see error_message
+
+    Frontend guidance:
+      - Poll every poll_interval_ms ms while is_ready is False and
+        status is not "failed".
+      - On is_ready=True, redirect to redirect_url.
+      - On status="failed", show error_message to the user.
+      - Future SSE/WebSocket upgrade: keep this response shape; push the
+        same object as the event payload so clients need no changes.
+    """
+    lecture_id:       uuid.UUID
+    status:           str
+    current_stage:    str
+    percent_complete: int | None   # 0–100; null when status is unknown
+    error_message:    str | None   # safe display text; no internal stack traces
+    is_ready:         bool         # True only when status == "completed"
+    last_updated_at:  datetime
+    redirect_url:     str | None   # populated when is_ready; points to review page
+    poll_interval_ms: int | None   # recommended polling cadence; null when terminal
+
+
+# ---------------------------------------------------------------------------
 # Course aggregate responses
 # ---------------------------------------------------------------------------
 

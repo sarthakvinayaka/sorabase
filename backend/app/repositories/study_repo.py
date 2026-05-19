@@ -31,6 +31,13 @@ from app.db.models import (
     StudyLecture,
     StudyQuestion,
 )
+from app.domain.study_llm_schemas import (
+    StudyConceptItem,
+    StudyDefinitionItem,
+    StudyFlashcardItem,
+    StudyFormulaItem,
+    StudyQuestionItem,
+)
 
 
 # ── Lecture ───────────────────────────────────────────────────────────────────
@@ -83,6 +90,133 @@ def list_lectures(
 
 def update_overview(db: Session, lecture: StudyLecture, *, summary: str) -> None:
     lecture.summary = summary
+    db.commit()
+
+
+def set_lecture_content(
+    db: Session,
+    lecture: StudyLecture,
+    *,
+    summary: str,
+    topics: list[str],
+    learning_objectives: list[str],
+    transcript: str,
+) -> None:
+    """Persist Pass-1 extracted content fields onto the lecture row."""
+    lecture.summary = summary
+    lecture.topics = topics
+    lecture.learning_objectives = learning_objectives
+    lecture.transcript = transcript
+    db.commit()
+
+
+def bulk_create_concepts(
+    db: Session,
+    lecture_id: uuid.UUID,
+    items: list[StudyConceptItem],
+) -> None:
+    if not items:
+        return
+    db.bulk_save_objects([
+        StudyConcept(
+            lecture_id=lecture_id,
+            concept=item.concept,
+            explanation=item.explanation,
+            confidence=item.confidence,
+            evidence_snippet=item.evidence_snippet,
+        )
+        for item in items
+    ])
+    db.commit()
+
+
+def bulk_create_definitions(
+    db: Session,
+    lecture_id: uuid.UUID,
+    items: list[StudyDefinitionItem],
+) -> None:
+    if not items:
+        return
+    db.bulk_save_objects([
+        StudyDefinition(
+            lecture_id=lecture_id,
+            term=item.term,
+            definition=item.definition,
+            confidence=item.confidence,
+            evidence_snippet=item.evidence_snippet,
+        )
+        for item in items
+    ])
+    db.commit()
+
+
+def bulk_create_formulas(
+    db: Session,
+    lecture_id: uuid.UUID,
+    items: list[StudyFormulaItem],
+) -> None:
+    if not items:
+        return
+    db.bulk_save_objects([
+        StudyFormula(
+            lecture_id=lecture_id,
+            notation=item.notation,
+            description=item.description,
+            example=item.example,
+            confidence=item.confidence,
+            evidence_snippet=item.evidence_snippet,
+        )
+        for item in items
+    ])
+    db.commit()
+
+
+def bulk_create_flashcards(
+    db: Session,
+    lecture_id: uuid.UUID,
+    items: list[StudyFlashcardItem],
+) -> None:
+    if not items:
+        return
+    db.bulk_save_objects([
+        StudyFlashcard(
+            lecture_id=lecture_id,
+            front=item.front,
+            back=item.back,
+            concept_tag=item.concept_tag,
+            confidence=item.confidence,
+            evidence_snippet=item.evidence_snippet,
+        )
+        for item in items
+    ])
+    db.commit()
+
+
+def bulk_create_questions(
+    db: Session,
+    lecture_id: uuid.UUID,
+    items: list[StudyQuestionItem],
+) -> None:
+    if not items:
+        return
+    db.bulk_save_objects([
+        StudyQuestion(
+            lecture_id=lecture_id,
+            question=item.question,
+            question_type=item.question_type,
+            difficulty=item.difficulty,
+            answer_short=item.answer_short,
+            answer_exam=item.answer_exam,
+            answer_detailed=item.answer_detailed,
+            # options is a list[MCQOption] — store as list[dict] in JSON column
+            options=[o.model_dump() for o in item.options] if item.options else None,
+            confidence=item.confidence,
+            source_coverage=item.source_coverage,
+            evidence_snippet=item.evidence_snippet,
+            topic_tags=item.topic_tags,
+        )
+        for item in items
+    ])
     db.commit()
 
 
