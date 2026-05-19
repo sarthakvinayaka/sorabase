@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 import SiteNav from "./marketing/SiteNav";
 import { modeFromPath } from "@/lib/mode";
 import { LogoMark } from "@/components/ui/LogoMark";
 import { useRecordingStatus } from "@/lib/useExtensionStatus";
 import { useAuth } from "@/lib/auth-context";
-import type { AccessType } from "@/lib/auth";
 
 const MARKETING_PATHS = new Set(["/", "/pricing"]);
 const AUTH_PATHS      = new Set(["/signin", "/signup"]);
@@ -73,44 +72,10 @@ export default function ConditionalNav() {
             </span>
           </Link>
 
-          <div className="h-3.5 w-px bg-stone-200 dark:bg-stone-700" />
-
-          <div className="flex items-center text-xs">
-            <Link
-              href="/workflow"
-              className={[
-                "px-2 py-0.5 rounded transition-colors",
-                mode === "recruiting"
-                  ? "text-aubergine-900 dark:text-aubergine-400 font-semibold"
-                  : "text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300",
-              ].join(" ")}
-            >
-              Recruiting
-            </Link>
-            <span className="text-stone-300 dark:text-stone-600 select-none">/</span>
-            <Link
-              href="/general"
-              className={[
-                "px-2 py-0.5 rounded transition-colors",
-                mode === "general"
-                  ? "text-aubergine-900 dark:text-aubergine-400 font-semibold"
-                  : "text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300",
-              ].join(" ")}
-            >
-              General
-            </Link>
-            <span className="text-stone-300 dark:text-stone-600 select-none">/</span>
-            <Link
-              href="/study/dashboard"
-              className={[
-                "px-2 py-0.5 rounded transition-colors",
-                mode === "study"
-                  ? "text-aubergine-900 dark:text-aubergine-400 font-semibold"
-                  : "text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300",
-              ].join(" ")}
-            >
-              Study
-            </Link>
+          <div className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 rounded-lg p-0.5">
+            <ModeTab href="/workflow"        active={mode === "recruiting"}>Recruiting</ModeTab>
+            <ModeTab href="/general"         active={mode === "general"}>General</ModeTab>
+            <ModeTab href="/study/dashboard" active={mode === "study"}>Study</ModeTab>
           </div>
         </div>
 
@@ -168,17 +133,9 @@ export default function ConditionalNav() {
   );
 }
 
-const HOME_MODES: { id: Exclude<AccessType, "pending">; label: string; href: string }[] = [
-  { id: "recruiter", label: "Recruiter", href: "/workflow" },
-  { id: "general",   label: "General",  href: "/general"  },
-  { id: "study",     label: "Study",    href: "/study/dashboard" },
-];
-
 function UserMenu() {
-  const { user, signOut, switchHomeMode } = useAuth();
-  const router   = useRouter();
-  const [open, setOpen]           = useState(false);
-  const [switching, setSwitching] = useState<string | null>(null);
+  const { user, signOut } = useAuth();
+  const [open, setOpen]   = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   if (!user) return null;
@@ -188,18 +145,6 @@ function UserMenu() {
     .map((p) => p[0]?.toUpperCase() ?? "")
     .slice(0, 2)
     .join("");
-
-  async function handleSwitch(mode: Exclude<AccessType, "pending">, href: string) {
-    if (mode === user!.access) { setOpen(false); return; }
-    setSwitching(mode);
-    try {
-      await switchHomeMode(mode);
-      setOpen(false);
-      router.push(href);
-    } finally {
-      setSwitching(null);
-    }
-  }
 
   return (
     <div className="relative" ref={ref}>
@@ -214,55 +159,13 @@ function UserMenu() {
 
       {open && (
         <>
-          {/* Click-outside overlay */}
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
 
-          <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-lg z-50 py-1 overflow-hidden">
-            {/* User info */}
+          <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-lg z-50 py-1 overflow-hidden">
             <div className="px-3 py-2.5 border-b border-stone-100 dark:border-stone-800">
               <p className="text-xs font-semibold text-stone-800 dark:text-stone-200 truncate">{user.name}</p>
               <p className="text-[11px] text-stone-400 dark:text-stone-500 truncate">{user.email}</p>
             </div>
-
-            {/* Workspace switcher */}
-            <div className="px-3 py-2 border-b border-stone-100 dark:border-stone-800">
-              <p className="text-[10px] font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-[0.08em] mb-1.5">
-                Home workspace
-              </p>
-              {HOME_MODES.map((m) => {
-                const isHome    = user.access === m.id;
-                const isLoading = switching === m.id;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    disabled={switching !== null}
-                    onClick={() => handleSwitch(m.id, m.href)}
-                    className={[
-                      "w-full flex items-center justify-between rounded-md px-2.5 py-1.5 text-xs transition-colors",
-                      isHome
-                        ? "bg-aubergine-50 dark:bg-aubergine-950/30 text-aubergine-900 dark:text-aubergine-300 font-medium"
-                        : "text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 hover:text-stone-900 dark:hover:text-stone-200",
-                      "disabled:opacity-50",
-                    ].join(" ")}
-                  >
-                    <span>{m.label}</span>
-                    {isLoading ? (
-                      <svg className="w-3 h-3 animate-spin text-aubergine-500" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                      </svg>
-                    ) : isHome ? (
-                      <svg className="w-3 h-3 text-aubergine-600 dark:text-aubergine-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 3L2 9h2v8h5v-5h2v5h5V9h2L10 3z" />
-                      </svg>
-                    ) : null}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Sign out */}
             <div className="py-1">
               <button
                 type="button"
@@ -276,6 +179,22 @@ function UserMenu() {
         </>
       )}
     </div>
+  );
+}
+
+function ModeTab({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className={[
+        "px-3 py-1 text-xs font-medium rounded-md transition-colors",
+        active
+          ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-sm"
+          : "text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300",
+      ].join(" ")}
+    >
+      {children}
+    </Link>
   );
 }
 
