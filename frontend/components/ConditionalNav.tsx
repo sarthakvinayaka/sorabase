@@ -22,6 +22,13 @@ function isNavSuppressed(pathname: string): boolean {
     pathname.startsWith("/general/schema") ||
     pathname.startsWith("/general/results")
   ) return true;
+  // Study Mode focused-flow pages — full-screen workspaces with own headers
+  if (pathname === "/study") return true;
+  if (
+    pathname.startsWith("/study/processing") ||
+    pathname.startsWith("/study/review") ||
+    pathname.startsWith("/study/flashcards")
+  ) return true;
   return false;
 }
 
@@ -43,7 +50,9 @@ export default function ConditionalNav() {
   // Internal app pages — shared app nav
   const mode    = modeFromPath(pathname);
   // Logo routes authenticated users to their mode home, not the marketing site
-  const appHome = mode === "general" ? "/general/dashboard" : "/dashboard";
+  const appHome = mode === "general" ? "/general/dashboard"
+                : mode === "study"   ? "/study/dashboard"
+                : "/dashboard";
 
   return (
     <nav className="sticky top-0 z-40 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900">
@@ -87,6 +96,18 @@ export default function ConditionalNav() {
             >
               General
             </Link>
+            <span className="text-stone-300 dark:text-stone-600 select-none">/</span>
+            <Link
+              href="/study"
+              className={[
+                "px-2 py-0.5 rounded transition-colors",
+                mode === "study"
+                  ? "text-aubergine-900 dark:text-aubergine-400 font-semibold"
+                  : "text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300",
+              ].join(" ")}
+            >
+              Study
+            </Link>
           </div>
         </div>
 
@@ -99,7 +120,19 @@ export default function ConditionalNav() {
             </div>
           )}
 
-          {mode === "general" ? (
+          {mode === "study" ? (
+            <>
+              <NavLink href="/study/dashboard">Dashboard</NavLink>
+              <NavLink href="/study/dashboard?tab=library">Library</NavLink>
+              <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
+              <Link
+                href="/study"
+                className="rounded bg-aubergine-800 text-white text-xs font-medium px-3 py-1.5 hover:bg-aubergine-900 transition-colors"
+              >
+                New lecture
+              </Link>
+            </>
+          ) : mode === "general" ? (
             <>
               <NavLink href="/general/dashboard">Dashboard</NavLink>
               <NavLink href="/general/dashboard?tab=data">Data</NavLink>

@@ -1,5 +1,5 @@
-/** Application modes — Recruiting is the original product; General covers all other use cases. */
-export type AppMode = "recruiting" | "general";
+/** Application modes — Recruiting is the original product; General and Study are additional verticals. */
+export type AppMode = "recruiting" | "general" | "study";
 
 export interface ModeConfig {
   id: AppMode;
@@ -21,10 +21,17 @@ export const MODES: ModeConfig[] = [
     description: "Transcript processing and structured analysis for any conversation or document.",
     href: "/general",
   },
+  {
+    id: "study",
+    label: "Study",
+    description: "Turn lectures into notes, flashcards, quizzes, and structured study material.",
+    href: "/study",
+  },
 ];
 
 /** Derive the active mode from the current pathname. */
 export function modeFromPath(pathname: string): AppMode {
+  if (pathname.startsWith("/study"))   return "study";
   if (pathname.startsWith("/general")) return "general";
   return "recruiting";
 }

@@ -6,7 +6,7 @@
 // the Prisma-backed API routes in app/api/auth/ and app/api/user/.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type AccessType = "recruiter" | "general" | "pending";
+export type AccessType = "recruiter" | "general" | "study" | "pending";
 export type PlanType   = "free" | "pro" | "custom";
 
 export interface AuthUser {
@@ -25,9 +25,12 @@ export function getRedirectForUser(user: AuthUser): string {
   if (!user.onboarded)             return "/onboarding";
   if (user.access === "recruiter") return "/workflow";
   if (user.access === "general")   return "/general";
+  if (user.access === "study")     return "/study";
   return "/onboarding";
 }
 
 export function getWorkspaceForUser(user: Pick<AuthUser, "access">): string {
-  return user.access === "recruiter" ? "/workflow" : "/general";
+  if (user.access === "recruiter") return "/workflow";
+  if (user.access === "study")     return "/study";
+  return "/general";
 }
