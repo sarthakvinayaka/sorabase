@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { listCandidates, ApiError } from "@/lib/api";
+import { PageHeader } from "@/components/ui/PageHeader";
 import type { ApprovalStatus, CandidateListItem } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
@@ -62,20 +63,16 @@ export default function CandidatesPage() {
   return (
     <main className="page space-y-6">
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
-            Candidate queue
-          </h1>
-          <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-            {loading ? "…" : `${total.toLocaleString()} candidate${total !== 1 ? "s" : ""}`}
-          </p>
-        </div>
-        <Link href="/workflow" className="btn-primary text-xs">
-          + New screening
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="Recruiting mode"
+        title="Candidate queue"
+        sub={loading ? "…" : `${total.toLocaleString()} candidate${total !== 1 ? "s" : ""}`}
+        action={
+          <Link href="/workflow" className="btn-primary text-xs">
+            + New screening
+          </Link>
+        }
+      />
 
       {/* Filter bar */}
       <div className="flex gap-1.5 flex-wrap">

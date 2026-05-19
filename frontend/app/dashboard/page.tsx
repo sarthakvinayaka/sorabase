@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getDashboard } from "@/lib/api";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { HorizontalBar } from "@/components/dashboard/HorizontalBar";
+import { PageHeader } from "@/components/ui/PageHeader";
 import type { DashboardStats } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
@@ -68,19 +69,12 @@ export default function DashboardPage() {
   const { candidates, extraction_completeness: ec, fit_score_stats: fs } = stats;
 
   return (
-    <main className="page space-y-10">
-
-      {/* Page header */}
-      <div className="flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
-            Dashboard
-          </h1>
-          <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-            Updated {new Date(stats.generated_at).toLocaleString()}
-          </p>
-        </div>
-      </div>
+    <main className="page space-y-8">
+      <PageHeader
+        eyebrow="Recruiting mode"
+        title="Dashboard"
+        sub={`Updated ${new Date(stats.generated_at).toLocaleString()}`}
+      />
 
       {/* ── Candidate pipeline ─────────────────────────────────────────────── */}
       <section>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { listStudyLectures, ApiError } from "@/lib/api";
 import type { StudyLecture } from "@/lib/types";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -41,26 +42,18 @@ export default function StudyDashboard() {
   const archived = lectures.filter((l) => l.archive_status === "archived");
 
   return (
-    <div className="max-w-3xl mx-auto px-5 py-10">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="font-display italic text-2xl text-stone-900 dark:text-stone-100">
-            Study Library
-          </h1>
-          <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-            Your processed lectures, notes, and flashcard sets
-          </p>
-        </div>
-        <Link
-          href="/study"
-          className="rounded bg-aubergine-800 text-white text-xs font-medium px-3.5 py-2 hover:bg-aubergine-900 transition-colors"
-        >
-          + New lecture
-        </Link>
-      </div>
+    <main className="page max-w-3xl space-y-6">
+      <PageHeader
+        eyebrow="Study mode"
+        title="Library"
+        sub="Your processed lectures, notes, and flashcard sets"
+        action={
+          <Link href="/study" className="btn-primary text-xs">
+            + New lecture
+          </Link>
+        }
+      />
 
-      {/* Body */}
       {loading ? (
         <div className="flex items-center justify-center py-24">
           <svg className="w-5 h-5 animate-spin text-aubergine-700" fill="none" viewBox="0 0 24 24">
@@ -69,7 +62,7 @@ export default function StudyDashboard() {
           </svg>
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/20 px-5 py-4 text-sm text-red-700 dark:text-red-400">
+        <div className="rounded-lg border border-negative-border bg-negative-light px-4 py-3 text-sm text-negative-text">
           {error}
         </div>
       ) : active.length === 0 ? (
@@ -81,9 +74,7 @@ export default function StudyDashboard() {
           ))}
           {archived.length > 0 && (
             <>
-              <p className="text-[10px] font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-[0.08em] pt-4 pb-1">
-                Archived
-              </p>
+              <p className="section-label pt-4 pb-1">Archived</p>
               {archived.map((lec) => (
                 <LectureRow key={lec.id} lecture={lec} dim />
               ))}
@@ -91,7 +82,7 @@ export default function StudyDashboard() {
           )}
         </div>
       )}
-    </div>
+    </main>
   );
 }
 

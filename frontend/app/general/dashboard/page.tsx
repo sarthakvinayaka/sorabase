@@ -6,6 +6,8 @@ import { useSearchParams } from "next/navigation";
 import { getGeneralDashboard } from "@/lib/api";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { HorizontalBar } from "@/components/dashboard/HorizontalBar";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { TabBar } from "@/components/ui/TabBar";
 import type { GeneralDashboardStats, GeneralFieldStats } from "@/lib/types";
 import DataExplorer from "@/components/general/DataExplorer";
 import { useExtensionStatus } from "@/lib/useExtensionStatus";
@@ -162,7 +164,7 @@ function AnalyticsTab() {
   const emptyFields  = fields.filter((f) => f.extracted_count === 0);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <div className="flex items-end justify-between">
         <div>
           <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
@@ -337,36 +339,19 @@ export default function GeneralDashboardPage() {
   const [tab, setTab] = useState<Tab>(initialTab);
 
   return (
-    <main className="page space-y-0">
-      {/* Page header */}
-      <div className="flex items-end justify-between mb-6">
-        <div>
-          <p className="section-label mb-1">General mode</p>
-          <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
-            Dashboard
-          </h1>
-        </div>
-        <CaptureCTA />
-      </div>
+    <main className="page space-y-6">
+      <PageHeader
+        eyebrow="General mode"
+        title="Dashboard"
+        action={<CaptureCTA />}
+      />
 
-      {/* Tab bar */}
-      <div className="flex items-center gap-0 border-b border-stone-200 dark:border-stone-700 mb-8">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTab(t.id)}
-            className={[
-              "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors",
-              tab === t.id
-                ? "border-aubergine-700 text-aubergine-800 dark:text-aubergine-400"
-                : "border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300",
-            ].join(" ")}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <TabBar
+        tabs={TABS}
+        active={tab}
+        onChange={setTab}
+        className="mb-2"
+      />
 
       {tab === "analytics" && <AnalyticsTab />}
       {tab === "data"      && <DataExplorer />}
