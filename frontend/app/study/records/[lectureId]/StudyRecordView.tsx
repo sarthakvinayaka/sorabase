@@ -462,7 +462,7 @@ export default function StudyRecordView({ lectureId }: { lectureId: string }) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {lecture.course && (
           <Link
-            href={`/study/dashboard?course=${encodeURIComponent(lecture.course)}`}
+            href={`/study/courses/${encodeURIComponent(lecture.course ?? "")}`}
             className="group flex items-center gap-3 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800/50 px-4 py-3 transition-all"
           >
             <svg className="w-4 h-4 text-stone-400 dark:text-stone-500 group-hover:text-stone-600 dark:group-hover:text-stone-300 flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

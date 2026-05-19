@@ -31,6 +31,7 @@ import type {
   SchemaTemplateUpdate,
   SchemasListResponse,
   StudyArchiveStatus,
+  StudyCourseDetail,
   StudyExtractionCreatedResponse,
   StudyFlashcard,
   StudyLectureDetail,
@@ -525,6 +526,10 @@ export async function archiveStudyLecture(
   return request(`/api/study/lectures/${lectureId}/archive`, {
     method: "POST",
   });
+}
+
+export async function getStudyCourse(courseName: string): Promise<StudyCourseDetail> {
+  return request(`/api/study/courses/${encodeURIComponent(courseName)}`);
 }
 
 export { ApiError };

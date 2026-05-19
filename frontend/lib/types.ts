@@ -692,3 +692,57 @@ export interface StudyExtractionCreatedResponse {
   lecture_id: string;
   extraction_id: string;
 }
+
+// ---------------------------------------------------------------------------
+// Study Mode — course aggregate
+// ---------------------------------------------------------------------------
+
+export interface CourseLectureItem {
+  lecture_id: string;
+  title: string | null;
+  lecture_date: string | null;
+  archive_status: StudyArchiveStatus;
+  flashcard_count: number;
+  question_count: number;
+  concept_count: number;
+  topic_count: number;
+  avg_confidence: number | null;
+  created_at: string;
+}
+
+export interface CourseTopicFrequency {
+  topic: string;
+  lecture_count: number;
+}
+
+export interface CourseRepeatedConcept {
+  concept: string;
+  explanation: string;
+  frequency: number;
+  avg_confidence: number;
+}
+
+export type ReviewItemType = "concept" | "topic" | "question";
+
+export interface SuggestedReviewItem {
+  type: ReviewItemType;
+  label: string;
+  reason: string;
+  lecture_id: string | null;
+}
+
+export interface StudyCourseDetail {
+  course_name: string;
+  lecture_count: number;
+  total_flashcards: number;
+  total_questions: number;
+  total_concepts: number;
+  avg_confidence: number | null;
+  last_updated: string | null;
+  lectures: CourseLectureItem[];
+  topic_frequencies: CourseTopicFrequency[];
+  repeated_concepts: CourseRepeatedConcept[];
+  coverage_gaps: string[];
+  suggested_review: SuggestedReviewItem[];
+  sample_questions: StudyQuestion[];
+}
