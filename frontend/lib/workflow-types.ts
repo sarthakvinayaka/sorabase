@@ -12,7 +12,7 @@ export type WorkflowNodeType =
 export type NodeStatus = "idle" | "configured" | "running" | "completed" | "error";
 
 // Source
-export type SourceInputMode = "transcript_paste" | "audio_upload" | "zoom" | "zoom_bot";
+export type SourceInputMode = "transcript_paste" | "audio_upload" | "zoom" | "zoom_bot" | "browser_capture";
 
 export interface SourceNodeData extends Record<string, unknown> {
   nodeType: "source";
@@ -36,6 +36,11 @@ export interface SourceNodeData extends Record<string, unknown> {
   botCandidateId?: string;      // populated once complete
   botTranscriptChars?: number;
   botErrorMessage?: string;
+  // Browser capture mode (Chrome extension)
+  captureConversationId?: string; // populated when extension completes
+  captureLabel?: string;
+  captureStatus?: "idle" | "recording" | "processing" | "done" | "error";
+  captureError?: string;
 }
 
 // Extraction

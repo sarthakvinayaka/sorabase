@@ -1,0 +1,86 @@
+{
+  "manifest_version": 3,
+  "name": "SoraBase Capture",
+  "short_name": "SoraBase",
+  "description": "Capture browser meeting audio and send to SoraBase for structured extraction.",
+  "version": "1.0.0",
+
+  "icons": {
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "SoraBase Capture",
+    "default_icon": {
+      "16":  "icons/icon16.png",
+      "48":  "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "background": {
+    "service_worker": "background/sw.js",
+    "type": "module"
+  },
+
+  "permissions": [
+    "tabCapture",
+    "offscreen",
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "notifications"
+  ],
+
+  "host_permissions": [
+    "https://meet.google.com/*",
+    "https://*.zoom.us/*",
+    "https://teams.microsoft.com/*",
+    "https://app.teams.microsoft.com/*",
+    "https://sorabase.org/*",
+    "https://www.sorabase.org/*",
+    "http://localhost:3000/*"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://meet.google.com/*",
+        "https://*.zoom.us/wc/*",
+        "https://teams.microsoft.com/*",
+        "https://app.teams.microsoft.com/*"
+      ],
+      "js": ["content/indicator.js"],
+      "css": ["content/indicator.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://sorabase.org/*",
+        "https://www.sorabase.org/*",
+        "http://localhost:3000/*"
+      ],
+      "js": ["content/bridge.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "externally_connectable": {
+    "matches": [
+      "https://sorabase.org/*",
+      "https://www.sorabase.org/*",
+      "http://localhost:3000/*"
+    ]
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["offscreen/offscreen.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

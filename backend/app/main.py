@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import analyses, audio, bot_sessions, candidates, conversations, dashboard, drafts, exports, general_dashboard, general_exports, jobs, meeting_sessions, schema_proposals, templates, webhooks
+from app.api.routes import analyses, audio, bot_sessions, candidates, conversations, dashboard, drafts, exports, general_dashboard, general_data, general_exports, jobs, meeting_sessions, schema_proposals, templates, webhooks
 
 app = FastAPI(
     title="Staffing Recruiter API",
@@ -34,6 +34,7 @@ app.include_router(meeting_sessions.router, prefix="/api", tags=["meeting-sessio
 app.include_router(bot_sessions.router,      prefix="/api", tags=["bot-sessions"])
 app.include_router(schema_proposals.router,    prefix="/api", tags=["schema-proposals"])
 app.include_router(general_dashboard.router,  prefix="/api", tags=["general-dashboard"])
+app.include_router(general_data.router,       prefix="/api", tags=["general-data"])
 app.include_router(templates.router,          prefix="/api", tags=["templates"])
 app.include_router(general_exports.router,    prefix="/api", tags=["general-exports"])
 

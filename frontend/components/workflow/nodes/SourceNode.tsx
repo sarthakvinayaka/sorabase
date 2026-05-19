@@ -7,6 +7,7 @@ const INPUT_LABEL: Record<string, string> = {
   audio_upload:     "Audio upload",
   zoom_bot:         "Zoom bot",
   zoom:             "Zoom recording",
+  browser_capture:  "Browser capture",
 };
 
 const BOT_DOT: Record<string, string> = {
@@ -108,6 +109,35 @@ export default function SourceNode({ id, data: raw, selected }: NodeProps) {
             </p>
           )}
         </>
+      )}
+
+      {/* Browser capture */}
+      {data.inputMode === "browser_capture" && (
+        <div className="mt-1.5 flex items-center gap-1.5">
+          {data.captureStatus === "recording" && (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+              <p className="text-[10px] text-red-500">Recording…</p>
+            </>
+          )}
+          {data.captureStatus === "done" && data.captureConversationId && (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-aubergine-700 flex-shrink-0" />
+              <p className="text-[10px] text-aubergine-700">{data.captureLabel || "Capture ready"}</p>
+            </>
+          )}
+          {data.captureStatus === "error" && (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+              <p className="text-[10px] text-red-500">Capture failed</p>
+            </>
+          )}
+          {(!data.captureStatus || data.captureStatus === "idle") && (
+            <p className="text-[10px] text-stone-300 dark:text-stone-600">
+              Awaiting extension
+            </p>
+          )}
+        </div>
       )}
     </BaseNode>
   );

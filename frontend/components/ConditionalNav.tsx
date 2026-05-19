@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import SiteNav from "./marketing/SiteNav";
 import { modeFromPath } from "@/lib/mode";
 import { LogoMark } from "@/components/ui/LogoMark";
+import { useRecordingStatus } from "@/lib/useExtensionStatus";
 
 const MARKETING_PATHS = new Set(["/", "/pricing"]);
 const AUTH_PATHS      = new Set(["/signin", "/signup"]);
@@ -26,6 +27,7 @@ function isNavSuppressed(pathname: string): boolean {
 
 export default function ConditionalNav() {
   const pathname = usePathname();
+  const { recording } = useRecordingStatus();
 
   // Marketing pages — full SiteNav with logo + links + CTA
   if (MARKETING_PATHS.has(pathname)) {
@@ -89,9 +91,18 @@ export default function ConditionalNav() {
         </div>
 
         <div className="flex items-center gap-1">
+          {/* Live recording indicator */}
+          {recording && (
+            <div className="flex items-center gap-1.5 mr-2 px-2.5 py-1 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-2xs font-semibold text-red-600 dark:text-red-400">Recording</span>
+            </div>
+          )}
+
           {mode === "general" ? (
             <>
               <NavLink href="/general/dashboard">Dashboard</NavLink>
+              <NavLink href="/general/dashboard?tab=data">Data</NavLink>
               <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
               <Link
                 href="/general"

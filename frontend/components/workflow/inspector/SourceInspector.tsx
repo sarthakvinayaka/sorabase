@@ -5,12 +5,14 @@ import { useWorkflowStoreContext, useWorkflowMode } from "@/lib/workflow-store-c
 import { listConversations, listMeetingSessions, createBotSession, getBotSession, cancelBotSession } from "@/lib/api";
 import type { BotSession, ConversationSummary, MeetingSession } from "@/lib/types";
 import type { SourceInputMode, SourceNodeData } from "@/lib/workflow-types";
+import { useExtensionStatus } from "@/lib/useExtensionStatus";
 
 interface Props { id: string; data: SourceNodeData }
 
 const MODES: { value: SourceInputMode; label: string }[] = [
   { value: "transcript_paste", label: "Paste transcript" },
   { value: "audio_upload",     label: "Audio upload" },
+  { value: "browser_capture",  label: "Browser capture" },
   { value: "zoom_bot",         label: "Zoom bot (live)" },
   { value: "zoom",             label: "Zoom cloud recording" },
 ];
@@ -70,6 +72,11 @@ export default function SourceInspector({ id, data }: Props) {
             onChange={(e) => update(id, { transcript: e.target.value })}
           />
         </Field>
+      )}
+
+      {/* Browser capture */}
+      {data.inputMode === "browser_capture" && (
+        <BrowserCapturePanel id={id} data={data} update={update} mode={mode} />
       )}
 
       {/* Audio upload placeholder */}
@@ -649,6 +656,153 @@ function AutoSessionsPanel() {
             </div>
           );
         })}
+      </div>
+    </Field>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Browser capture panel
+// ---------------------------------------------------------------------------
+
+interface BrowserCapturePanelProps {
+  id: string;
+  data: SourceNodeData;
+  update: (id: string, patch: Partial<Record<string, unknown>>) => void;
+  mode: string;
+}
+
+function BrowserCapturePanel({ id, data, update, mode }: BrowserCapturePanelProps) {
+  const ext       = useExtensionStatus();
+  const isGeneral = mode === "general";
+  const status    = data.captureStatus ?? "idle";
+
+  function handleReset() {
+    update(id, {
+      captureConversationId: undefined,
+      captureStatus: "idle",
+      captureError:  undefined,
+      captureLabel:  undefined,
+      status:        "idle",
+    });
+  }
+
+  // Extension not installed
+  if (!ext.installed) {
+    return (
+      <Field label="Browser capture">
+        <div className="rounded-lg border border-dashed border-aubergine-200 dark:border-aubergine-800 bg-aubergine-50 dark:bg-aubergine-950/20 px-4 py-4 text-center">
+          <p className="text-xs font-medium text-aubergine-800 dark:text-aubergine-300 mb-1">
+            Extension not installed
+          </p>
+          <p className="text-[10px] text-aubergine-600 dark:text-aubergine-500 leading-relaxed mb-2.5">
+            Install the SoraBase Capture extension to record Google Meet, Zoom, and Teams directly in your browser.
+          </p>
+          <a
+            href="https://chrome.google.com/webstore/detail/sorabase-capture/EXTENSION_ID"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-[10px] font-semibold text-white bg-aubergine-800 hover:bg-aubergine-900 transition-colors px-2.5 py-1.5 rounded"
+          >
+            Install extension →
+          </a>
+        </div>
+      </Field>
+    );
+  }
+
+  // Extension installed — recording in progress via extension
+  if (ext.recording) {
+    return (
+      <Field label="Browser capture">
+        <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/20 px-3 py-2.5">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+            <p className="text-xs font-semibold text-red-700 dark:text-red-400">Recording in progress</p>
+          </div>
+          <p className="text-[10px] text-red-600 dark:text-red-500 leading-relaxed">
+            {ext.label || "Meeting capture active"}. Stop the recording via the extension popup to process.
+          </p>
+        </div>
+      </Field>
+    );
+  }
+
+  // Recording done — conversation_id available
+  if (status === "done" && data.captureConversationId) {
+    return (
+      <>
+        <Field label="Browser capture">
+          <div className="rounded-lg border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/20 px-3 py-2.5">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-aubergine-800 dark:text-aubergine-300">
+                  Capture ready
+                </p>
+                <p className="text-[10px] text-aubergine-600 dark:text-aubergine-500 mt-0.5">
+                  {data.captureLabel || "Recording processed"} · transcript available
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleReset}
+                className="text-[10px] font-medium text-aubergine-600 hover:text-aubergine-800 flex-shrink-0"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+          <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-1.5">
+            Click Run to process through the {isGeneral ? "General" : "Recruiting"} workflow.
+          </p>
+        </Field>
+
+        <Field label={isGeneral ? "Session label" : "Job reference"} hint="optional">
+          <input
+            type="text"
+            className="w-full rounded-lg border bg-stone-50 dark:bg-stone-800 px-3 py-2 text-sm text-stone-800 dark:text-stone-200 placeholder:text-stone-400 border-stone-200 dark:border-stone-700 focus:outline-none focus:ring-1 focus:ring-aubergine-700"
+            placeholder={isGeneral ? "e.g. Q4 planning call" : "e.g. REQ-1042"}
+            value={data.jobReference}
+            onChange={(e) => update(id, { jobReference: e.target.value })}
+          />
+        </Field>
+      </>
+    );
+  }
+
+  // Error state
+  if (status === "error") {
+    return (
+      <Field label="Browser capture">
+        <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/20 px-3 py-2.5">
+          <p className="text-xs font-medium text-red-700 dark:text-red-400 mb-0.5">Capture failed</p>
+          <p className="text-[10px] text-red-600 dark:text-red-500">{data.captureError || "Unknown error"}</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleReset}
+          className="w-full mt-2 rounded-lg px-3 py-2 text-xs font-medium text-stone-600 dark:text-stone-400 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+        >
+          Try again
+        </button>
+      </Field>
+    );
+  }
+
+  // Idle — extension installed, not recording
+  return (
+    <Field label="Browser capture">
+      <div className="rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 px-3 py-3 text-center">
+        <div className="flex items-center justify-center gap-1.5 mb-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-aubergine-500" />
+          <p className="text-xs font-medium text-aubergine-700 dark:text-aubergine-400">Extension ready</p>
+        </div>
+        <p className="text-[10px] text-stone-500 dark:text-stone-400 leading-relaxed mb-2">
+          Open the SoraBase Capture extension popup on your meeting tab to start recording. Once the recording is processed, this node will receive the transcript automatically.
+        </p>
+        <p className="text-[10px] text-stone-400 dark:text-stone-500">
+          Supported: Google Meet · Zoom · Teams · any browser tab
+        </p>
       </div>
     </Field>
   );

@@ -24,10 +24,12 @@ import type {
   Job,
   MeetingSession,
   ProposedColumn,
+  RecordsTableResponse,
   SchemaProposalResponse,
   SchemaTemplate,
   SchemaTemplateCreate,
   SchemaTemplateUpdate,
+  SchemasListResponse,
   WebhookDeliveryResult,
 } from "./types";
 
@@ -438,6 +440,25 @@ export async function sendGeneralWebhook(
       include_summary:    opts?.includeSummary    ?? true,
     }),
   });
+}
+
+// ---------------------------------------------------------------------------
+// General Mode data explorer
+// ---------------------------------------------------------------------------
+
+export async function listGeneralSchemas(): Promise<SchemasListResponse> {
+  return request("/api/general-data/schemas");
+}
+
+export async function getSchemaRecords(
+  schemaId: string,
+  params?: { page?: number; limit?: number },
+): Promise<RecordsTableResponse> {
+  const qs = new URLSearchParams();
+  if (params?.page)  qs.set("page",  String(params.page));
+  if (params?.limit) qs.set("limit", String(params.limit));
+  const q = qs.toString();
+  return request(`/api/general-data/schemas/${encodeURIComponent(schemaId)}/records${q ? `?${q}` : ""}`);
 }
 
 export { ApiError };

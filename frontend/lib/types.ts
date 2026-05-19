@@ -551,3 +551,53 @@ export interface SchemaProposalResponse {
   model_used:      string;
   generated_at:    string;
 }
+
+// ---------------------------------------------------------------------------
+// General Mode data explorer
+// ---------------------------------------------------------------------------
+
+export interface SchemaInfo {
+  schema_id:      string;
+  name:           string;
+  record_count:   number;
+  avg_confidence: number;
+  avg_fill_rate:  number;
+  last_updated:   string;
+  field_names:    string[];
+}
+
+export interface SchemasListResponse {
+  schemas:      SchemaInfo[];
+  generated_at: string;
+}
+
+export interface FieldCell {
+  value:            FieldValue;
+  confidence:       number;
+  status:           string;
+  evidence_snippet: string | null;
+  edited:           boolean;
+}
+
+export interface RecordRow {
+  record_id:       string;
+  run_id:          string;
+  created_at:      string;
+  approval_status: string;
+  confidence:      number;
+  fill_rate:       number;
+  missing_fields:  string[];
+  summary:         string | null;
+  source_type:     string | null;
+  fields:          Record<string, FieldCell>;
+}
+
+export interface RecordsTableResponse {
+  schema_id:   string;
+  name:        string;
+  field_names: string[];
+  records:     RecordRow[];
+  total:       number;
+  page:        number;
+  limit:       number;
+}

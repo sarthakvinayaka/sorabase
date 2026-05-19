@@ -2,13 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { getGeneralDashboard } from "@/lib/api";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { HorizontalBar } from "@/components/dashboard/HorizontalBar";
 import type { GeneralDashboardStats, GeneralFieldStats } from "@/lib/types";
+import DataExplorer from "@/components/general/DataExplorer";
+import { useExtensionStatus } from "@/lib/useExtensionStatus";
 
 // ---------------------------------------------------------------------------
-// Layout helpers — same patterns as Recruiting Mode dashboard
+// Tab types
+// ---------------------------------------------------------------------------
+
+type Tab = "analytics" | "data";
+
+// ---------------------------------------------------------------------------
+// Analytics tab — original dashboard (unchanged)
 // ---------------------------------------------------------------------------
 
 function SectionLabel({ title }: { title: string }) {
@@ -29,10 +38,6 @@ function Card({ title, children }: { title?: string; children: React.ReactNode }
 function EmptyState({ message }: { message: string }) {
   return <p className="text-xs text-stone-400 dark:text-stone-500 py-2 italic">{message}</p>;
 }
-
-// ---------------------------------------------------------------------------
-// Field-type-to-widget mapping
-// ---------------------------------------------------------------------------
 
 type WidgetKind = "bar" | "numeric" | "fill-only";
 
@@ -69,19 +74,14 @@ function FillBar({ rate }: { rate: number }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Per-field card
-// ---------------------------------------------------------------------------
-
 function FieldCard({ field }: { field: GeneralFieldStats }) {
-  const kind      = widgetKind(field);
-  const color     = TYPE_COLORS[field.inferred_type] ?? "bg-stone-400";
-  const fillPct   = Math.round(field.fill_rate * 100);
-  const confPct   = Math.round(field.avg_confidence * 100);
+  const kind    = widgetKind(field);
+  const color   = TYPE_COLORS[field.inferred_type] ?? "bg-stone-400";
+  const fillPct = Math.round(field.fill_rate * 100);
+  const confPct = Math.round(field.avg_confidence * 100);
 
   return (
     <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-5 flex flex-col gap-3">
-      {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <p className="text-xs font-semibold text-stone-700 dark:text-stone-300 leading-snug">
           {prettyLabel(field.field_name)}
@@ -91,21 +91,16 @@ function FieldCard({ field }: { field: GeneralFieldStats }) {
         </span>
       </div>
 
-      {/* Fill rate + confidence chips */}
       <div className="flex items-center gap-3 text-2xs text-stone-400 dark:text-stone-500">
         <span>
           <span className="tabular-nums font-medium text-stone-600 dark:text-stone-300">{field.extracted_count}</span>
           /{field.total_sessions} sessions
         </span>
-        {field.extracted_count > 0 && (
-          <span>conf {confPct}%</span>
-        )}
+        {field.extracted_count > 0 && <span>conf {confPct}%</span>}
       </div>
 
-      {/* Fill bar */}
       <FillBar rate={field.fill_rate} />
 
-      {/* Widget */}
       {kind === "bar" && (
         <HorizontalBar items={field.value_counts} colorClass={color} />
       )}
@@ -132,11 +127,7 @@ function FieldCard({ field }: { field: GeneralFieldStats }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
-
-export default function GeneralDashboardPage() {
+function AnalyticsTab() {
   const [stats,   setStats]   = useState<GeneralDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState<string | null>(null);
@@ -144,56 +135,43 @@ export default function GeneralDashboardPage() {
   useEffect(() => {
     getGeneralDashboard()
       .then(setStats)
-      .catch(() => setError("Failed to load dashboard."))
+      .catch(() => setError("Failed to load analytics."))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
     return (
-      <main className="page">
-        <div className="flex items-center gap-2 text-sm text-stone-400">
-          <span className="w-4 h-4 rounded-full border-2 border-aubergine-400 border-t-transparent animate-spin inline-block" />
-          Loading…
-        </div>
-      </main>
+      <div className="flex items-center gap-2 text-sm text-stone-400 py-12">
+        <span className="w-4 h-4 rounded-full border-2 border-aubergine-400 border-t-transparent animate-spin inline-block" />
+        Loading…
+      </div>
     );
   }
 
   if (error || !stats) {
     return (
-      <main className="page">
-        <div className="rounded-lg border border-negative-border bg-negative-light px-4 py-3 text-sm text-negative-text">
-          {error ?? "No data available."}
-        </div>
-      </main>
+      <div className="rounded-lg border border-negative-border bg-negative-light px-4 py-3 text-sm text-negative-text">
+        {error ?? "No data available."}
+      </div>
     );
   }
 
   const { sessions: s, fields } = stats;
   const fillRatePct = Math.round(stats.avg_fill_rate * 100);
-
-  // Fields that have enough data to be worth showing (extracted in ≥1 session)
-  const activeFields  = fields.filter((f) => f.extracted_count > 0);
-  // Fields never extracted — group separately
-  const emptyFields   = fields.filter((f) => f.extracted_count === 0);
+  const activeFields = fields.filter((f) => f.extracted_count > 0);
+  const emptyFields  = fields.filter((f) => f.extracted_count === 0);
 
   return (
-    <main className="page space-y-10">
-
-      {/* ── Page header ────────────────────────────────────────────────────── */}
+    <div className="space-y-10">
       <div className="flex items-end justify-between">
         <div>
-          <p className="section-label mb-1">General mode</p>
-          <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
-            Dashboard
-          </h1>
           <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
             Updated {new Date(stats.generated_at).toLocaleString()}
           </p>
         </div>
       </div>
 
-      {/* ── Session overview ───────────────────────────────────────────────── */}
+      {/* Session overview */}
       <section>
         <SectionLabel title="Session overview" />
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -208,7 +186,7 @@ export default function GeneralDashboardPage() {
         </div>
       </section>
 
-      {/* ── Extraction quality ─────────────────────────────────────────────── */}
+      {/* Extraction quality */}
       <section>
         <SectionLabel title="Extraction quality" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
@@ -228,10 +206,7 @@ export default function GeneralDashboardPage() {
           {stats.top_missing_fields.length > 0 && (
             <div className="lg:col-span-2">
               <Card title="Most missing fields">
-                <HorizontalBar
-                  items={stats.top_missing_fields}
-                  colorClass="bg-warning-DEFAULT"
-                />
+                <HorizontalBar items={stats.top_missing_fields} colorClass="bg-warning-DEFAULT" />
               </Card>
             </div>
           )}
@@ -246,22 +221,19 @@ export default function GeneralDashboardPage() {
         </div>
       </section>
 
-      {/* ── Confidence distribution ────────────────────────────────────────── */}
+      {/* Confidence distribution */}
       {stats.confidence_distribution.length > 0 && (
         <section>
           <SectionLabel title="Confidence distribution" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Card title="Sessions by confidence band">
-              <HorizontalBar
-                items={stats.confidence_distribution}
-                colorClass="bg-aubergine-700"
-              />
+              <HorizontalBar items={stats.confidence_distribution} colorClass="bg-aubergine-700" />
             </Card>
           </div>
         </section>
       )}
 
-      {/* ── Per-field breakdown ────────────────────────────────────────────── */}
+      {/* Per-field breakdown */}
       {activeFields.length > 0 && (
         <section>
           <SectionLabel title="Field breakdown" />
@@ -273,7 +245,7 @@ export default function GeneralDashboardPage() {
         </section>
       )}
 
-      {/* ── Never-extracted fields ─────────────────────────────────────────── */}
+      {/* Never-extracted */}
       {emptyFields.length > 0 && (
         <section>
           <SectionLabel title="Never extracted" />
@@ -292,11 +264,10 @@ export default function GeneralDashboardPage() {
         </section>
       )}
 
-      {/* Empty state — no sessions yet */}
       {s.total === 0 && (
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-6 py-12 text-center">
           <p className="text-sm font-medium text-stone-600 dark:text-stone-300 mb-1">
-            No General Mode sessions yet
+            No sessions yet
           </p>
           <p className="text-xs text-stone-400 dark:text-stone-500 mb-6">
             Run a transcript through General Mode to see extraction analytics here.
@@ -309,6 +280,96 @@ export default function GeneralDashboardPage() {
           </Link>
         </div>
       )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page — tabs
+// ---------------------------------------------------------------------------
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "analytics", label: "Analytics" },
+  { id: "data",      label: "Data" },
+];
+
+function CaptureCTA() {
+  const ext = useExtensionStatus();
+
+  if (ext.installed && ext.recording) {
+    return (
+      <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
+        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+        <p className="text-xs font-medium text-red-700 dark:text-red-400">Recording in progress</p>
+      </div>
+    );
+  }
+
+  if (ext.installed) {
+    return (
+      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-aubergine-50 dark:bg-aubergine-950/20 border border-aubergine-200 dark:border-aubergine-900">
+        <span className="w-1.5 h-1.5 rounded-full bg-aubergine-500 flex-shrink-0" />
+        <p className="text-xs text-aubergine-700 dark:text-aubergine-400">
+          SoraBase Capture ready — open extension to record a meeting
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href="https://chrome.google.com/webstore/detail/sorabase-capture/EXTENSION_ID"
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex items-center gap-1.5 text-xs font-medium text-aubergine-700 dark:text-aubergine-400 hover:text-aubergine-900 dark:hover:text-aubergine-300 transition-colors"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4M9 11V7a3 3 0 116 0v4a3 3 0 11-6 0z"/>
+      </svg>
+      Install capture extension
+    </a>
+  );
+}
+
+export default function GeneralDashboardPage() {
+  const searchParams = useSearchParams();
+  const initialTab   = searchParams.get("tab") === "data" ? "data" : "analytics";
+  const [tab, setTab] = useState<Tab>(initialTab);
+
+  return (
+    <main className="page space-y-0">
+      {/* Page header */}
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <p className="section-label mb-1">General mode</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">
+            Dashboard
+          </h1>
+        </div>
+        <CaptureCTA />
+      </div>
+
+      {/* Tab bar */}
+      <div className="flex items-center gap-0 border-b border-stone-200 dark:border-stone-700 mb-8">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setTab(t.id)}
+            className={[
+              "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors",
+              tab === t.id
+                ? "border-aubergine-700 text-aubergine-800 dark:text-aubergine-400"
+                : "border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300",
+            ].join(" ")}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "analytics" && <AnalyticsTab />}
+      {tab === "data"      && <DataExplorer />}
     </main>
   );
 }

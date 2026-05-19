@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ApprovalStatus, AuditLogEntry, CandidateDetail, ExtractedField, ProposedColumn, StoredSchema } from "@/lib/types";
 import { updateApproval, confirmField, getCandidateAudit, ApiError } from "@/lib/api";
 import GeneralFieldRow from "@/components/review/GeneralFieldRow";
@@ -137,6 +138,7 @@ function AuditTimeline({
 // ---------------------------------------------------------------------------
 
 export default function GeneralResultsWorkspace({ initial }: Props) {
+  const router = useRouter();
   const { candidate, extraction, conversation } = initial;
 
   const [columns, setColumns] = useState<ProposedColumn[]>([]);
@@ -200,6 +202,9 @@ export default function GeneralResultsWorkspace({ initial }: Props) {
       const u = await updateApproval(candidate.id, next);
       setApprovalStatus(u.approval_status);
       setAuditKey((k) => k + 1);
+      if (next === "approved") {
+        router.push(`/general/records/${candidate.id}`);
+      }
     } catch (err) {
       setApprovalError(err instanceof ApiError ? err.detail : "Failed to update.");
     } finally { setApproving(false); }

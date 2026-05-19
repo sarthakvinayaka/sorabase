@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SoraBase Capture</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="logo">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="8.5" stroke="#3a1828" stroke-width="1.5"/>
+        <circle cx="9" cy="9" r="4" fill="#3a1828"/>
+      </svg>
+      <span class="logo-text">SoraBase</span>
+    </div>
+    <div id="recording-badge" class="recording-badge hidden">
+      <span class="rec-dot"></span>
+      <span>REC</span>
+    </div>
+  </header>
+
+  <!-- ── Auth gate ──────────────────────────────────────────────────── -->
+  <div id="auth-section">
+
+    <!-- Not signed in -->
+    <div id="not-signed-in" class="hidden">
+      <div class="state-card state-card--warn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
+        </svg>
+        <div>
+          <p class="state-title">Not signed in</p>
+          <p class="state-sub">Sign in to SoraBase to start capturing.</p>
+        </div>
+      </div>
+      <button id="signin-btn" class="btn btn--primary btn--full">
+        Open SoraBase →
+      </button>
+    </div>
+
+    <!-- Signed in — main UI -->
+    <div id="signed-in" class="hidden">
+
+      <!-- Meeting detection -->
+      <div id="meeting-info" class="meeting-row hidden">
+        <span class="meeting-dot"></span>
+        <p id="meeting-label" class="meeting-label">Detected meeting</p>
+      </div>
+
+      <!-- Not on a meeting page -->
+      <div id="no-meeting" class="hidden">
+        <p class="hint-text">No meeting detected on this tab.</p>
+        <p class="hint-sub">You can still capture any tab with audio.</p>
+      </div>
+
+      <!-- ── Config (shown when not recording) ── -->
+      <div id="config-panel">
+
+        <!-- Mode -->
+        <div class="field">
+          <label class="field-label">Mode</label>
+          <div class="radio-row">
+            <label class="radio-option">
+              <input type="radio" name="mode" value="general" id="mode-general" checked />
+              <span class="radio-dot"></span>
+              <span>General</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="mode" value="recruiting" id="mode-recruiting" />
+              <span class="radio-dot"></span>
+              <span>Recruiting</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Label -->
+        <div class="field">
+          <label class="field-label" for="session-label">Label <span class="optional">optional</span></label>
+          <input
+            type="text"
+            id="session-label"
+            class="text-input"
+            placeholder="e.g. Q4 planning call"
+            maxlength="120"
+          />
+        </div>
+
+        <!-- Mic toggle -->
+        <div class="field">
+          <label class="toggle-row" for="mic-toggle">
+            <div>
+              <span class="field-label" style="margin-bottom:0">Include microphone</span>
+              <p class="field-hint">Mix your mic audio with the meeting</p>
+            </div>
+            <button type="button" class="toggle" id="mic-toggle" role="switch" aria-checked="true"></button>
+          </label>
+        </div>
+
+        <!-- Consent notice -->
+        <div class="consent-notice">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <p>Ensure all participants consent to being recorded before starting.</p>
+        </div>
+
+        <button id="start-btn" class="btn btn--primary btn--full btn--record">
+          <span class="btn-dot"></span>
+          Start capture
+        </button>
+
+      </div><!-- /config-panel -->
+
+      <!-- ── Recording panel (shown when recording) ── -->
+      <div id="recording-panel" class="hidden">
+
+        <div class="state-card state-card--recording">
+          <span class="rec-pulse"></span>
+          <div>
+            <p class="state-title">Recording in progress</p>
+            <p id="recording-timer" class="recording-time">0:00</p>
+          </div>
+        </div>
+
+        <p class="recording-desc">
+          All participants on this tab are being recorded. A recording indicator is visible on the meeting page.
+        </p>
+
+        <button id="stop-btn" class="btn btn--primary btn--full">
+          Stop &amp; process
+        </button>
+        <button id="cancel-btn" class="btn btn--ghost btn--full">
+          Cancel (discard)
+        </button>
+
+      </div><!-- /recording-panel -->
+
+      <!-- ── Processing panel ── -->
+      <div id="processing-panel" class="hidden">
+        <div class="state-card state-card--processing">
+          <span class="spinner"></span>
+          <div>
+            <p class="state-title">Processing…</p>
+            <p class="state-sub">Uploading and transcribing audio.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Error panel ── -->
+      <div id="error-panel" class="hidden">
+        <div class="state-card state-card--error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <path d="M12 9v4m0 4h.01"/>
+          </svg>
+          <div>
+            <p class="state-title">Capture failed</p>
+            <p id="error-message" class="state-sub"></p>
+          </div>
+        </div>
+        <button id="retry-btn" class="btn btn--secondary btn--full">
+          Try again
+        </button>
+      </div>
+
+      <!-- ── User info row ── -->
+      <div class="user-row">
+        <span id="user-email" class="user-email"></span>
+        <a id="sorabase-link" class="user-link" href="#" target="_blank">Open SoraBase ↗</a>
+      </div>
+
+    </div><!-- /signed-in -->
+
+  </div><!-- /auth-section -->
+
+  <script src="popup.js"></script>
+</body>
+</html>

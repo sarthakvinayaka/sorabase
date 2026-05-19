@@ -44,6 +44,11 @@ export default function WorkflowBuilder() {
         appendLog("Select a Zoom recording in the Source node before running.", "error");
         return;
       }
+    } else if (sourceData.inputMode === "browser_capture") {
+      if (!sourceData.captureConversationId) {
+        appendLog("Browser capture not complete. Start a recording via the SoraBase Capture extension.", "error");
+        return;
+      }
     } else if (!sourceData.transcript.trim()) {
       appendLog("Source node has no transcript. Paste text before running.", "error");
       return;
@@ -68,6 +73,14 @@ export default function WorkflowBuilder() {
         updateNodeData(sourceNode.id, { status: "completed", conversationId });
         appendLog(
           `Zoom source ready · ${sourceData.zoomCharCount?.toLocaleString() ?? "?"} chars`,
+          "success",
+        );
+      } else if (sourceData.inputMode === "browser_capture" && sourceData.captureConversationId) {
+        // Browser capture: audio already uploaded by extension — use conversation directly
+        conversationId = sourceData.captureConversationId;
+        updateNodeData(sourceNode.id, { status: "completed", conversationId });
+        appendLog(
+          `Browser capture ready · ${sourceData.captureLabel || "recording"} processed`,
           "success",
         );
       } else {
