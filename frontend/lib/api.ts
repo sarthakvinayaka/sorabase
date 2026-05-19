@@ -36,6 +36,7 @@ import type {
   StudyCourseDetail,
   StudyExtractionCreatedResponse,
   StudyFlashcard,
+  StudyLecture,
   StudyLectureDetail,
   StudyQuestion,
   WebhookDeliveryResult,
