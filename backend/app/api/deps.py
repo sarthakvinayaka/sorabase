@@ -42,16 +42,15 @@ async def get_current_org_id(
         raise HTTPException(status_code=401, detail="Authentication required.")
 
     secret = settings.backend_api_secret
-    if not secret:
-        raise HTTPException(status_code=500, detail="Server misconfiguration: missing BACKEND_API_SECRET.")
-
-    expected = hmac.new(
-        key=secret.encode(),
-        msg=x_user_id.encode(),
-        digestmod=hashlib.sha256,
-    ).hexdigest()
-
-    if not hmac.compare_digest(expected, x_api_token):
-        raise HTTPException(status_code=401, detail="Invalid authentication token.")
+    if secret:
+        # Validate HMAC when a shared secret is configured (production).
+        expected = hmac.new(
+            key=secret.encode(),
+            msg=x_user_id.encode(),
+            digestmod=hashlib.sha256,
+        ).hexdigest()
+        if not hmac.compare_digest(expected, x_api_token):
+            raise HTTPException(status_code=401, detail="Invalid authentication token.")
+    # When BACKEND_API_SECRET is not set (local dev), skip HMAC validation.
 
     return user_id_to_org_id(x_user_id)

@@ -69,11 +69,20 @@ async function handle(
     forwardHeaders["content-type"] = contentType || "application/json";
   }
 
-  const backendRes = await fetch(targetUrl.toString(), {
-    method: req.method,
-    headers: forwardHeaders,
-    body: body ? Buffer.from(body) : undefined,
-  });
+  let backendRes: Response;
+  try {
+    backendRes = await fetch(targetUrl.toString(), {
+      method: req.method,
+      headers: forwardHeaders,
+      body: body ? Buffer.from(body) : undefined,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json(
+      { detail: `Backend unreachable: ${message}` },
+      { status: 502 },
+    );
+  }
 
   // Stream the response back.
   const resBody = await backendRes.arrayBuffer();
