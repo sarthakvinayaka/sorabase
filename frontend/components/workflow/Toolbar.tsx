@@ -28,7 +28,6 @@ export default function Toolbar({ onRun }: Props) {
   const isCompleted    = runState === "completed";
 
   const isRecruiting   = mode === "recruiting";
-  const contextLabel   = isRecruiting ? "Workflow builder" : "General mode";
   const newLabel       = isRecruiting ? "New Candidate" : "New session";
 
   return (
@@ -44,7 +43,11 @@ export default function Toolbar({ onRun }: Props) {
           SoraBase
         </Link>
         <div className="h-3.5 w-px bg-stone-200 dark:bg-stone-700" />
-        <span className="text-xs text-stone-400 dark:text-stone-500">{contextLabel}</span>
+        <div className="flex items-center gap-0.5 bg-stone-100 dark:bg-stone-800 rounded-lg p-0.5">
+          <ModeTab href="/workflow"        active={mode === "recruiting"}>Recruiting</ModeTab>
+          <ModeTab href="/general"         active={mode === "general"}>General</ModeTab>
+          <ModeTab href="/study/dashboard" active={false}>Study</ModeTab>
+        </div>
       </div>
 
       {/* Right: controls */}
@@ -113,6 +116,22 @@ export default function Toolbar({ onRun }: Props) {
         </div>
       </div>
     </header>
+  );
+}
+
+function ModeTab({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className={[
+        "px-3 py-1 text-xs font-medium rounded-md transition-colors",
+        active
+          ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-sm"
+          : "text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300",
+      ].join(" ")}
+    >
+      {children}
+    </Link>
   );
 }
 
