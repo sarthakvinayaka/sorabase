@@ -7,7 +7,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      access: "recruiter" | "general" | "pending";
+      access: "recruiter" | "general" | "study" | "pending";
       onboarded: boolean;
       plan: "free" | "pro" | "custom";
     } & DefaultSession["user"];
@@ -17,7 +17,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     id: string;
-    access: "recruiter" | "general" | "pending";
+    access: "recruiter" | "general" | "study" | "pending";
     onboarded: boolean;
     plan: "free" | "pro" | "custom";
   }
