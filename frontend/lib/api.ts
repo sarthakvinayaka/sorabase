@@ -30,6 +30,11 @@ import type {
   SchemaTemplateCreate,
   SchemaTemplateUpdate,
   SchemasListResponse,
+  StudyArchiveStatus,
+  StudyExtractionCreatedResponse,
+  StudyFlashcard,
+  StudyLectureDetail,
+  StudyQuestion,
   WebhookDeliveryResult,
 } from "./types";
 
@@ -459,6 +464,67 @@ export async function getSchemaRecords(
   if (params?.limit) qs.set("limit", String(params.limit));
   const q = qs.toString();
   return request(`/api/general-data/schemas/${encodeURIComponent(schemaId)}/records${q ? `?${q}` : ""}`);
+}
+
+// ---------------------------------------------------------------------------
+// Study Mode
+// ---------------------------------------------------------------------------
+
+export async function extractStudyLecture(params: {
+  conversation_id: string;
+  template_slug: string;
+  title?: string;
+  course?: string;
+  lecture_date?: string;
+}): Promise<StudyExtractionCreatedResponse> {
+  return request("/api/study/extract", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
+export async function getStudyLecture(lectureId: string): Promise<StudyLectureDetail> {
+  return request(`/api/study/lectures/${lectureId}`);
+}
+
+export async function updateStudyOverview(
+  lectureId: string,
+  data: { summary?: string },
+): Promise<{ updated: boolean }> {
+  return request(`/api/study/lectures/${lectureId}/overview`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateStudyFlashcard(
+  lectureId: string,
+  flashcardId: string,
+  data: { front?: string; back?: string },
+): Promise<StudyFlashcard> {
+  return request(`/api/study/lectures/${lectureId}/flashcards/${flashcardId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateStudyQuestion(
+  lectureId: string,
+  questionId: string,
+  data: { question?: string; answer?: string },
+): Promise<StudyQuestion> {
+  return request(`/api/study/lectures/${lectureId}/questions/${questionId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function archiveStudyLecture(
+  lectureId: string,
+): Promise<{ lecture_id: string; archive_status: StudyArchiveStatus }> {
+  return request(`/api/study/lectures/${lectureId}/archive`, {
+    method: "POST",
+  });
 }
 
 export { ApiError };

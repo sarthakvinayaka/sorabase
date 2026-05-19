@@ -601,3 +601,94 @@ export interface RecordsTableResponse {
   page:        number;
   limit:       number;
 }
+
+// ---------------------------------------------------------------------------
+// Study Mode
+// ---------------------------------------------------------------------------
+
+export type StudyArchiveStatus = "needs_review" | "archived" | "discarded";
+
+export interface StudyLecture {
+  id: string;
+  conversation_id: string;
+  title: string | null;
+  course: string | null;
+  lecture_date: string | null;
+  template_slug: string | null;
+  archive_status: StudyArchiveStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StudyExtractionResult {
+  id: string;
+  lecture_id: string;
+  status: "pending" | "running" | "done" | "error";
+  model_used: string | null;
+  created_at: string;
+}
+
+export interface StudyConcept {
+  concept: string;
+  explanation: string;
+  confidence: number;
+  evidence_snippet: string | null;
+}
+
+export interface StudyDefinition {
+  term: string;
+  definition: string;
+  confidence: number;
+  evidence_snippet: string | null;
+}
+
+export interface StudyFormula {
+  notation: string;
+  description: string;
+  example: string | null;
+  confidence: number;
+  evidence_snippet: string | null;
+}
+
+export interface StudyFlashcard {
+  id: string;
+  front: string;
+  back: string;
+  concept_tag: string | null;
+  confidence: number;
+  evidence_snippet: string | null;
+  edited: boolean;
+}
+
+export type QuestionDifficulty = "easy" | "medium" | "hard";
+export type QuestionType = "short_answer" | "multiple_choice" | "conceptual";
+
+export interface StudyQuestion {
+  id: string;
+  question: string;
+  answer: string;
+  difficulty: QuestionDifficulty | null;
+  question_type: QuestionType | null;
+  confidence: number;
+  evidence_snippet: string | null;
+  edited: boolean;
+}
+
+export interface StudyLectureDetail {
+  lecture: StudyLecture;
+  extraction: StudyExtractionResult;
+  summary: string | null;
+  topics: string[];
+  learning_objectives: string[];
+  key_concepts: StudyConcept[];
+  definitions: StudyDefinition[];
+  formulas: StudyFormula[];
+  flashcards: StudyFlashcard[];
+  questions: StudyQuestion[];
+  transcript: string | null;
+}
+
+export interface StudyExtractionCreatedResponse {
+  lecture_id: string;
+  extraction_id: string;
+}
