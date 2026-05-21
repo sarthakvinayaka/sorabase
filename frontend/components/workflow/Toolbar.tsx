@@ -46,7 +46,6 @@ export default function Toolbar({ onRun }: Props) {
         <div className="flex items-center gap-0.5 bg-stone-100 dark:bg-stone-800 rounded-lg p-0.5">
           <ModeTab href="/workflow"        active={mode === "recruiting"}>Recruiting</ModeTab>
           <ModeTab href="/general"         active={mode === "general"}>General</ModeTab>
-          <ModeTab href="/study/dashboard" active={false}>Study</ModeTab>
         </div>
       </div>
 

@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { getRedirectForUser } from "@/lib/auth";
 
 type FormState = "idle" | "loading" | "success";
-type AccessIntent = "recruiter" | "general" | "study";
+type AccessIntent = "recruiter" | "general";
 
 const ACCESS_OPTIONS: {
   id:      AccessIntent;
@@ -27,12 +27,6 @@ const ACCESS_OPTIONS: {
     label:   "General Mode",
     tagline: "Configurable for any meeting",
     bullets: ["Custom schemas", "AI field proposals", "JSON / webhook output"],
-  },
-  {
-    id:      "study",
-    label:   "Study Mode",
-    tagline: "Turn lectures into study materials",
-    bullets: ["AI notes & flashcards", "Q&A practice sets", "Course library"],
   },
 ];
 
@@ -150,7 +144,7 @@ export default function SignUpPage() {
               <p className="text-[12px] font-semibold text-stone-600 dark:text-stone-400 mb-2.5">
                 Which workspace do you need?
               </p>
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-2 gap-2.5">
                 {ACCESS_OPTIONS.map((opt) => (
                   <button
                     key={opt.id}

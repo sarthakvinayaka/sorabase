@@ -52,9 +52,7 @@ export default function ConditionalNav() {
   // Internal app pages — shared app nav
   const mode    = modeFromPath(pathname);
   // Logo routes authenticated users to their mode home, not the marketing site
-  const appHome = mode === "general" ? "/general/dashboard"
-                : mode === "study"   ? "/study/dashboard"
-                : "/dashboard";
+  const appHome = mode === "general" ? "/general/dashboard" : "/dashboard";
 
   return (
     <nav className="sticky top-0 z-40 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900">
@@ -75,7 +73,6 @@ export default function ConditionalNav() {
           <div className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 rounded-lg p-0.5">
             <ModeTab href="/workflow"        active={mode === "recruiting"}>Recruiting</ModeTab>
             <ModeTab href="/general"         active={mode === "general"}>General</ModeTab>
-            <ModeTab href="/study/dashboard" active={mode === "study"}>Study</ModeTab>
           </div>
         </div>
 
@@ -88,18 +85,7 @@ export default function ConditionalNav() {
             </div>
           )}
 
-          {mode === "study" ? (
-            <>
-              <NavLink href="/study/dashboard">Library</NavLink>
-              <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
-              <Link
-                href="/study"
-                className="rounded bg-aubergine-800 text-white text-xs font-medium px-3 py-1.5 hover:bg-aubergine-900 transition-colors"
-              >
-                New lecture
-              </Link>
-            </>
-          ) : mode === "general" ? (
+          {mode === "general" ? (
             <>
               <NavLink href="/general/dashboard">Dashboard</NavLink>
               <NavLink href="/general/dashboard?tab=data">Data</NavLink>
