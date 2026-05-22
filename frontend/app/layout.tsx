@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     url:         BASE,
     title:       "SoraBase — Meeting Intelligence Platform",
     description: "From every meeting, a structured record.",
-    images:      [{ url: "/logo.svg", width: 200, height: 200, alt: "SoraBase" }],
+    images:      [{ url: "/favicon-512.png", width: 512, height: 512, alt: "SoraBase" }],
     locale:      "en_US",
   },
 
@@ -38,12 +38,19 @@ export const metadata: Metadata = {
     card:        "summary",
     title:       "SoraBase — Meeting Intelligence Platform",
     description: "From every meeting, a structured record.",
-    images:      ["/logo.svg"],
+    images:      ["/favicon-512.png"],
   },
 
   icons: {
-    icon:  [{ url: "/logo.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/logo.svg" }],
+    icon: [
+      { url: "/favicon.ico",       sizes: "any" },
+      { url: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon.svg",          type: "image/svg+xml" },
+    ],
+    apple:    [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/favicon.ico",
+    other:    [{ rel: "manifest", url: "/site.webmanifest" }],
   },
 
   robots: {
