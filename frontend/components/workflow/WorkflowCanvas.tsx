@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
   ReactFlow,
   Background,
@@ -26,16 +26,26 @@ interface Props { isDark: boolean }
 export default function WorkflowCanvas({ isDark }: Props) {
   const { screenToFlowPosition, fitView } = useReactFlow();
   const nodesInitialized = useNodesInitialized();
-
-  // fitView after nodes are measured — the `fitView` prop fires before node
-  // dimensions are known on first mount, leaving nodes off-screen.
-  useEffect(() => {
-    if (nodesInitialized) fitView({ padding: 0.3, duration: 0 });
-  }, [nodesInitialized, fitView]);
-  const { coreNodeIds }          = useWorkflowMode();
+  const hasFitRef        = useRef(false);
+  const { coreNodeIds }  = useWorkflowMode();
 
   const nodes           = useWorkflowStoreContext((s) => s.nodes);
   const edges           = useWorkflowStoreContext((s) => s.edges);
+
+  // After nodes are fully measured by React Flow, run fitView once per mount.
+  // hasFitRef guards against re-running when persist rehydration briefly
+  // cycles nodesInitialized false → true a second time.
+  // requestAnimationFrame defers until after the browser has painted the flex
+  // layout — without it, fitView can calculate against a 0-height container
+  // during the Next.js hydration pass and misplace nodes.
+  useEffect(() => {
+    if (!nodesInitialized || hasFitRef.current) return;
+    hasFitRef.current = true;
+    const raf = requestAnimationFrame(() => {
+      fitView({ padding: 0.3, duration: 0 });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [nodesInitialized, fitView]);
   const onNodesChange   = useWorkflowStoreContext((s) => s.onNodesChange);
   const onEdgesChange   = useWorkflowStoreContext((s) => s.onEdgesChange);
   const onConnect       = useWorkflowStoreContext((s) => s.onConnect);

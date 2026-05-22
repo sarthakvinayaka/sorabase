@@ -476,7 +476,36 @@ function createWorkflowStore({
       }),
       {
         name: storageKey,
-        partialize: (s) => ({ nodes: s.nodes, edges: s.edges, isDark: s.isDark }),
+        // v1 persisted the full node objects, which included React Flow internals
+        // (measured, positionAbsolute, width, height, selected, dragging) written
+        // back by applyNodeChanges. On reload RF received those stale internals,
+        // mismatched handle bounds, and skipped its measurement cycle — causing
+        // edges not to render and fitView to run against a 0-height container.
+        // v2 strips everything RF added so RF always initializes from clean data.
+        version: 2,
+        migrate: (persisted: unknown, version: number) => {
+          const s = persisted as { nodes?: unknown[]; edges?: unknown[]; isDark?: boolean };
+          if (version < 2) {
+            return {
+              ...s,
+              nodes: (s.nodes ?? initialNodes).map((n: unknown) => {
+                const { id, type, position, data } = n as WorkflowNode;
+                return { id, type, position, data };
+              }),
+            };
+          }
+          return s;
+        },
+        partialize: (s) => ({
+          // Only persist user-controlled fields — never RF internals.
+          nodes: s.nodes.map(({ id, type, position, data }) => ({ id, type, position, data })),
+          edges: s.edges.map(({ id, source, target, sourceHandle, targetHandle, type: t, data }) => ({
+            id, source, target, type: t, data,
+            ...(sourceHandle ? { sourceHandle } : {}),
+            ...(targetHandle ? { targetHandle } : {}),
+          })),
+          isDark: s.isDark,
+        }),
       },
     ),
   );
