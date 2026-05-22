@@ -8,6 +8,7 @@ import {
   Controls,
   MiniMap,
   useReactFlow,
+  useNodesInitialized,
   type Connection,
   type Edge,
   type IsValidConnection,
@@ -23,7 +24,14 @@ const EDGE_STYLE_DARK = { strokeWidth: 2, stroke: "#78716c" };  // stone-500
 interface Props { isDark: boolean }
 
 export default function WorkflowCanvas({ isDark }: Props) {
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, fitView } = useReactFlow();
+  const nodesInitialized = useNodesInitialized();
+
+  // fitView after nodes are measured — the `fitView` prop fires before node
+  // dimensions are known on first mount, leaving nodes off-screen.
+  useEffect(() => {
+    if (nodesInitialized) fitView({ padding: 0.3, duration: 0 });
+  }, [nodesInitialized, fitView]);
   const { coreNodeIds }          = useWorkflowMode();
 
   const nodes           = useWorkflowStoreContext((s) => s.nodes);
@@ -119,8 +127,6 @@ export default function WorkflowCanvas({ isDark }: Props) {
         nodeDragThreshold={8}
         multiSelectionKeyCode={null}
         selectionKeyCode={null}
-        fitView
-        fitViewOptions={{ padding: 0.3 }}
         minZoom={0.3}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
