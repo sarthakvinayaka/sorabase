@@ -505,9 +505,23 @@ function createWorkflowStore({
           // persisted is undefined when localStorage has no entry yet (first-ever visit).
           // Spreading undefined is safe in JS but accessing p.edges would throw — guard it.
           const p = (persisted ?? {}) as Partial<typeof current>;
+
+          // Strip React Flow internal fields from any persisted nodes.
+          // migrate() only runs when stored data already has a version number.
+          // If a user has old data stored WITHOUT a version field (saved before
+          // versioning was introduced), migrate is skipped and merge receives the
+          // raw object with RF internals (measured, width, height, positionAbsolute,
+          // selected, dragging).  RF v12 sees `measured` on a node and skips its
+          // ResizeObserver init cycle, leaving handle positions at 0 → edges invisible.
+          const cleanNodes = (p.nodes ?? []).map((n) => {
+            const { id, type, position, data } = n as { id: string; type: string; position: { x: number; y: number }; data: unknown };
+            return { id, type, position, data };
+          }) as typeof current.nodes;
+
           return {
             ...current,
             ...p,
+            nodes: cleanNodes.length > 0 ? cleanNodes : current.nodes,
             edges: (p.edges && p.edges.length > 0) ? p.edges : current.edges,
           };
         },
