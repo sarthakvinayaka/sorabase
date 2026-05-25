@@ -1226,7 +1226,7 @@ function PricingPreview() {
       price:     "$20",
       period:    "/ month",
       desc:      "Unlimited meetings, saved templates, webhooks, and the REST API. For regular use.",
-      features:  ["Unlimited meetings", "AI schema proposals", "Saved, versioned templates", "Webhooks & REST API"],
+      features:  ["Unlimited meetings", "AI schema proposals", "Saved, versioned templates", "Webhooks & REST API", "Custom workflow integration support"],
       cta:       "Start with Pro",
       href:      "/signup",
       highlight: true,
