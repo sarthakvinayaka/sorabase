@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { getDashboard, listCandidates } from "@/lib/api";
@@ -330,6 +330,14 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
+  );
+}
+
+function DashboardContent() {
   const searchParams = useSearchParams();
   const initialTab   = searchParams.get("tab") === "records" ? "records" : "analytics";
   const [tab, setTab] = useState<Tab>(initialTab);
