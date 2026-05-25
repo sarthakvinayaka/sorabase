@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "SoraBase — Meeting Intelligence Platform",
+  title: "SoraBase — Structured Data from Every Meeting",
   description:
-    "SoraBase turns every call, meeting, and transcript into structured, actionable data. Reusable schemas, AI extraction, workflow outputs — for recruiting, sales, and any team.",
+    "SoraBase turns interviews, sales calls, and team meetings into field-by-field structured data — confidence-scored, evidence-cited, and ready to push into your ATS, CRM, or BI tools.",
   alternates: {
     canonical: "https://www.sorabase.org/",
   },
   openGraph: {
-    title:       "SoraBase — Meeting Intelligence Platform",
-    description: "From every meeting, a structured workflow. AI-powered extraction for every call.",
+    title:       "SoraBase — Structured Data from Every Meeting",
+    description: "Field-by-field extraction from any conversation. Confidence-scored outputs with evidence citations, ready to push into your systems.",
     url:         "https://www.sorabase.org/",
     type:        "website",
   },
   twitter: {
     card:        "summary",
-    title:       "SoraBase — Meeting Intelligence Platform",
-    description: "From every meeting, a structured workflow.",
+    title:       "SoraBase — Structured Data from Every Meeting",
+    description: "Field-by-field extraction from any conversation. Not summaries — structured data.",
   },
 };
 
@@ -52,20 +52,20 @@ function Hero() {
 
           {/* Left: copy */}
           <div className="max-w-xl">
-            <p className="eyebrow mb-6">Meeting workflow platform</p>
+            <p className="eyebrow mb-6">Meeting data platform</p>
 
             <h1
               className="font-display italic text-stone-900 dark:text-stone-100 leading-[1.04]"
               style={{ fontSize: "clamp(2.6rem, 5.5vw, 5rem)" }}
             >
-              From any meeting,{" "}
-              <span className="text-stone-400 dark:text-stone-500">a structured workflow.</span>
+              Your meetings produce data,{" "}
+              <span className="text-stone-400 dark:text-stone-500">not just transcripts.</span>
             </h1>
 
             <p className="mt-7 text-[16px] text-stone-500 dark:text-stone-400 leading-relaxed">
-              SoraBase extracts structured, confidence-scored data from any conversation —
-              interview, sales call, or team sync. Schema-driven, AI-powered, and ready to
-              act on before the recap email is written.
+              SoraBase extracts field-by-field structured data from any conversation —
+              interview, sales call, or ops sync. Confidence-scored outputs with evidence
+              citations, ready to push into your systems before the recap email is written.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
@@ -182,7 +182,7 @@ function LogosBar() {
     <div className="border-y border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900 py-10">
       <div className="mkt-section">
         <p className="text-center text-[10px] font-semibold tracking-[0.15em] uppercase text-stone-300 dark:text-stone-600 mb-7">
-          Trusted by teams at
+          Trusted by teams building better hiring, sales, and ops workflows
         </p>
         <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
           {orgs.map((name) => (
@@ -207,26 +207,26 @@ function PlatformFlow() {
   const steps = [
     {
       n:     "01",
-      title: "Bring any source",
-      body:  "Connect a live Zoom or Google Meet bot, upload an audio or video recording, or paste a transcript directly. SoraBase handles every source format without configuration.",
+      title: "Bring the conversation",
+      body:  "Connect a live Zoom or Google Meet bot, upload an audio or video file, or paste a transcript directly. SoraBase handles every source format without extra configuration.",
       tags:  ["Zoom", "Google Meet", "Audio upload", "Transcript paste"],
     },
     {
       n:     "02",
-      title: "Automatic transcript",
-      body:  "Speech is converted to a clean, speaker-labeled transcript with timestamps. Diarization separates speakers automatically — no manual tagging required.",
+      title: "Clean, speaker-labeled transcript",
+      body:  "Audio is converted to a speaker-labeled transcript with timestamps. Automatic diarization separates speakers so you know who said what — no manual tagging.",
       tags:  ["Speaker labels", "Timestamps", "Diarization"],
     },
     {
       n:     "03",
-      title: "Schema-driven extraction",
-      body:  "AI proposes columns from your conversation, or you load a saved template. Edit, approve, and run structured extraction against the full transcript.",
+      title: "Schema-driven field extraction",
+      body:  "AI proposes columns based on what's in your transcript, or you load a saved template. Review and approve the schema, then run extraction against the full text.",
       tags:  ["Recruiter schema", "Custom columns", "AI proposals"],
     },
     {
       n:     "04",
-      title: "Structured output, anywhere",
-      body:  "Every run produces a complete structured record with confidence scores and evidence citations. Review in the dashboard, export JSON, fire a webhook, or call the REST API.",
+      title: "Structured data, everywhere",
+      body:  "Every run produces a complete structured record with confidence scores and evidence citations. Review in the dashboard, export JSON, fire a webhook, or pull via the REST API.",
       tags:  ["Dashboard", "JSON", "Webhooks", "REST API"],
     },
   ];
@@ -240,7 +240,7 @@ function PlatformFlow() {
             className="font-display italic text-stone-900 dark:text-stone-100 leading-tight"
             style={{ fontSize: "clamp(1.9rem, 3.5vw, 2.9rem)" }}
           >
-            Four steps.<br />One structured record.
+            Meeting to structured record<br />in four steps.
           </h2>
         </div>
 
@@ -318,12 +318,12 @@ function WorkflowCanvas() {
             className="font-display italic text-stone-900 dark:text-stone-100 leading-tight mb-5"
             style={{ fontSize: "clamp(1.9rem, 3.5vw, 2.9rem)" }}
           >
-            Your extraction pipeline,<br />node by node.
+            Build your extraction pipeline,<br />node by node.
           </h2>
           <p className="text-[15px] text-stone-500 dark:text-stone-400 leading-relaxed">
-            General Mode gives you a full seven-node visual canvas — from source to structured
-            output. Click any node to configure it. The Column Config node is where your
-            schema lives: field names, types, and whether AI proposed them or you wrote them.
+            General Mode gives you a configurable seven-node canvas — from source to structured
+            output. The Column Config node is where your schema lives: define field names, types,
+            and requirements. AI proposes the schema from your transcript; you edit and approve.
           </p>
         </div>
 
@@ -587,7 +587,7 @@ function ModeComparison() {
     <section id="modes" className="py-24 lg:py-32 bg-stone-50 dark:bg-stone-950">
       <div className="mkt-section">
         <div className="max-w-lg mb-16 lg:mb-20">
-          <p className="eyebrow mb-4">Two modes. One workflow engine.</p>
+          <p className="eyebrow mb-4">Two modes. One extraction engine.</p>
           <h2
             className="font-display italic text-stone-900 dark:text-stone-100 leading-tight"
             style={{ fontSize: "clamp(1.9rem, 3.5vw, 2.9rem)" }}
@@ -609,12 +609,12 @@ function ModeComparison() {
                 className="font-display italic text-stone-100 leading-snug mb-3"
                 style={{ fontSize: "clamp(1.3rem, 2vw, 1.65rem)" }}
               >
-                Your schema.<br />Your structure. Any meeting.
+                Your schema.<br />Any conversation.
               </h3>
               <p className="text-sm text-stone-400 leading-relaxed">
-                A configurable extraction platform for any conversation type. AI proposes
-                columns from your transcript — you edit, approve, and save as a template.
-                Sales calls, ops syncs, customer debriefs: same engine, different schemas.
+                Define your own extraction columns for any meeting type. AI proposes a schema
+                from your transcript — you edit, approve, and save as a versioned template.
+                Sales calls, customer debriefs, ops syncs: one engine, different schemas.
               </p>
             </div>
 
@@ -650,11 +650,11 @@ function ModeComparison() {
             <div className="px-8 py-6">
               <ul className="space-y-3">
                 {[
-                  "AI proposes a schema from your transcript content",
-                  "Edit columns: name, type, required, description",
-                  "Save schemas as reusable, versioned templates",
-                  "Run on sales calls, customer meetings, ops syncs",
-                  "JSON, webhook, or REST API output",
+                  "AI proposes columns from your transcript",
+                  "Edit field names, types, and requirements",
+                  "Save schemas as versioned, reusable templates",
+                  "Works for sales, CS, ops, and any other meeting type",
+                  "JSON, webhook, and REST API output",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm text-stone-600 dark:text-stone-300">
                     <CheckIcon className="text-stone-400" />
@@ -681,11 +681,12 @@ function ModeComparison() {
                 className="font-display italic text-stone-900 dark:text-stone-100 leading-snug mb-3"
                 style={{ fontSize: "clamp(1.3rem, 2vw, 1.65rem)" }}
               >
-                The workflow is already built.<br />Just run it.
+                The schema is already<br />built. Just run it.
               </h3>
               <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
-                An opinionated, end-to-end hiring pipeline. Interview ends — candidate profile
-                begins. No schema design. No configuration. You show up; the structure is already there.
+                An end-to-end hiring workflow with a fixed 35-field schema. Interview ends,
+                candidate profile begins — no configuration required. JD fit scoring, evidence
+                citations for every field, and a built-in recruiter review queue.
               </p>
             </div>
 
@@ -715,9 +716,9 @@ function ModeComparison() {
               <ul className="space-y-3">
                 {[
                   "35+ structured fields extracted per interview",
-                  "JD fit scoring with Tier A / B / C classification",
-                  "Evidence citations for every extracted field",
-                  "Recruiter review dashboard with approval queue",
+                  "JD fit scoring — Tier A / B / C classification",
+                  "Evidence citation for every extracted value",
+                  "Approval queue with recruiter review dashboard",
                   "JSON export or direct ATS push",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm text-stone-600 dark:text-stone-300">
@@ -736,7 +737,7 @@ function ModeComparison() {
         </div>
 
         <p className="mt-6 text-xs text-stone-400 dark:text-stone-500 text-center">
-          Access mode is assigned per account. Choose yours at signup — your workspace is pre-configured from day one.
+          Choose your mode at signup. Your workspace is pre-configured from day one.
         </p>
       </div>
     </section>
@@ -754,7 +755,7 @@ function StructuredDataSection() {
 
         {/* Section header */}
         <div className="max-w-2xl mb-16 lg:mb-20">
-          <p className="eyebrow mb-4">What extraction means</p>
+          <p className="eyebrow mb-4">What extraction actually means</p>
           <h2
             className="font-display italic text-stone-900 dark:text-stone-100 leading-tight"
             style={{ fontSize: "clamp(1.9rem, 3.5vw, 2.9rem)" }}
@@ -762,8 +763,9 @@ function StructuredDataSection() {
             A transcript is a record of words.<br />Extraction is a record of meaning.
           </h2>
           <p className="mt-5 text-[15px] text-stone-500 dark:text-stone-400 leading-relaxed max-w-xl">
-            Transcription tools stop at the spoken word. SoraBase continues —
-            pulling out the structured data embedded inside the conversation.
+            AI notetakers stop at the spoken word. SoraBase continues — pulling
+            structured, field-level data from the conversation and attaching evidence
+            for every value it extracts.
           </p>
         </div>
 
@@ -835,22 +837,22 @@ function StructuredDataSection() {
             {
               n:     "01",
               title: "Field-by-field",
-              body:  "Every piece of data lands in its own named field — not buried in a paragraph summary you have to re-read.",
+              body:  "Every piece of data lands in a named field — not buried in a paragraph you have to re-read or interpret.",
             },
             {
               n:     "02",
               title: "Confidence-scored",
-              body:  "Each extracted value carries a confidence score. Low-confidence fields are flagged for human review — never silently wrong.",
+              body:  "Each extracted value carries a 0–100% confidence score. Low-confidence fields are flagged for human review — never silently wrong.",
             },
             {
               n:     "03",
               title: "Evidence-cited",
-              body:  "Click any field to see the exact transcript passage that produced it. Extraction you can audit, not just trust.",
+              body:  "Every field links back to the exact transcript line that produced it. Auditable extraction, not just trusted extraction.",
             },
             {
               n:     "04",
-              title: "Schema-versioned",
-              body:  "Define your extraction schema once. Save it. Every future session runs against the same structure — consistent and comparable.",
+              title: "Schema-consistent",
+              body:  "Run the same schema across every session of the same type. Outputs are comparable, structured the same way, every time.",
             },
           ].map((item) => (
             <div key={item.n} className="px-7 py-7 bg-white dark:bg-stone-900">
@@ -887,11 +889,12 @@ function Integrations() {
               className="font-display italic text-stone-900 dark:text-stone-100 leading-tight mb-5"
               style={{ fontSize: "clamp(1.9rem, 3.5vw, 2.9rem)" }}
             >
-              Connect any source.<br />Deliver anywhere.
+              Meet your stack.<br />Deliver anywhere.
             </h2>
             <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed mb-8 max-w-sm">
               SoraBase sits in the middle of your meeting workflow — ingesting from wherever
-              conversations happen, and routing structured data to wherever your team needs it.
+              conversations happen and routing structured data to wherever your team needs it.
+              No custom glue required.
             </p>
             <Link href="/signup" className="btn-mkt-ghost inline-flex">
               See all integrations
@@ -1014,16 +1017,16 @@ function Templates() {
               className="font-display italic text-stone-900 dark:text-stone-100 leading-tight mb-5"
               style={{ fontSize: "clamp(1.9rem, 3.5vw, 2.9rem)" }}
             >
-              Define once.<br />Run every time.
+              Define once.<br />Run on every session.
             </h2>
             <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed mb-6">
               Save any extraction schema as a reusable template. Every future session
-              of the same type runs the same structure — versioned, consistent, and
-              ready to compare across runs.
+              of the same type runs the same structure — versioned, consistent data
+              you can compare across runs, teams, and time.
             </p>
             <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
-              AI can propose a schema from your first session. Approve the columns,
-              save the template. From there, extraction is one click.
+              AI proposes a schema from your first session. Approve the columns, save
+              the template. From there, extraction is one click.
             </p>
           </div>
 
@@ -1082,8 +1085,8 @@ function Testimonials() {
               style={{ fontSize: "clamp(1.25rem, 2.5vw, 1.75rem)" }}
             >
               &ldquo;I was skeptical about another AI meeting tool. But SoraBase doesn&apos;t
-              summarize — it structures. That&apos;s a different product. The confidence
-              scores and evidence citations make it actually trustworthy.&rdquo;
+              summarize — it structures. The confidence scores and evidence citations mean
+              you can actually trust the output, not just hope it&apos;s right.&rdquo;
             </p>
             <div>
               <p className="text-sm font-semibold text-stone-800 dark:text-stone-200">Yuki Tanaka</p>
@@ -1114,12 +1117,12 @@ function Testimonials() {
         <div className="grid lg:grid-cols-2 gap-8">
           {[
             {
-              text: "We went from spending 25 minutes on post-interview notes to having a structured profile ready before the debrief starts. SoraBase changed how our whole team operates.",
+              text: "We went from 25 minutes of post-interview notes to a complete structured candidate profile ready before the debrief starts. The whole team uses the same fields now — no more inconsistent notes across interviewers.",
               name: "Rachel Osei",
               role: "Head of Talent, Meridian Partners",
             },
             {
-              text: "The schema template feature made this stick for us. We defined our sales call structure once — now every rep runs the same extraction, and the JSON goes straight into Salesforce.",
+              text: "We defined our sales discovery schema once. Every rep now runs the same extraction, and the JSON pushes straight into Salesforce. We haven't manually updated a CRM record after a call in three months.",
               name: "Tom Varela",
               role: "Revenue Operations Lead, Vantage Growth",
             },
@@ -1211,8 +1214,8 @@ function PricingPreview() {
       name:      "Free",
       price:     "$0",
       period:    "forever",
-      desc:      "10 meetings included. Good for trying the product — no credit card required.",
-      features:  ["10 meetings", "Transcript + summary", "Basic extraction", "JSON export"],
+      desc:      "10 meetings to try the full product — no credit card required.",
+      features:  ["10 meetings", "Transcript + summary", "Full field extraction", "JSON export"],
       cta:       "Get started free",
       href:      "/signup",
       highlight: false,
@@ -1222,8 +1225,8 @@ function PricingPreview() {
       name:      "Pro",
       price:     "$20",
       period:    "/ month",
-      desc:      "Unlimited meetings and the full feature set. The plan for regular use.",
-      features:  ["Unlimited meetings", "AI schema proposals", "Saved templates", "Webhooks & API"],
+      desc:      "Unlimited meetings, saved templates, webhooks, and the REST API. For regular use.",
+      features:  ["Unlimited meetings", "AI schema proposals", "Saved, versioned templates", "Webhooks & REST API"],
       cta:       "Start with Pro",
       href:      "/signup",
       highlight: true,
@@ -1233,7 +1236,7 @@ function PricingPreview() {
       name:      "Custom",
       price:     "Custom",
       period:    "",
-      desc:      "Custom workflows, team rollouts, special integrations, or unusual requirements.",
+      desc:      "Team rollouts, specialized workflows, or custom integrations. Tell us what you need.",
       features:  ["Everything in Pro", "Custom workflow design", "Team onboarding", "Flexible pricing"],
       cta:       "Talk to us",
       href:      "mailto:hello@sorabase.com",
@@ -1254,8 +1257,8 @@ function PricingPreview() {
             Simple, honest pricing.
           </h2>
           <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
-            Start free with 10 meetings. Upgrade to Pro at $20/month for unlimited.
-            Something custom? Let&apos;s talk.
+            Start free with 10 meetings — no credit card. Pro at $20/month unlocks
+            unlimited meetings and the full feature set. Need something custom? Let&apos;s talk.
           </p>
         </div>
 
@@ -1343,12 +1346,11 @@ function FinalCTA() {
               className="font-display italic text-stone-900 dark:text-stone-100 leading-tight mb-5"
               style={{ fontSize: "clamp(1.8rem, 3vw, 2.6rem)" }}
             >
-              Turn your next meeting into a structured record.
+              Your next meeting should end with structured data.
             </h2>
             <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed mb-9">
-              Start free with 10 meetings — no credit card required. Choose your access mode
-              at signup and your workspace is ready from day one. Upgrade to Pro at $20/month
-              when you need unlimited.
+              10 meetings free — no credit card. Choose your mode at signup and your workspace
+              is ready immediately. Upgrade to Pro at $20/month when you&apos;re ready for unlimited.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Link href="/signup" className="btn-mkt-primary">
