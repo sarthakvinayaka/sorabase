@@ -198,9 +198,13 @@ export default function WorkflowBuilder() {
     <div className={`flex flex-col h-screen overflow-hidden ${isDark ? "dark" : ""}`}>
       <ReactFlowProvider>
         <Toolbar onRun={handleRun} />
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 min-h-0 overflow-hidden">
           <NodeLibrary />
-          <WorkflowCanvas isDark={isDark} />
+          {/* relative+flex-1 wrapper so WorkflowCanvas can use absolute inset-0,
+              bypassing the CSS-class height chain that breaks on first paint */}
+          <div className="relative flex-1 min-h-0">
+            <WorkflowCanvas isDark={isDark} />
+          </div>
           <InspectorPanel />
         </div>
         <LogStrip />

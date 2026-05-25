@@ -122,7 +122,7 @@ export default function WorkflowCanvas({ isDark }: Props) {
   const styledEdges = edges.map((e) => ({ ...e, style: edgeStyle, type: e.type ?? "smoothstep" }));
 
   return (
-    <div className="flex-1 h-full" onDragOver={onDragOver} onDrop={onDrop}>
+    <div className="absolute inset-0" onDragOver={onDragOver} onDrop={onDrop}>
       <ReactFlow
         nodes={nodes}
         edges={styledEdges}

@@ -492,9 +492,22 @@ function createWorkflowStore({
                 const { id, type, position, data } = n as WorkflowNode;
                 return { id, type, position, data };
               }),
+              // v1 may have persisted empty edges from a previous bug; restore defaults
+              edges: (s.edges && s.edges.length > 0) ? s.edges : initialEdges,
             };
           }
           return s;
+        },
+        // If a v2 store somehow has empty edges (e.g. from a reset that was
+        // persisted before initial edges were re-set), restore the initial edges
+        // rather than leaving the canvas disconnected.
+        merge: (persisted, current) => {
+          const p = persisted as Partial<typeof current>;
+          return {
+            ...current,
+            ...p,
+            edges: (p.edges && p.edges.length > 0) ? p.edges : current.edges,
+          };
         },
         partialize: (s) => ({
           // Only persist user-controlled fields — never RF internals.

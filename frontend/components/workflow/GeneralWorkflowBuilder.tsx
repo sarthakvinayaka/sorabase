@@ -195,9 +195,11 @@ export default function GeneralWorkflowBuilder() {
     <div className={`flex flex-col h-screen overflow-hidden ${isDark ? "dark" : ""}`}>
       <ReactFlowProvider>
         <Toolbar onRun={handleRun} />
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 min-h-0 overflow-hidden">
           <NodeLibrary />
-          <WorkflowCanvas isDark={isDark} />
+          <div className="relative flex-1 min-h-0">
+            <WorkflowCanvas isDark={isDark} />
+          </div>
           <InspectorPanel />
         </div>
         <LogStrip />
