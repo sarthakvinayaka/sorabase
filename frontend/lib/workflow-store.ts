@@ -482,17 +482,19 @@ function createWorkflowStore({
         // mismatched handle bounds, and skipped its measurement cycle — causing
         // edges not to render and fitView to run against a 0-height container.
         // v2 strips everything RF added so RF always initializes from clean data.
-        version: 2,
+        version: 3,
         migrate: (persisted: unknown, version: number) => {
           const s = persisted as { nodes?: unknown[]; edges?: unknown[]; isDark?: boolean };
-          if (version < 2) {
+          // (version ?? 0) correctly handles: undefined (no version field in old data),
+          // null, 0, 1, 2 — all of which need RF internals stripped.
+          // Plain `version < 3` fails because `undefined < 3` is false in JS.
+          if ((version ?? 0) < 3) {
             return {
               ...s,
               nodes: (s.nodes ?? initialNodes).map((n: unknown) => {
                 const { id, type, position, data } = n as WorkflowNode;
                 return { id, type, position, data };
               }),
-              // v1 may have persisted empty edges from a previous bug; restore defaults
               edges: (s.edges && s.edges.length > 0) ? s.edges : initialEdges,
             };
           }
