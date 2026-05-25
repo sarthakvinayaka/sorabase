@@ -438,3 +438,4 @@ class DashboardStats(BaseModel):
     salary_distribution: list[CountItem]
     extraction_completeness: ExtractionCompleteness
     fit_score_stats: FitScoreStats
+    confidence_distribution: list[CountItem]

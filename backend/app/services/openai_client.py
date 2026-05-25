@@ -16,10 +16,8 @@ import openai
 
 from app.config import settings
 from app.domain.extraction_schemas import ExtractionLLMResponse
-from app.prompts.extraction import (
-    EXTRACTION_SYSTEM_PROMPT,
-    build_extraction_user_message,
-)
+from app.prompts.extraction import build_extraction_user_message
+from app.prompts.selector import get_extraction_system_prompt
 
 
 class ExtractionError(Exception):
@@ -34,18 +32,25 @@ class ExtractionResult:
     model_used: str
 
 
-def extract_from_transcript(transcript_text: str) -> ExtractionResult:
+def extract_from_transcript(
+    transcript_text: str,
+    system_prompt: str | None = None,
+) -> ExtractionResult:
     """
     Call OpenAI Structured Outputs and return a validated ExtractionLLMResponse.
     Raises ExtractionError on API failure, refusal, or schema mismatch.
+
+    system_prompt — override the default recruiter-mode prompt (useful in tests
+    and for future mode variants).  Defaults to the recruiter prompt via selector.
     """
+    resolved_prompt = system_prompt if system_prompt is not None else get_extraction_system_prompt("recruiter")
     client = openai.OpenAI(api_key=settings.openai_api_key)
 
     try:
         completion = client.beta.chat.completions.parse(
             model=settings.openai_model,
             messages=[
-                {"role": "system", "content": EXTRACTION_SYSTEM_PROMPT},
+                {"role": "system", "content": resolved_prompt},
                 {"role": "user", "content": build_extraction_user_message(transcript_text)},
             ],
             response_format=ExtractionLLMResponse,

@@ -2,14 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getDashboard } from "@/lib/api";
+import { useSearchParams } from "next/navigation";
+import { getDashboard, listCandidates } from "@/lib/api";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { HorizontalBar } from "@/components/dashboard/HorizontalBar";
 import { PageHeader } from "@/components/ui/PageHeader";
-import type { DashboardStats } from "@/lib/types";
+import { TabBar } from "@/components/ui/TabBar";
+import type { DashboardStats, CandidateListResponse } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
-// Sub-components
+// Tab types
+// ---------------------------------------------------------------------------
+
+type Tab = "analytics" | "records";
+
+// ---------------------------------------------------------------------------
+// Shared sub-components
 // ---------------------------------------------------------------------------
 
 function SectionLabel({ title }: { title: string }) {
@@ -30,13 +38,13 @@ function Card({ title, children }: { title?: string; children: React.ReactNode }
 }
 
 // ---------------------------------------------------------------------------
-// Page
+// Analytics tab
 // ---------------------------------------------------------------------------
 
-export default function DashboardPage() {
-  const [stats, setStats]   = useState<DashboardStats | null>(null);
+function AnalyticsTab() {
+  const [stats, setStats]     = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError]   = useState<string | null>(null);
+  const [error, setError]     = useState<string | null>(null);
 
   useEffect(() => {
     getDashboard()
@@ -47,34 +55,28 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <main className="page">
-        <div className="flex items-center gap-2 text-sm text-stone-400">
-          <span className="w-4 h-4 rounded-full border-2 border-aubergine-400 border-t-transparent animate-spin inline-block" />
-          Loading…
-        </div>
-      </main>
+      <div className="flex items-center gap-2 text-sm text-stone-400 py-12">
+        <span className="w-4 h-4 rounded-full border-2 border-aubergine-400 border-t-transparent animate-spin inline-block" />
+        Loading…
+      </div>
     );
   }
 
   if (error || !stats) {
     return (
-      <main className="page">
-        <div className="rounded-lg border border-negative-border bg-negative-light px-4 py-3 text-sm text-negative-text">
-          {error ?? "No data available."}
-        </div>
-      </main>
+      <div className="rounded-lg border border-negative-border bg-negative-light px-4 py-3 text-sm text-negative-text">
+        {error ?? "No data available."}
+      </div>
     );
   }
 
   const { candidates, extraction_completeness: ec, fit_score_stats: fs } = stats;
 
   return (
-    <main className="page space-y-8">
-      <PageHeader
-        eyebrow="Recruiting mode"
-        title="Dashboard"
-        sub={`Updated ${new Date(stats.generated_at).toLocaleString()}`}
-      />
+    <div className="space-y-8">
+      <p className="text-xs text-stone-400 dark:text-stone-500">
+        Updated {new Date(stats.generated_at).toLocaleString()}
+      </p>
 
       {/* ── Candidate pipeline ─────────────────────────────────────────────── */}
       <section>
@@ -94,7 +96,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            <StatCard label="Total" value={candidates.total} accent />
+            <StatCard label="Total"             value={candidates.total} accent />
             <StatCard label="Needs Review"      value={candidates.needs_review} />
             <StatCard label="Approved"          value={candidates.approved} />
             <StatCard label="Rejected"          value={candidates.rejected} />
@@ -108,9 +110,9 @@ export default function DashboardPage() {
         <SectionLabel title="Extraction quality" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           <div className="grid grid-cols-3 lg:grid-cols-1 gap-3">
-            <StatCard label="Avg confidence"      value={`${Math.round(ec.avg_confidence * 100)}%`} />
-            <StatCard label="Fields extracted"    value={ec.avg_extracted_count.toFixed(1)} />
-            <StatCard label="Fields missing"      value={ec.avg_missing_count.toFixed(1)} />
+            <StatCard label="Avg confidence"   value={`${Math.round(ec.avg_confidence * 100)}%`} />
+            <StatCard label="Fields extracted" value={ec.avg_extracted_count.toFixed(1)} />
+            <StatCard label="Fields missing"   value={ec.avg_missing_count.toFixed(1)} />
           </div>
           {ec.top_missing_fields.length > 0 && (
             <div className="lg:col-span-2">
@@ -121,6 +123,18 @@ export default function DashboardPage() {
           )}
         </div>
       </section>
+
+      {/* ── Confidence distribution ────────────────────────────────────────── */}
+      {stats.confidence_distribution.length > 0 && (
+        <section>
+          <SectionLabel title="Confidence distribution" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Card title="Candidates by confidence band">
+              <HorizontalBar items={stats.confidence_distribution} colorClass="bg-aubergine-700" />
+            </Card>
+          </div>
+        </section>
+      )}
 
       {/* ── JD fit analysis ────────────────────────────────────────────────── */}
       <section>
@@ -161,6 +175,181 @@ export default function DashboardPage() {
           </Card>
         </div>
       </section>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Records tab
+// ---------------------------------------------------------------------------
+
+const APPROVAL_BADGE: Record<string, string> = {
+  needs_review: "bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400",
+  approved:     "bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400",
+  rejected:     "bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400",
+};
+
+function RecordsTab() {
+  const [data, setData]       = useState<CandidateListResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
+  const [page, setPage]       = useState(1);
+  const limit = 20;
+
+  useEffect(() => {
+    setLoading(true);
+    listCandidates({ page, limit })
+      .then(setData)
+      .catch(() => setError("Failed to load records."))
+      .finally(() => setLoading(false));
+  }, [page]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-sm text-stone-400 py-12">
+        <span className="w-4 h-4 rounded-full border-2 border-aubergine-400 border-t-transparent animate-spin inline-block" />
+        Loading…
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="rounded-lg border border-negative-border bg-negative-light px-4 py-3 text-sm text-negative-text">
+        {error ?? "No data available."}
+      </div>
+    );
+  }
+
+  if (data.total === 0) {
+    return (
+      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-6 py-12 text-center">
+        <p className="text-sm font-medium text-stone-600 dark:text-stone-300 mb-1">No candidates yet</p>
+        <p className="text-xs text-stone-400 dark:text-stone-500 mb-6">
+          Run your first interview transcript through the workflow.
+        </p>
+        <Link
+          href="/workflow"
+          className="inline-flex items-center gap-1.5 rounded bg-aubergine-800 text-white text-xs font-medium px-4 py-2 hover:bg-aubergine-900 transition-colors"
+        >
+          Open workflow builder →
+        </Link>
+      </div>
+    );
+  }
+
+  const totalPages = Math.ceil(data.total / limit);
+
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-stone-400 dark:text-stone-500">
+        {data.total} candidate{data.total !== 1 ? "s" : ""} total
+      </p>
+
+      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg overflow-hidden">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-stone-100 dark:border-stone-800">
+              <th className="text-left px-4 py-3 font-medium text-stone-400 dark:text-stone-500">Name</th>
+              <th className="text-left px-4 py-3 font-medium text-stone-400 dark:text-stone-500 hidden sm:table-cell">Job ref</th>
+              <th className="text-left px-4 py-3 font-medium text-stone-400 dark:text-stone-500 hidden md:table-cell">Status</th>
+              <th className="text-left px-4 py-3 font-medium text-stone-400 dark:text-stone-500">Approval</th>
+              <th className="text-left px-4 py-3 font-medium text-stone-400 dark:text-stone-500 hidden lg:table-cell">Created</th>
+              <th className="px-4 py-3" />
+            </tr>
+          </thead>
+          <tbody>
+            {data.items.map((c) => (
+              <tr
+                key={c.id}
+                className="border-b last:border-0 border-stone-100 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+              >
+                <td className="px-4 py-3 font-medium text-stone-700 dark:text-stone-300">
+                  {c.full_name ?? <span className="text-stone-400 italic">Unnamed</span>}
+                </td>
+                <td className="px-4 py-3 text-stone-500 hidden sm:table-cell">
+                  {c.job_reference ?? <span className="text-stone-300 dark:text-stone-600">—</span>}
+                </td>
+                <td className="px-4 py-3 text-stone-500 hidden md:table-cell">
+                  {c.extraction_status ?? "—"}
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`inline-block px-2 py-0.5 rounded text-2xs font-medium ${APPROVAL_BADGE[c.approval_status] ?? "bg-stone-100 text-stone-500"}`}>
+                    {c.approval_status.replace("_", " ")}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-stone-400 dark:text-stone-500 hidden lg:table-cell tabular-nums">
+                  {new Date(c.created_at).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <Link
+                    href={`/review/${c.id}`}
+                    className="text-aubergine-700 dark:text-aubergine-400 hover:underline font-medium"
+                  >
+                    View →
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+            className="text-xs text-stone-500 hover:text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            ← Previous
+          </button>
+          <span className="text-xs text-stone-400">
+            Page {page} of {totalPages}
+          </span>
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => p + 1)}
+            className="text-xs text-stone-500 hover:text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            Next →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "analytics", label: "Analytics" },
+  { id: "records",   label: "Records" },
+];
+
+export default function DashboardPage() {
+  const searchParams = useSearchParams();
+  const initialTab   = searchParams.get("tab") === "records" ? "records" : "analytics";
+  const [tab, setTab] = useState<Tab>(initialTab);
+
+  return (
+    <main className="page space-y-6">
+      <PageHeader
+        eyebrow="Recruiting mode"
+        title="Dashboard"
+      />
+
+      <TabBar
+        tabs={TABS}
+        active={tab}
+        onChange={setTab}
+        className="mb-2"
+      />
+
+      {tab === "analytics" && <AnalyticsTab />}
+      {tab === "records"   && <RecordsTab />}
     </main>
   );
 }

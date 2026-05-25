@@ -13,10 +13,8 @@ from pydantic import BaseModel, create_model
 
 from app.config import settings
 from app.domain.general_extraction_schemas import ApprovedColumn, FIELD_TYPE_MAP
-from app.prompts.general_extraction import (
-    GENERAL_EXTRACTION_SYSTEM_PROMPT,
-    build_general_extraction_user_message,
-)
+from app.prompts.general_extraction import build_general_extraction_user_message
+from app.prompts.selector import get_extraction_system_prompt
 
 
 class GeneralExtractionError(Exception):
@@ -57,11 +55,16 @@ _EMPTY_FIELD: dict[str, Any] = {
 def extract_general(
     transcript_text: str,
     columns: list[ApprovedColumn],
+    system_prompt: str | None = None,
 ) -> GeneralExtractionResult:
     """
     Call OpenAI Structured Outputs with a dynamically-built schema.
     Raises GeneralExtractionError on any failure.
+
+    system_prompt — override the default general-mode prompt (useful in tests).
+    Defaults to the general prompt via selector.
     """
+    resolved_prompt = system_prompt if system_prompt is not None else get_extraction_system_prompt("general")
     client = openai.OpenAI(api_key=settings.openai_api_key)
     response_model = _build_response_model(columns)
 
@@ -69,7 +72,7 @@ def extract_general(
         completion = client.beta.chat.completions.parse(
             model=settings.openai_model,
             messages=[
-                {"role": "system", "content": GENERAL_EXTRACTION_SYSTEM_PROMPT},
+                {"role": "system", "content": resolved_prompt},
                 {
                     "role": "user",
                     "content": build_general_extraction_user_message(transcript_text, columns),

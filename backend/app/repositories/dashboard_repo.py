@@ -95,6 +95,24 @@ def compute_stats(
     ]
     avg_confidence = sum(confidences) / len(confidences) if confidences else 0.0
 
+    # Confidence distribution buckets (same bands as general dashboard)
+    conf_buckets: dict[str, int] = {"<50%": 0, "50–70%": 0, "70–90%": 0, "90%+": 0}
+    for c in confidences:
+        pct = c * 100
+        if pct < 50:
+            conf_buckets["<50%"] += 1
+        elif pct < 70:
+            conf_buckets["50–70%"] += 1
+        elif pct < 90:
+            conf_buckets["70–90%"] += 1
+        else:
+            conf_buckets["90%+"] += 1
+    confidence_distribution = [
+        CountItem(label=k, count=v)
+        for k, v in conf_buckets.items()
+        if v > 0
+    ]
+
     # ------------------------------------------------------------------ #
     # 3. Extracted fields for bucketing + completeness                    #
     # ------------------------------------------------------------------ #
@@ -205,6 +223,7 @@ def compute_stats(
             avg_score=round(avg_score, 1),
             by_tier=by_tier,
         ),
+        confidence_distribution=confidence_distribution,
     )
 
 

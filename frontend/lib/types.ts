@@ -344,6 +344,7 @@ export interface DashboardStats {
   salary_distribution: CountItem[];
   extraction_completeness: ExtractionCompleteness;
   fit_score_stats: FitScoreStats;
+  confidence_distribution: CountItem[];
 }
 
 export interface AuditLogEntry {
