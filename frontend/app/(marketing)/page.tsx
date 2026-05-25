@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ProductDemo } from "@/components/marketing/ProductDemo";
 
 export const metadata: Metadata = {
   title: "SoraBase — Structured Data from Every Meeting",
@@ -90,82 +91,18 @@ function Hero() {
             </div>
           </div>
 
-          {/* Right: product preview */}
+          {/* Right: animated product demo */}
           <div className="lg:block hidden">
-            <SessionPreview />
+            <ProductDemo />
           </div>
         </div>
 
-        {/* Mobile preview */}
+        {/* Mobile demo */}
         <div className="lg:hidden mt-12">
-          <SessionPreview />
+          <ProductDemo />
         </div>
       </div>
     </section>
-  );
-}
-
-function SessionPreview() {
-  return (
-    <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden shadow-panel">
-      {/* Window chrome */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-950">
-        <div className="flex gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-stone-200 dark:bg-stone-700" />
-          <span className="w-2.5 h-2.5 rounded-full bg-stone-200 dark:bg-stone-700" />
-          <span className="w-2.5 h-2.5 rounded-full bg-stone-200 dark:bg-stone-700" />
-        </div>
-        <span className="text-xs font-mono text-stone-400 dark:text-stone-500">
-          sorabase / sessions / discovery-call
-        </span>
-        <span className="ml-auto flex items-center gap-1.5 text-xs font-medium text-aubergine-800 dark:text-aubergine-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-aubergine-700 animate-pulse" />
-          Extracted
-        </span>
-      </div>
-
-      {/* Session header */}
-      <div className="px-5 py-4 border-b border-stone-100 dark:border-stone-800">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
-              Sales Discovery — Acme Corp
-            </p>
-            <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-              2026-05-17 · 38 min · Zoom recording
-            </p>
-          </div>
-          <span className="flex-shrink-0 inline-flex items-center border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900 px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 rounded-xs">
-            General
-          </span>
-        </div>
-      </div>
-
-      {/* Extracted fields */}
-      {[
-        { label: "Prospect",    value: "Maria Chen, VP Operations",    conf: 99 },
-        { label: "Pain point",  value: "Manual data entry post-meeting", conf: 96 },
-        { label: "Budget",      value: "$30k – $50k annually",         conf: 88 },
-        { label: "Timeline",    value: "Q3 2026 decision",             conf: 85 },
-        { label: "Current",     value: "Google Docs + Notion",         conf: 97 },
-        { label: "Next steps",  value: "Demo with ops team, May 24",   conf: 91 },
-      ].map(({ label, value, conf }) => (
-        <div
-          key={label}
-          className="flex items-center gap-3 px-5 py-2.5 border-b border-stone-50 dark:border-stone-800/50 hover:bg-stone-50/70 dark:hover:bg-stone-800/30 transition-colors"
-        >
-          <span className="text-xs text-stone-400 dark:text-stone-500 w-24 flex-shrink-0">{label}</span>
-          <span className="flex-1 text-sm text-stone-800 dark:text-stone-200 truncate">{value}</span>
-          <span className="text-xs font-mono text-aubergine-700 dark:text-aubergine-400 flex-shrink-0">{conf}%</span>
-        </div>
-      ))}
-
-      {/* Footer */}
-      <div className="px-5 py-3 bg-stone-50/60 dark:bg-stone-950/60 flex items-center justify-between">
-        <span className="text-xs text-stone-400 dark:text-stone-500">6 of 12 fields shown</span>
-        <span className="text-xs font-medium text-aubergine-800 dark:text-aubergine-400">93% avg confidence</span>
-      </div>
-    </div>
   );
 }
 
@@ -775,14 +712,14 @@ function StructuredDataSection() {
           {/* Before: raw transcript */}
           <div>
             <p className="text-[10px] font-semibold tracking-[0.12em] uppercase text-stone-400 dark:text-stone-500 mb-3">
-              Before — raw transcript
+              Before — raw interview transcript
             </p>
             <div className="rounded-lg border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 p-5 font-mono text-xs text-stone-400 dark:text-stone-500 leading-relaxed overflow-hidden">
-              <p><span className="text-stone-300 dark:text-stone-600">[00:02:11]</span> Rep: What does the current process look like for capturing notes after a customer call?</p>
-              <p className="mt-2"><span className="text-stone-300 dark:text-stone-600">[00:02:18]</span> Maria: Honestly it&apos;s a mess — we&apos;re in Google Docs and Notion, different people have different templates. It takes us probably thirty minutes per call just to write up what happened...</p>
-              <p className="mt-2"><span className="text-stone-300 dark:text-stone-600">[00:09:42]</span> Rep: What kind of budget are you working with for a solution like this?</p>
-              <p className="mt-2"><span className="text-stone-300 dark:text-stone-600">[00:09:51]</span> Maria: We&apos;re probably looking at thirty to fifty thousand annually depending on the feature set...</p>
-              <p className="mt-3 text-stone-300 dark:text-stone-600 select-none">· · · · · 36 more minutes · · · · ·</p>
+              <p><span className="text-stone-300 dark:text-stone-600">[00:03:14]</span> Interviewer: How many years have you been working in backend engineering overall?</p>
+              <p className="mt-2"><span className="text-stone-300 dark:text-stone-600">[00:03:19]</span> Jamie: About seven years now — primarily Go and distributed systems, a couple years of Python before that...</p>
+              <p className="mt-2"><span className="text-stone-300 dark:text-stone-600">[00:11:22]</span> Interviewer: What&apos;s your timeline looking like? When could you realistically start a new role?</p>
+              <p className="mt-2"><span className="text-stone-300 dark:text-stone-600">[00:11:31]</span> Jamie: I&apos;m on two weeks notice at my current job, so pretty quickly. I&apos;m also fully authorized to work — no sponsorship needed...</p>
+              <p className="mt-3 text-stone-300 dark:text-stone-600 select-none">· · · · · 42 more minutes · · · · ·</p>
             </div>
           </div>
 
@@ -799,33 +736,33 @@ function StructuredDataSection() {
             </div>
           </div>
 
-          {/* After: structured fields */}
+          {/* After: structured recruiting fields */}
           <div>
             <p className="text-[10px] font-semibold tracking-[0.12em] uppercase text-stone-400 dark:text-stone-500 mb-3">
               After — structured extraction
             </p>
             <div className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
               {[
-                { field: "prospect_name",     value: "Maria Chen, VP Operations",    conf: 99, type: "text"   },
-                { field: "pain_points",        value: "Manual notes, no standard fmt", conf: 96, type: "text[]" },
-                { field: "budget_range",       value: "$30k – $50k annually",         conf: 88, type: "range"  },
-                { field: "decision_timeline",  value: "Q3 2026",                      conf: 85, type: "date"   },
-                { field: "current_solution",   value: "Google Docs + Notion",         conf: 97, type: "text"   },
-                { field: "next_steps",         value: "Demo with ops team, May 24",   conf: 91, type: "text"   },
+                { field: "full_name",              value: "Jamie Rivera",                   conf: 99, type: "text"   },
+                { field: "current_title",           value: "Senior Backend Engineer",        conf: 97, type: "text"   },
+                { field: "years_experience_years",  value: "7 years",                        conf: 94, type: "number" },
+                { field: "work_authorization",      value: "Authorized — no sponsorship",    conf: 99, type: "enum"   },
+                { field: "notice_period_days",      value: "14 days",                        conf: 91, type: "number" },
+                { field: "recruiter_recommendation",value: "Strong hire — Tier A",           conf: 88, type: "text"   },
               ].map(({ field, value, conf, type }) => (
                 <div
                   key={field}
                   className="flex items-center gap-3 px-4 py-2.5 border-b border-stone-50 dark:border-stone-800/60 last:border-0"
                 >
-                  <span className="text-xs font-mono text-stone-300 dark:text-stone-600 w-32 flex-shrink-0">{field}</span>
+                  <span className="text-xs font-mono text-stone-300 dark:text-stone-600 w-36 flex-shrink-0">{field}</span>
                   <span className="flex-1 text-sm text-stone-800 dark:text-stone-200 truncate">{value}</span>
                   <span className="text-[10px] font-mono text-stone-300 dark:text-stone-600 flex-shrink-0 mr-1">{type}</span>
                   <span className="text-[11px] font-semibold font-mono text-aubergine-700 dark:text-aubergine-400 flex-shrink-0 w-8 text-right">{conf}%</span>
                 </div>
               ))}
               <div className="px-4 py-2.5 bg-stone-50 dark:bg-stone-950 flex items-center justify-between">
-                <span className="text-xs text-stone-400 dark:text-stone-500">6 of 12 fields</span>
-                <span className="text-xs font-medium text-aubergine-800 dark:text-aubergine-400">93% avg confidence</span>
+                <span className="text-xs text-stone-400 dark:text-stone-500">6 of 35 fields</span>
+                <span className="text-xs font-medium text-aubergine-800 dark:text-aubergine-400">95% avg confidence</span>
               </div>
             </div>
           </div>

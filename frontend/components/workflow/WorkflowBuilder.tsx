@@ -56,12 +56,10 @@ export default function WorkflowBuilder() {
 
     setRunState("running");
     appendLog("Starting workflow run…", "info");
-
-    // Mark all nodes as running
-    updateNodeData(sourceNode.id,     { status: "running" });
-    updateNodeData(extractionNode.id, { status: "running" });
-    if (analysisNode) updateNodeData(analysisNode.id, { status: "running" });
-    if (outputNode)   updateNodeData(outputNode.id,   { status: "running" });
+    // Step 1 begins — only mark the source node running now.
+    // Subsequent nodes are marked running immediately before their step starts
+    // so the canvas always highlights exactly the node that is executing.
+    updateNodeData(sourceNode.id, { status: "running" });
 
     try {
       // ── Step 1: resolve conversation ───────────────────────────────────────
@@ -99,6 +97,7 @@ export default function WorkflowBuilder() {
       const conv = { id: conversationId };
 
       // ── Step 2: extract ───────────────────────────────────────────────────
+      updateNodeData(extractionNode.id, { status: "running" });
       appendLog("Running extraction pipeline…", "info");
       const extraction = await extractConversation(conv.id);
       updateNodeData(extractionNode.id, {
@@ -111,6 +110,7 @@ export default function WorkflowBuilder() {
       // ── Step 3: analysis (optional — skipped in General Mode) ─────────────
       let candidateId = extraction.candidate_id;
       if (analysisNode) {
+        updateNodeData(analysisNode.id, { status: "running" });
         const analysisData = analysisNode.data as unknown as AnalysisNodeData;
 
         // Resolve job ID: use existing one or create from inline JD paste
@@ -165,6 +165,7 @@ export default function WorkflowBuilder() {
       // Dashboard is always the primary destination — navigate there regardless
       // of what extra formats are configured.
       if (outputNode) {
+        updateNodeData(outputNode.id, { status: "running" });
         const outputData   = outputNode.data as unknown as OutputNodeData;
         const extraFormats = (outputData.extraFormats ?? []) as string[];
         updateNodeData(outputNode.id, { status: "completed", candidateId });

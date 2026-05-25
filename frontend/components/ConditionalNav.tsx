@@ -76,43 +76,38 @@ export default function ConditionalNav() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {/* Live recording indicator */}
           {recording && (
-            <div className="flex items-center gap-1.5 mr-2 px-2.5 py-1 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               <span className="text-2xs font-semibold text-red-600 dark:text-red-400">Recording</span>
             </div>
           )}
 
-          {mode === "general" ? (
-            <>
-              <NavLink href="/general/dashboard">Dashboard</NavLink>
-              <NavLink href="/general/dashboard?tab=data">Data</NavLink>
-              <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
-              <Link
-                href="/general"
-                className="rounded bg-aubergine-800 text-white text-xs font-medium px-3 py-1.5 hover:bg-aubergine-900 transition-colors"
-              >
-                Workspace
-              </Link>
-            </>
-          ) : (
-            <>
-              <NavLink href="/dashboard">Dashboard</NavLink>
-              <NavLink href="/candidates">Queue</NavLink>
-              <NavLink href="/data">Data</NavLink>
-              <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
-              <Link
-                href="/workflow"
-                className="rounded bg-aubergine-800 text-white text-xs font-medium px-3 py-1.5 hover:bg-aubergine-900 transition-colors"
-              >
-                Workflow
-              </Link>
-            </>
-          )}
+          {/* Page nav links — grouped tightly */}
+          <div className="flex items-center gap-0.5">
+            {mode === "general" ? (
+              <>
+                <NavLink href="/general/dashboard">Dashboard</NavLink>
+                <NavLink href="/general/dashboard?tab=data">Data</NavLink>
+              </>
+            ) : (
+              <>
+                <NavLink href="/dashboard">Dashboard</NavLink>
+                <NavLink href="/candidates">Candidates</NavLink>
+              </>
+            )}
+          </div>
 
-          <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
+          {/* Primary action — outlined so it reads as a CTA without overpowering the nav links */}
+          <Link
+            href={mode === "general" ? "/general" : "/workflow"}
+            className="rounded-md border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 text-xs font-medium px-3 py-1.5 hover:border-aubergine-400 dark:hover:border-aubergine-700 hover:text-aubergine-800 dark:hover:text-aubergine-400 transition-colors"
+          >
+            {mode === "general" ? "Workspace" : "Workflow"}
+          </Link>
+
           <UserMenu />
         </div>
       </div>
@@ -174,7 +169,7 @@ function ModeTab({ href, active, children }: { href: string; active: boolean; ch
     <Link
       href={href}
       className={[
-        "px-3 py-1 text-xs font-medium rounded-md transition-colors",
+        "px-2.5 py-1 text-[11px] font-medium rounded transition-colors leading-none",
         active
           ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-sm"
           : "text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300",
@@ -192,10 +187,10 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
     <Link
       href={href}
       className={[
-        "px-3 py-1.5 text-xs font-medium rounded transition-colors",
+        "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
         active
           ? "text-stone-900 dark:text-stone-100 bg-stone-100 dark:bg-stone-800"
-          : "text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800",
+          : "text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 hover:bg-stone-50 dark:hover:bg-stone-800/50",
       ].join(" ")}
     >
       {children}

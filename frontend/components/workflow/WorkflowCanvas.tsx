@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ReactFlow,
   Background,
@@ -16,7 +16,7 @@ import {
 } from "@xyflow/react";
 import { useWorkflowStoreContext, useWorkflowMode } from "@/lib/workflow-store-context";
 import { nodeTypes } from "./nodes";
-import { VALID_CONNECTIONS, type WorkflowNodeType } from "@/lib/workflow-types";
+import { VALID_CONNECTIONS, type WorkflowNodeType, type NodeStatus } from "@/lib/workflow-types";
 
 const EDGE_STYLE      = { strokeWidth: 2, stroke: "#a8a29e" };  // stone-400 — readable on white
 const EDGE_STYLE_DARK = { strokeWidth: 2, stroke: "#78716c" };  // stone-500
@@ -32,13 +32,15 @@ export default function WorkflowCanvas({ isDark }: Props) {
   // canvas mounts cleanly on the next tick via useEffect.
   const [mounted, setMounted] = useState(false);
 
-  const { screenToFlowPosition, fitView } = useReactFlow();
+  const { screenToFlowPosition, fitView, setCenter, getViewport } = useReactFlow();
   const nodesInitialized = useNodesInitialized();
   const hasFitRef        = useRef(false);
+  const prevRunningRef   = useRef<string | null>(null);
   const { coreNodeIds }  = useWorkflowMode();
 
   const nodes           = useWorkflowStoreContext((s) => s.nodes);
   const edges           = useWorkflowStoreContext((s) => s.edges);
+  const runState        = useWorkflowStoreContext((s) => s.runState);
 
   // After nodes are fully measured by React Flow, run fitView once per mount.
   // hasFitRef guards against re-running when persist rehydration briefly
@@ -54,6 +56,32 @@ export default function WorkflowCanvas({ isDark }: Props) {
     });
     return () => cancelAnimationFrame(raf);
   }, [nodesInitialized, fitView]);
+  // ── Execution-state derivations ───────────────────────────────────────────
+  const runningNodeId = useMemo(() => {
+    if (runState !== "running") return null;
+    return nodes.find((n) => (n.data as { status: NodeStatus }).status === "running")?.id ?? null;
+  }, [nodes, runState]);
+
+  const completedNodeIds = useMemo(() => {
+    const ids = new Set<string>();
+    nodes.forEach((n) => {
+      if ((n.data as { status: NodeStatus }).status === "completed") ids.add(n.id);
+    });
+    return ids;
+  }, [nodes]);
+
+  // Smooth-pan viewport to the currently running node whenever it changes
+  useEffect(() => {
+    if (!runningNodeId || runningNodeId === prevRunningRef.current) return;
+    prevRunningRef.current = runningNodeId;
+    const node = nodes.find((n) => n.id === runningNodeId);
+    if (!node) return;
+    const x = node.position.x + 112;   // center of 224px-wide card
+    const y = node.position.y + 50;    // approximate vertical midpoint
+    const { zoom } = getViewport();
+    setCenter(x, y, { duration: 500, zoom });
+  }, [runningNodeId, nodes, setCenter, getViewport]);
+
   const onNodesChange   = useWorkflowStoreContext((s) => s.onNodesChange);
   const onEdgesChange   = useWorkflowStoreContext((s) => s.onEdgesChange);
   const onConnect       = useWorkflowStoreContext((s) => s.onConnect);
@@ -128,8 +156,32 @@ export default function WorkflowCanvas({ isDark }: Props) {
 
   const edgeStyle = isDark ? EDGE_STYLE_DARK : EDGE_STYLE;
 
-  // Inject current theme style into every edge so persisted edges re-apply the right color
-  const styledEdges = edges.map((e) => ({ ...e, style: edgeStyle, type: e.type ?? "smoothstep" }));
+  // Classify each edge by execution state and apply appropriate style + className
+  const styledEdges = useMemo(() => edges.map((e) => {
+    const srcRunning = e.source === runningNodeId;
+    const tgtRunning = e.target === runningNodeId;
+    const isActive   = srcRunning || tgtRunning;
+    const isCompleted = !isActive && completedNodeIds.has(e.source) && completedNodeIds.has(e.target);
+    const isInactive  = runState === "running" && !isActive && !isCompleted;
+
+    let style: React.CSSProperties;
+    let className = "";
+
+    if (isActive) {
+      style = { strokeWidth: 2, stroke: isDark ? "#7c5060" : "#5e3848" };
+      className = "rf-edge-active";
+    } else if (isCompleted) {
+      style = { strokeWidth: 1.5, stroke: isDark ? "#4ade80" : "#16a34a", opacity: 0.7 };
+      className = "rf-edge-completed";
+    } else if (isInactive) {
+      style = { ...edgeStyle, opacity: 0.3 };
+      className = "rf-edge-inactive";
+    } else {
+      style = edgeStyle;
+    }
+
+    return { ...e, style, className, type: e.type ?? "smoothstep" };
+  }), [edges, edgeStyle, runningNodeId, completedNodeIds, runState, isDark]);
 
   // Render a stable placeholder until after client mount so React hydration
   // always matches the server-rendered HTML (server emits no edge SVG paths).

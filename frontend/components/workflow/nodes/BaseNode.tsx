@@ -5,7 +5,7 @@
 import { useState, useEffect } from "react";
 import { Handle, Position } from "@xyflow/react";
 import { useWorkflowStoreContext, useWorkflowMode } from "@/lib/workflow-store-context";
-import type { NodeStatus } from "@/lib/workflow-types";
+import type { NodeStatus, RunState } from "@/lib/workflow-types";
 
 interface BaseNodeProps {
   selected: boolean;
@@ -22,9 +22,9 @@ interface BaseNodeProps {
 const STATUS_DOT: Record<NodeStatus, string> = {
   idle:       "bg-stone-300 dark:bg-stone-600",
   configured: "bg-aubergine-400",
-  running:    "bg-amber-400 animate-pulse",
-  completed:  "bg-aubergine-700",
-  error:      "bg-red-400",
+  running:    "bg-aubergine-500 animate-pulse",
+  completed:  "bg-positive-DEFAULT",
+  error:      "bg-negative-DEFAULT",
 };
 
 const STATUS_LABEL: Record<NodeStatus, string> = {
@@ -34,6 +34,31 @@ const STATUS_LABEL: Record<NodeStatus, string> = {
   completed:  "Done",
   error:      "Error",
 };
+
+function containerClass(status: NodeStatus, runState: RunState, selected: boolean): string {
+  const base = "group relative w-56 rounded-md overflow-visible select-none bg-white dark:bg-stone-900 border transition-all duration-200";
+
+  // Border + shadow driven entirely by execution state (overrides selection ring while running)
+  let stateCls: string;
+  if (status === "running") {
+    stateCls = "border-aubergine-600 dark:border-aubergine-500 node-running";
+  } else if (status === "completed") {
+    stateCls = "border-positive-border dark:border-positive-DEFAULT/25 shadow-card";
+  } else if (status === "error") {
+    stateCls = "border-negative-border shadow-card";
+  } else if (selected) {
+    stateCls = "border-aubergine-700 shadow-[0_0_0_2px_rgba(74,40,56,0.18)] dark:shadow-[0_0_0_2px_rgba(124,80,96,0.25)]";
+  } else {
+    stateCls = "border-stone-200 dark:border-stone-700 shadow-card";
+  }
+
+  // Dim nodes that are idle/configured while a run is in progress
+  const dimCls = (runState === "running" && status !== "running" && status !== "completed" && status !== "error")
+    ? "node-dimmed"
+    : "";
+
+  return [base, stateCls, dimCls].filter(Boolean).join(" ");
+}
 
 export default function BaseNode({
   selected,
@@ -47,6 +72,7 @@ export default function BaseNode({
   nodeId,
 }: BaseNodeProps) {
   const removeNode              = useWorkflowStoreContext((s) => s.removeNode);
+  const runState                = useWorkflowStoreContext((s) => s.runState);
   const { coreNodeIds }         = useWorkflowMode();
   const isCore                  = nodeId ? coreNodeIds.has(nodeId) : false;
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -62,15 +88,7 @@ export default function BaseNode({
   }, [confirmDelete]);
 
   return (
-    <div
-      className={[
-        "group relative w-56 rounded-md overflow-visible select-none",
-        "bg-white dark:bg-stone-900 border transition-all duration-100",
-        selected
-          ? "border-aubergine-700 shadow-[0_0_0_2px_rgba(26,107,90,0.18)]"
-          : "border-stone-200 dark:border-stone-700 shadow-card",
-      ].join(" ")}
-    >
+    <div className={containerClass(status, runState, selected)}>
       {/* Accent stripe — 2.5px left border color */}
       <div className={`absolute inset-y-0 left-0 w-[2.5px] ${accent}`} />
 
@@ -139,6 +157,13 @@ export default function BaseNode({
 
       {/* Body */}
       <div className="pl-4 pr-3 py-2.5">{children}</div>
+
+      {/* Running progress rail — thin animated sweep at the bottom of the card */}
+      {status === "running" && (
+        <div className="absolute inset-x-0 bottom-0 h-[2.5px] overflow-hidden rounded-b-md bg-aubergine-100 dark:bg-aubergine-950/60">
+          <div className="progress-rail-inner absolute inset-y-0 w-2/5 rounded-full bg-aubergine-600 dark:bg-aubergine-400" />
+        </div>
+      )}
 
       {/* Handles — visible always, pulse on hover for discoverability */}
       {!hideTarget && (

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useWorkflowStoreContext, useWorkflowMode } from "@/lib/workflow-store-context";
+import type { LogEntry } from "@/lib/workflow-types";
 import type {
   AnyNodeData,
   AnalysisNodeData,
@@ -94,6 +95,8 @@ export default function InspectorPanel() {
   const nodes                  = useWorkflowStoreContext((s) => s.nodes);
   const selectedNodeId         = useWorkflowStoreContext((s) => s.selectedNodeId);
   const selectedLibraryNodeType = useWorkflowStoreContext((s) => s.selectedLibraryNodeType);
+  const runState               = useWorkflowStoreContext((s) => s.runState);
+  const logEntries             = useWorkflowStoreContext((s) => s.logEntries);
   const selectedNode            = nodes.find((n) => n.id === selectedNodeId);
   const { mode }               = useWorkflowMode();
 
@@ -155,6 +158,8 @@ export default function InspectorPanel() {
           />
         ) : selectedLibraryNodeType ? (
           <LibraryNodePreview type={selectedLibraryNodeType} mode={mode} />
+        ) : (runState === "running" || runState === "completed" || runState === "error") ? (
+          <RunProgressPanel nodes={nodes} runState={runState} logEntries={logEntries} />
         ) : (
           <EmptyState />
         )}
@@ -176,6 +181,117 @@ function EmptyState() {
         Click a node in the left panel to preview it, or click any canvas node to configure it.
       </p>
     </div>
+  );
+}
+
+// ── Run Progress Panel ─────────────────────────────────────────────────────────
+
+const LOG_LEVEL_DOT: Record<string, string> = {
+  info:    "bg-stone-300 dark:bg-stone-600",
+  success: "bg-positive-DEFAULT",
+  warn:    "bg-amber-400",
+  error:   "bg-negative-DEFAULT",
+};
+
+interface RunProgressPanelProps {
+  nodes: Array<{ id: string; type?: string; data: unknown }>;
+  runState: string;
+  logEntries: LogEntry[];
+}
+
+function RunProgressPanel({ nodes, runState, logEntries }: RunProgressPanelProps) {
+  const logEndRef = useRef<HTMLDivElement>(null);
+  const recentLogs = logEntries.slice(-40);
+
+  // Auto-scroll log to bottom when new entries arrive
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logEntries.length]);
+
+  // Compute per-node step status for the step list
+  const steps = nodes.map((n) => {
+    const d = n.data as { status?: string; label?: string };
+    return { id: n.id, type: n.type ?? "", status: d.status ?? "idle" };
+  });
+
+  const runningStep = steps.find((s) => s.status === "running");
+
+  return (
+    <>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-stone-100 dark:border-stone-800 flex-shrink-0 min-h-[44px]">
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+            runState === "running"   ? "bg-aubergine-500 animate-pulse" :
+            runState === "completed" ? "bg-positive-DEFAULT" :
+            "bg-negative-DEFAULT"
+          }`} />
+          <p className="text-xs font-semibold text-stone-700 dark:text-stone-300">
+            {runState === "running" ? "Running" : runState === "completed" ? "Completed" : "Failed"}
+          </p>
+        </div>
+        {runningStep && (
+          <span className="text-2xs text-stone-400 dark:text-stone-500 font-mono truncate max-w-[120px]">
+            {TYPE_LABEL[runningStep.type as WorkflowNodeType] ?? runningStep.type}
+          </span>
+        )}
+      </div>
+
+      {/* Step list */}
+      <div className="px-4 pt-3 pb-2 border-b border-stone-100 dark:border-stone-800 flex-shrink-0">
+        <p className="text-2xs font-semibold tracking-label uppercase text-stone-400 dark:text-stone-500 mb-2">Steps</p>
+        <div className="space-y-1.5">
+          {steps.map((s) => (
+            <div key={s.id} className="flex items-center gap-2">
+              <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                s.status === "running"   ? "bg-aubergine-500 animate-pulse" :
+                s.status === "completed" ? "bg-positive-DEFAULT" :
+                s.status === "error"     ? "bg-negative-DEFAULT" :
+                s.status === "configured" ? "bg-aubergine-400" :
+                "bg-stone-300 dark:bg-stone-600"
+              }`} />
+              <span className={`text-2xs ${
+                s.status === "running" ? "text-stone-700 dark:text-stone-200 font-medium" :
+                s.status === "completed" ? "text-stone-500 dark:text-stone-400" :
+                "text-stone-400 dark:text-stone-600"
+              }`}>
+                {TYPE_LABEL[s.type as WorkflowNodeType] ?? s.type}
+              </span>
+              {s.status === "running" && (
+                <span className="text-2xs text-aubergine-500 dark:text-aubergine-400 ml-auto">running…</span>
+              )}
+              {s.status === "completed" && (
+                <span className="text-2xs text-positive-text dark:text-positive-DEFAULT ml-auto">done</span>
+              )}
+              {s.status === "error" && (
+                <span className="text-2xs text-negative-text dark:text-negative-DEFAULT ml-auto">error</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Log stream */}
+      <div className="flex-1 overflow-y-auto px-4 py-3">
+        <p className="text-2xs font-semibold tracking-label uppercase text-stone-400 dark:text-stone-500 mb-2">Log</p>
+        <div className="space-y-1">
+          {recentLogs.map((entry) => (
+            <div key={entry.id} className="flex items-start gap-1.5">
+              <div className={`w-1 h-1 rounded-full flex-shrink-0 mt-[5px] ${LOG_LEVEL_DOT[entry.level] ?? LOG_LEVEL_DOT.info}`} />
+              <span className={`text-2xs leading-relaxed break-words ${
+                entry.level === "error" ? "text-negative-text dark:text-negative-DEFAULT" :
+                entry.level === "warn"  ? "text-amber-600 dark:text-amber-400" :
+                entry.level === "success" ? "text-positive-text dark:text-positive-DEFAULT" :
+                "text-stone-500 dark:text-stone-400"
+              }`}>
+                {entry.message}
+              </span>
+            </div>
+          ))}
+          <div ref={logEndRef} />
+        </div>
+      </div>
+    </>
   );
 }
 
