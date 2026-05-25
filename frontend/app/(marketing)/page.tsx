@@ -1170,9 +1170,9 @@ function BrandMoment() {
           <div className="h-px flex-1 bg-stone-800" />
         </div>
 
-        <div className="overflow-hidden mb-14">
+        <div className="mb-14">
           <h2
-            className="font-display italic text-stone-100 leading-[0.96] select-none"
+            className="font-display italic text-stone-100 leading-[1.04] select-none"
             style={{ fontSize: "clamp(3.2rem, 11vw, 10.5rem)" }}
           >
             <span className="block">Meetings</span>
@@ -1180,13 +1180,13 @@ function BrandMoment() {
           </h2>
         </div>
 
-        <div className="overflow-hidden mb-14">
+        <div className="mb-14">
           <h2
-            className="font-display italic text-aubergine-400 leading-[0.96] select-none"
+            className="font-display italic text-aubergine-400 leading-[1.04] select-none"
             style={{ fontSize: "clamp(3.2rem, 11vw, 10.5rem)" }}
           >
             <span className="block">Structure</span>
-            <span className="block text-aubergine-900/80">is permanent.</span>
+            <span className="block text-aubergine-300">is permanent.</span>
           </h2>
         </div>
 
