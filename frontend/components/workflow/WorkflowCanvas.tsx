@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ReactFlow,
   Background,
@@ -24,6 +24,14 @@ const EDGE_STYLE_DARK = { strokeWidth: 2, stroke: "#78716c" };  // stone-500
 interface Props { isDark: boolean }
 
 export default function WorkflowCanvas({ isDark }: Props) {
+  // Prevent rendering during SSR and the initial hydration pass.
+  // React Flow emits different SVG structure on the server vs. client (no node
+  // measurements server-side), causing a hydration mismatch that leaves edges
+  // invisible until the component remounts. Rendering a plain placeholder on
+  // the first pass gives React something stable to hydrate against; the full
+  // canvas mounts cleanly on the next tick via useEffect.
+  const [mounted, setMounted] = useState(false);
+
   const { screenToFlowPosition, fitView } = useReactFlow();
   const nodesInitialized = useNodesInitialized();
   const hasFitRef        = useRef(false);
@@ -116,10 +124,16 @@ export default function WorkflowCanvas({ isDark }: Props) {
     [setSelectedNode],
   );
 
+  useEffect(() => { setMounted(true); }, []);
+
   const edgeStyle = isDark ? EDGE_STYLE_DARK : EDGE_STYLE;
 
   // Inject current theme style into every edge so persisted edges re-apply the right color
   const styledEdges = edges.map((e) => ({ ...e, style: edgeStyle, type: e.type ?? "smoothstep" }));
+
+  // Render a stable placeholder until after client mount so React hydration
+  // always matches the server-rendered HTML (server emits no edge SVG paths).
+  if (!mounted) return <div className="absolute inset-0" />;
 
   return (
     <div className="absolute inset-0" onDragOver={onDragOver} onDrop={onDrop}>

@@ -502,7 +502,9 @@ function createWorkflowStore({
         // persisted before initial edges were re-set), restore the initial edges
         // rather than leaving the canvas disconnected.
         merge: (persisted, current) => {
-          const p = persisted as Partial<typeof current>;
+          // persisted is undefined when localStorage has no entry yet (first-ever visit).
+          // Spreading undefined is safe in JS but accessing p.edges would throw — guard it.
+          const p = (persisted ?? {}) as Partial<typeof current>;
           return {
             ...current,
             ...p,
