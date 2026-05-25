@@ -16,7 +16,8 @@ from app.domain.api_schemas import (
     FieldActionRequest,
     FieldEditRequest,
 )
-from app.repositories import candidate_repo, extraction_repo
+from app.domain.general_data_schemas import RecordsTableResponse
+from app.repositories import candidate_repo, extraction_repo, recruiting_data_repo
 from app.services import audit_service
 
 router = APIRouter()
@@ -35,6 +36,25 @@ def list_candidates(
 ):
     return candidate_repo.list_candidates(
         db, org_id=org_id, page=page, limit=limit, approval_status=approval_status
+    )
+
+
+@router.get("/candidates/rows", response_model=RecordsTableResponse)
+def get_candidates_rows(
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=200),
+    search: str | None = Query(None, description="Filter by candidate full name (case-insensitive substring)."),
+    approval_status: str | None = Query(None, description="needs_review | approved | rejected"),
+    db: Session = Depends(get_db),
+    org_id: uuid.UUID = Depends(get_current_org_id),
+) -> RecordsTableResponse:
+    return recruiting_data_repo.get_recruiting_records(
+        db,
+        org_id=org_id,
+        page=page,
+        limit=limit,
+        search=search or None,
+        approval_status=approval_status or None,
     )
 
 

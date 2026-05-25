@@ -101,6 +101,7 @@ export default function ConditionalNav() {
             <>
               <NavLink href="/dashboard">Dashboard</NavLink>
               <NavLink href="/candidates">Queue</NavLink>
+              <NavLink href="/data">Data</NavLink>
               <div className="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1" />
               <Link
                 href="/workflow"

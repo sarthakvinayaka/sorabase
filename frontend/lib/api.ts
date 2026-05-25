@@ -123,6 +123,21 @@ export async function listCandidates(params?: {
   return request(`/api/candidates${qs ? `?${qs}` : ""}`);
 }
 
+export async function getRecruitingTableData(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  approval_status?: string;
+}): Promise<RecordsTableResponse> {
+  const p = new URLSearchParams();
+  if (params?.page)            p.set("page",            String(params.page));
+  if (params?.limit)           p.set("limit",           String(params.limit));
+  if (params?.search)          p.set("search",          params.search);
+  if (params?.approval_status) p.set("approval_status", params.approval_status);
+  const qs = p.toString();
+  return request(`/api/candidates/rows${qs ? `?${qs}` : ""}`);
+}
+
 export async function updateApproval(
   candidateId: string,
   approvalStatus: ApprovalStatus,
