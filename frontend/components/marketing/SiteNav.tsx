@@ -7,6 +7,7 @@ import { useTheme } from "./ThemeProvider";
 import { useAuth } from "@/lib/auth-context";
 import { getRedirectForUser } from "@/lib/auth";
 import { LogoMark } from "@/components/ui/LogoMark";
+import { buttonVariants } from "@/components/ui/Button";
 
 export default function SiteNav() {
   const [scrolled,   setScrolled]   = useState(false);
@@ -73,7 +74,7 @@ export default function SiteNav() {
 
           <Link
             href={user ? appHref : "/signup"}
-            className="btn-mkt-primary"
+            className={buttonVariants({ variant: "primary", size: "md" })}
           >
             {user ? "Open app" : "Get started"}
           </Link>
@@ -113,7 +114,7 @@ export default function SiteNav() {
             )}
             <Link
               href={user ? appHref : "/signup"}
-              className="w-full text-center btn-mkt-primary justify-center"
+              className={buttonVariants({ variant: "primary", size: "md", className: "w-full justify-center" })}
             >
               {user ? "Open app" : "Get started free"}
             </Link>

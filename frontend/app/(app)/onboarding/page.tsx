@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { getRedirectForUser } from "@/lib/auth";
 import type { AccessType } from "@/lib/auth";
+import { Button } from "@/components/ui/Button";
 
 type Step = "choose" | "welcome" | "tour" | "done";
 
@@ -165,16 +166,18 @@ export default function OnboardingPage() {
                 ))}
               </div>
 
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                size="lg"
                 onClick={handleChooseAccess}
                 disabled={granting}
-                className="w-full btn-mkt-primary justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full justify-center"
               >
                 {granting
                   ? "Setting up…"
                   : `Continue with ${chosenAccess === "recruiter" ? "Recruiter Mode" : "General Mode"} →`}
-              </button>
+              </Button>
             </div>
           )}
 
@@ -203,13 +206,13 @@ export default function OnboardingPage() {
                   ? "Your workspace turns every interview into a structured candidate profile — automatically extracted, scored, and ready to review."
                   : "Your workspace lets you extract structured data from any meeting type using AI-proposed schemas and reusable templates."}
               </p>
-              <button
+              <Button
                 type="button"
+                variant="primary"
                 onClick={() => setStep("tour")}
-                className="btn-mkt-primary"
               >
                 Show me around
-              </button>
+              </Button>
             </div>
           )}
 
@@ -242,13 +245,13 @@ export default function OnboardingPage() {
                 >
                   ← Back
                 </button>
-                <button
+                <Button
                   type="button"
+                  variant="primary"
                   onClick={() => setStep("done")}
-                  className="btn-mkt-primary"
                 >
                   Got it →
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -266,9 +269,9 @@ export default function OnboardingPage() {
                 Your workspace is ready. Head in and run your first session — paste a transcript,
                 upload a recording, or connect a live meeting.
               </p>
-              <button type="button" onClick={handleFinish} className="btn-mkt-primary">
+              <Button type="button" variant="primary" onClick={handleFinish}>
                 Open my workspace →
-              </button>
+              </Button>
             </div>
           )}
         </div>

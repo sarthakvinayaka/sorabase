@@ -101,7 +101,7 @@ export default function Toolbar({ onRun }: Props) {
               "flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold transition-colors",
               isBlocked
                 ? "bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 cursor-not-allowed"
-                : "bg-aubergine-800 hover:bg-aubergine-900 text-white",
+                : "bg-aubergine-600 hover:bg-aubergine-700 active:bg-aubergine-800 text-white",
             ].join(" ")}
           >
             {isBlocked ? <SpinIcon /> : <PlayIcon />}

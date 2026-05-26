@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/Button";
 import { ProductDemo }            from "@/components/marketing/ProductDemo";
 import { AnimatedPlatformFlow }   from "@/components/marketing/AnimatedPlatformFlow";
 import { AnimatedWorkflowCanvas } from "@/components/marketing/AnimatedWorkflowCanvas";
@@ -76,10 +77,10 @@ function Hero() {
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Link href="/signup" className="btn-mkt-primary">
+              <Link href="/signup" className={buttonVariants({ variant: "primary" })}>
                 Get started free
               </Link>
-              <Link href="#how-it-works" className="btn-mkt-ghost">
+              <Link href="#how-it-works" className={buttonVariants({ variant: "ghost" })}>
                 How it works
               </Link>
             </div>
@@ -227,7 +228,7 @@ function ModeComparison() {
                 ))}
               </ul>
               <div className="mt-7">
-                <Link href="/signup" className="btn-mkt-ghost">
+                <Link href="/signup" className={buttonVariants({ variant: "ghost" })}>
                   Start with General Mode
                 </Link>
               </div>
@@ -292,7 +293,7 @@ function ModeComparison() {
                 ))}
               </ul>
               <div className="mt-7">
-                <Link href="/signup" className="btn-mkt-primary">
+                <Link href="/signup" className={buttonVariants({ variant: "primary" })}>
                   Start with Recruiter Mode
                 </Link>
               </div>
@@ -332,7 +333,7 @@ function Integrations() {
               conversations happen and routing structured data to wherever your team needs it.
               No custom glue required.
             </p>
-            <Link href="/signup" className="btn-mkt-ghost inline-flex">
+            <Link href="/signup" className={buttonVariants({ variant: "ghost" })}>
               See all integrations
             </Link>
           </div>
@@ -501,13 +502,13 @@ function PricingPreview() {
               </ul>
 
               {plan.ctaEl === "anchor" ? (
-                <a href={plan.href} className="btn-mkt-ghost">
+                <a href={plan.href} className={buttonVariants({ variant: "ghost" })}>
                   {plan.cta}
                 </a>
               ) : (
                 <Link
                   href={plan.href}
-                  className={plan.highlight ? "btn-mkt-primary" : "btn-mkt-ghost"}
+                  className={buttonVariants({ variant: plan.highlight ? "primary" : "ghost" })}
                 >
                   {plan.cta}
                 </Link>
@@ -549,10 +550,10 @@ function FinalCTA() {
               is ready immediately. Upgrade to Pro at $20/month when you&apos;re ready for unlimited.
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <Link href="/signup" className="btn-mkt-primary">
+              <Link href="/signup" className={buttonVariants({ variant: "primary" })}>
                 Get started free
               </Link>
-              <Link href="/pricing" className="btn-mkt-ghost">
+              <Link href="/pricing" className={buttonVariants({ variant: "ghost" })}>
                 View pricing
               </Link>
             </div>

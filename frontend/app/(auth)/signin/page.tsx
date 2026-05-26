@@ -6,6 +6,7 @@ import Link from "next/link";
 import { signIn as nextAuthSignIn } from "next-auth/react";
 import { useAuth } from "@/lib/auth-context";
 import { getRedirectForUser } from "@/lib/auth";
+import { Button } from "@/components/ui/Button";
 
 type FormState = "idle" | "loading" | "success";
 
@@ -186,10 +187,12 @@ export default function SignInPage() {
             )}
 
             {/* Submit */}
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              size="lg"
               disabled={formState === "loading"}
-              className="w-full btn-mkt-primary justify-center py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full justify-center"
             >
               {formState === "loading" ? (
                 <>
@@ -197,7 +200,7 @@ export default function SignInPage() {
                   Signing in…
                 </>
               ) : "Sign in"}
-            </button>
+            </Button>
           </form>
         </>
       )}

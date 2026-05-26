@@ -2,6 +2,7 @@
 
 import { useInView } from "./hooks/useInView";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/Button";
 
 export function AnimatedBrandMoment() {
   const { ref, inView } = useInView({ threshold: 0.2 });
@@ -73,7 +74,7 @@ export function AnimatedBrandMoment() {
             From every call: a structured record. Searchable, exportable, and
             ready to act on — long after the conversation ends.
           </p>
-          <Link href="/signup" className="btn-mkt-primary flex-shrink-0">
+          <Link href="/signup" className={buttonVariants({ variant: "primary", className: "flex-shrink-0" })}>
             Get started free
           </Link>
         </div>

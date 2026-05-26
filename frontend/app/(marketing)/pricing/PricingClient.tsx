@@ -3,6 +3,7 @@
 import { Fragment, useState } from "react";
 import Link from "next/link";
 import SiteFooter from "@/components/marketing/SiteFooter";
+import { buttonVariants } from "@/components/ui/Button";
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    DATA
@@ -287,17 +288,14 @@ function PlanCard({ plan }: { plan: (typeof PLANS)[number] }) {
         {isCustom ? (
           <a
             href={plan.href}
-            className="btn-mkt-ghost w-full justify-center"
+            className={buttonVariants({ variant: "ghost", className: "w-full justify-center" })}
           >
             {plan.cta}
           </a>
         ) : (
           <Link
             href={plan.href}
-            className={[
-              "w-full justify-center",
-              plan.primary ? "btn-mkt-primary" : "btn-mkt-ghost",
-            ].join(" ")}
+            className={buttonVariants({ variant: plan.primary ? "primary" : "ghost", className: "w-full justify-center" })}
           >
             {plan.cta}
           </Link>
@@ -610,7 +608,7 @@ function BottomCTA() {
           </div>
 
           <div className="flex flex-col gap-4 lg:items-end">
-            <Link href="/signup" className="btn-mkt-primary self-start lg:self-auto">
+            <Link href="/signup" className={buttonVariants({ variant: "primary", className: "self-start lg:self-auto" })}>
               Get started free
             </Link>
             <a
