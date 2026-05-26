@@ -35,22 +35,24 @@ export function ProductDemo() {
         setStatus("ready");
         setCount(0);
 
-        await wait(1000);
+        await wait(1400);
         if (!alive) return;
 
         setStatus("extracting");
+        await wait(240);          // brief "engine-start" pause before first row
+        if (!alive) return;
 
         for (let i = 1; i <= FIELDS.length; i++) {
-          await wait(380);
+          await wait(520);
           if (!alive) return;
           setCount(i);
         }
 
-        await wait(300);
+        await wait(620);
         if (!alive) return;
         setStatus("done");
 
-        await wait(4200);
+        await wait(5400);
       }
     }
 
@@ -137,7 +139,7 @@ export function ProductDemo() {
         <div className="flex items-center gap-3">
           <div className="flex-1 h-[3px] bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-aubergine-600 dark:bg-aubergine-500 rounded-full transition-all duration-500 ease-out"
+              className="h-full bg-aubergine-600 dark:bg-aubergine-500 rounded-full transition-all duration-700 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -153,8 +155,8 @@ export function ProductDemo() {
           <div
             key={label}
             className={[
-              "flex items-center gap-3 px-5 py-2.5 border-b border-stone-50 dark:border-stone-800/50 last:border-0 transition-all duration-300",
-              i < count ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none",
+              "flex items-center gap-3 px-5 py-2.5 border-b border-stone-50 dark:border-stone-800/50 last:border-0 transition-all duration-500 ease-out",
+              i < count ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none",
             ].join(" ")}
           >
             <span className="text-xs text-stone-400 dark:text-stone-500 w-[88px] flex-shrink-0">
