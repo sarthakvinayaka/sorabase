@@ -696,7 +696,7 @@ function BrowserCapturePanel({ id, data, update, mode }: BrowserCapturePanelProp
             Extension not installed
           </p>
           <p className="text-[10px] text-aubergine-600 dark:text-aubergine-500 leading-relaxed mb-2.5">
-            Install the SoraBase Capture extension to record Google Meet, Zoom, and Teams directly in your browser.
+            Install the Sorabase Capture extension to record Google Meet, Zoom, and Teams directly in your browser.
           </p>
           <a
             href="https://chrome.google.com/webstore/detail/sorabase-capture/EXTENSION_ID"
@@ -798,7 +798,7 @@ function BrowserCapturePanel({ id, data, update, mode }: BrowserCapturePanelProp
           <p className="text-xs font-medium text-aubergine-700 dark:text-aubergine-400">Extension ready</p>
         </div>
         <p className="text-[10px] text-stone-500 dark:text-stone-400 leading-relaxed mb-2">
-          Open the SoraBase Capture extension popup on your meeting tab to start recording. Once the recording is processed, this node will receive the transcript automatically.
+          Open the Sorabase Capture extension popup on your meeting tab to start recording. Once the recording is processed, this node will receive the transcript automatically.
         </p>
         <p className="text-[10px] text-stone-400 dark:text-stone-500">
           Supported: Google Meet · Zoom · Teams · any browser tab

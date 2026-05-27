@@ -1,6 +1,6 @@
 import type { DefaultSession } from "next-auth";
 
-// Augment NextAuth session and JWT with SoraBase-specific fields.
+// Augment NextAuth session and JWT with Sorabase-specific fields.
 // These are populated in the jwt + session callbacks inside lib/auth-config.ts.
 
 declare module "next-auth" {

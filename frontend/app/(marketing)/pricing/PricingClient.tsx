@@ -419,7 +419,7 @@ function AccessModeSection() {
           Your plan sets the budget.<br />Your access mode sets the workspace.
         </h2>
         <p className="text-[13px] text-stone-500 dark:text-stone-400 leading-relaxed max-w-2xl">
-          SoraBase has two product modes. You choose which one your account enters at signup.
+          Sorabase has two product modes. You choose which one your account enters at signup.
           Both modes are available on every plan.
         </p>
       </div>

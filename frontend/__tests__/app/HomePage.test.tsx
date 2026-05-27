@@ -9,10 +9,10 @@ jest.mock("next/link", () => {
   };
 });
 
-describe("HomePage (SoraBase marketing)", () => {
-  it("renders the SoraBase wordmark in the hero", () => {
+describe("HomePage (Sorabase marketing)", () => {
+  it("renders the Sorabase wordmark in the hero", () => {
     render(<HomePage />);
-    expect(screen.getByText(/SoraBase/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sorabase/i)).toBeInTheDocument();
   });
 
   it("renders the hero headline", () => {

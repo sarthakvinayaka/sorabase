@@ -6,7 +6,7 @@ import { useInView } from "./hooks/useInView";
 const STATS = [
   { target: 35, suffix: "+", label: "Fields extracted per recruiting session" },
   { target: 94, suffix: "%", label: "Average confidence score"                },
-  { target: 40, suffix: "+", label: "Organizations using SoraBase"            },
+  { target: 40, suffix: "+", label: "Organizations using Sorabase"            },
 ];
 
 function useCountUp(target: number, duration: number, started: boolean): number {
@@ -88,7 +88,7 @@ export function AnimatedTestimonials() {
               className="font-display italic text-stone-700 dark:text-stone-300 leading-snug mb-7"
               style={{ fontSize: "clamp(1.25rem, 2.5vw, 1.75rem)" }}
             >
-              &ldquo;I was skeptical about another AI meeting tool. But SoraBase doesn&apos;t
+              &ldquo;I was skeptical about another AI meeting tool. But Sorabase doesn&apos;t
               summarize — it structures. The confidence scores and evidence citations mean
               you can actually trust the output, not just hope it&apos;s right.&rdquo;
             </p>

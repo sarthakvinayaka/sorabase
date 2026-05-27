@@ -10,21 +10,21 @@ import { AnimatedStructuredData } from "@/components/marketing/AnimatedStructure
 import { AnimatedBrandMoment }    from "@/components/marketing/AnimatedBrandMoment";
 
 export const metadata: Metadata = {
-  title: "SoraBase — Structured Data from Every Meeting",
+  title: "Sorabase — Structured Data from Every Meeting",
   description:
-    "SoraBase turns interviews, sales calls, and team meetings into field-by-field structured data — confidence-scored, evidence-cited, and ready to push into your ATS, CRM, or BI tools.",
+    "Sorabase turns interviews, sales calls, and team meetings into field-by-field structured data — confidence-scored, evidence-cited, and ready to push into your ATS, CRM, or BI tools.",
   alternates: {
     canonical: "https://www.sorabase.org/",
   },
   openGraph: {
-    title:       "SoraBase — Structured Data from Every Meeting",
+    title:       "Sorabase — Structured Data from Every Meeting",
     description: "Field-by-field extraction from any conversation. Confidence-scored outputs with evidence citations, ready to push into your systems.",
     url:         "https://www.sorabase.org/",
     type:        "website",
   },
   twitter: {
     card:        "summary",
-    title:       "SoraBase — Structured Data from Every Meeting",
+    title:       "Sorabase — Structured Data from Every Meeting",
     description: "Field-by-field extraction from any conversation. Not summaries — structured data.",
   },
 };
@@ -71,7 +71,7 @@ function Hero() {
             </h1>
 
             <p className="mt-7 text-[16px] text-stone-500 dark:text-stone-400 leading-relaxed">
-              SoraBase extracts field-by-field structured data from any conversation —
+              Sorabase extracts field-by-field structured data from any conversation —
               interview, sales call, or ops sync. Confidence-scored outputs with evidence
               citations, ready to push into your systems before the recap email is written.
             </p>
@@ -329,7 +329,7 @@ function Integrations() {
               Meet your stack.<br />Deliver anywhere.
             </h2>
             <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed mb-8 max-w-sm">
-              SoraBase sits in the middle of your meeting workflow — ingesting from wherever
+              Sorabase sits in the middle of your meeting workflow — ingesting from wherever
               conversations happen and routing structured data to wherever your team needs it.
               No custom glue required.
             </p>
@@ -571,7 +571,7 @@ function FinalCTA() {
 function BrandSignature() {
   return (
     <section
-      aria-label="SoraBase"
+      aria-label="Sorabase"
       className="relative overflow-hidden flex flex-col justify-end"
       style={{
         minHeight: "80vh",

@@ -63,7 +63,7 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-stone-50 dark:bg-stone-950 flex flex-col">
       {/* Header */}
       <header className="h-16 flex items-center px-8 border-b border-stone-200 dark:border-stone-800 flex-shrink-0">
-        <span className="font-display italic text-[18px] leading-none text-stone-900 dark:text-stone-100">SoraBase</span>
+        <span className="font-display italic text-[18px] leading-none text-stone-900 dark:text-stone-100">Sorabase</span>
         <span className="mx-3 h-3.5 w-px bg-stone-200 dark:bg-stone-700" />
         <span className="text-xs text-stone-400 dark:text-stone-500">Onboarding</span>
       </header>
@@ -109,7 +109,7 @@ export default function OnboardingPage() {
           {step === "choose" && (
             <div>
               <h1 className="font-display italic text-stone-900 dark:text-stone-100 text-3xl mb-3 text-center">
-                Welcome to SoraBase.
+                Welcome to Sorabase.
               </h1>
               <p className="text-sm text-stone-500 dark:text-stone-400 mb-8 text-center leading-relaxed max-w-sm mx-auto">
                 Choose the workspace that fits your workflow.
@@ -193,7 +193,7 @@ export default function OnboardingPage() {
                 {isRecruiter ? <BriefcaseIcon /> : <GridIcon />}
               </div>
               <h1 className="font-display italic text-stone-900 dark:text-stone-100 text-3xl mb-3">
-                Welcome to SoraBase, {user.name.split(" ")[0]}.
+                Welcome to Sorabase, {user.name.split(" ")[0]}.
               </h1>
               <p className="text-sm text-stone-500 dark:text-stone-400 mb-2 leading-relaxed">
                 You&apos;re in{" "}
@@ -289,7 +289,7 @@ const RECRUITER_TOUR = [
   {
     icon: <ExtractIcon />,
     title: "35+ structured fields per interview",
-    body:  "After each call, SoraBase extracts candidate name, role, experience, skills, compensation, and 30+ more fields automatically.",
+    body:  "After each call, Sorabase extracts candidate name, role, experience, skills, compensation, and 30+ more fields automatically.",
   },
   {
     icon: <ScoreIcon />,

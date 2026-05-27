@@ -23,7 +23,7 @@ const INITIAL: ExtensionState = {
 const PING_TIMEOUT_MS = 600;
 
 /**
- * Detects whether the SoraBase Capture Chrome extension is installed and
+ * Detects whether the Sorabase Capture Chrome extension is installed and
  * whether a recording is currently in progress.
  *
  * Uses a postMessage handshake with the extension's bridge content script.

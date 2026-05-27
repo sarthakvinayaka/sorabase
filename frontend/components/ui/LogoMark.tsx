@@ -1,5 +1,5 @@
 /**
- * LogoMark — the SoraBase waveform-to-lines mark.
+ * LogoMark — the Sorabase waveform-to-lines mark.
  *
  * Two variants:
  *   <LogoMark />   — icon only, currentColor (nav/auth, adapts to theme)
@@ -59,7 +59,7 @@ export function LogoIcon({
       height={size}
       viewBox="0 0 100 100"
       fill="none"
-      aria-label="SoraBase"
+      aria-label="Sorabase"
       className={className}
     >
       <rect width="100" height="100" rx="20" fill="#0C1221"/>

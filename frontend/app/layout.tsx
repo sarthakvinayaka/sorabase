@@ -10,11 +10,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE),
 
   title: {
-    default:  "SoraBase — Meeting Intelligence Platform",
-    template: "%s | SoraBase",
+    default:  "Sorabase — Meeting Intelligence Platform",
+    template: "%s | Sorabase",
   },
   description:
-    "SoraBase turns every call, meeting, and transcript into structured, actionable data. Reusable schemas, AI extraction, workflow outputs, and integrations for every team.",
+    "Sorabase turns every call, meeting, and transcript into structured, actionable data. Reusable schemas, AI extraction, workflow outputs, and integrations for every team.",
   keywords: [
     "meeting intelligence", "transcript extraction", "structured data",
     "recruiting workflow", "meeting automation",
@@ -25,18 +25,18 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    siteName:    "SoraBase",
+    siteName:    "Sorabase",
     type:        "website",
     url:         BASE,
-    title:       "SoraBase — Meeting Intelligence Platform",
+    title:       "Sorabase — Meeting Intelligence Platform",
     description: "From every meeting, a structured record.",
-    images:      [{ url: "/favicon-512.png", width: 512, height: 512, alt: "SoraBase" }],
+    images:      [{ url: "/favicon-512.png", width: 512, height: 512, alt: "Sorabase" }],
     locale:      "en_US",
   },
 
   twitter: {
     card:        "summary",
-    title:       "SoraBase — Meeting Intelligence Platform",
+    title:       "Sorabase — Meeting Intelligence Platform",
     description: "From every meeting, a structured record.",
     images:      ["/favicon-512.png"],
   },

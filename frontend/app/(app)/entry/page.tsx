@@ -51,7 +51,7 @@ export default function EntryPage() {
           href="/"
           className="font-display italic text-[18px] text-stone-900 dark:text-stone-100 hover:opacity-70 transition-opacity"
         >
-          SoraBase
+          Sorabase
         </Link>
         <button
           type="button"

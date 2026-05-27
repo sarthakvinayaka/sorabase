@@ -51,7 +51,7 @@ export function AnimatedStructuredData() {
             A transcript is a record of words.<br />Extraction is a record of meaning.
           </h2>
           <p className="mt-5 text-[15px] text-stone-500 dark:text-stone-400 leading-relaxed max-w-xl">
-            AI notetakers stop at the spoken word. SoraBase continues — pulling
+            AI notetakers stop at the spoken word. Sorabase continues — pulling
             structured, field-level data from the conversation and attaching evidence
             for every value it extracts.
           </p>

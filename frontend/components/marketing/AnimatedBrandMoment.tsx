@@ -9,7 +9,7 @@ export function AnimatedBrandMoment() {
 
   return (
     <section
-      aria-label="SoraBase"
+      aria-label="Sorabase"
       className="relative overflow-hidden bg-stone-950 py-28 lg:py-40"
     >
       <div aria-hidden className="absolute inset-0 flex pointer-events-none">
@@ -24,7 +24,7 @@ export function AnimatedBrandMoment() {
         <div className="flex items-center gap-5 mb-14">
           <div className="h-px w-10 bg-aubergine-700" />
           <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-stone-600">
-            SoraBase
+            Sorabase
           </span>
           <div className="h-px flex-1 bg-stone-800" />
         </div>

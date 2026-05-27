@@ -6,7 +6,7 @@ const STEPS = [
   {
     n:     "01",
     title: "Bring the conversation",
-    body:  "Connect a live Zoom or Google Meet bot, upload an audio or video file, or paste a transcript directly. SoraBase handles every source format without extra configuration.",
+    body:  "Connect a live Zoom or Google Meet bot, upload an audio or video file, or paste a transcript directly. Sorabase handles every source format without extra configuration.",
     tags:  ["Zoom", "Google Meet", "Audio upload", "Transcript paste"],
   },
   {

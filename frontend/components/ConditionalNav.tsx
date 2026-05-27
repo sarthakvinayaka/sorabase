@@ -62,11 +62,11 @@ export default function ConditionalNav() {
           <Link
             href={appHome}
             className="flex items-center gap-2 hover:opacity-70 transition-opacity"
-            aria-label="SoraBase home"
+            aria-label="Sorabase home"
           >
             <LogoMark size={22} className="text-stone-900 dark:text-stone-100" />
             <span className="font-display italic text-[18px] leading-none text-stone-900 dark:text-stone-100">
-              SoraBase
+              Sorabase
             </span>
           </Link>
 

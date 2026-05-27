@@ -28,7 +28,7 @@ export default function ExtensionInstallPrompt({
         <MicIcon />
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-aubergine-900 dark:text-aubergine-300">
-            SoraBase Capture not installed
+            Sorabase Capture not installed
           </p>
           <p className="text-2xs text-aubergine-700 dark:text-aubergine-400 mt-0.5">
             Install the extension to record browser meetings and capture audio directly.
@@ -55,7 +55,7 @@ export default function ExtensionInstallPrompt({
         </div>
         <div>
           <p className="text-sm font-semibold text-stone-800 dark:text-stone-100">
-            SoraBase Capture
+            Sorabase Capture
           </p>
           <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
             Chrome extension · free
@@ -67,7 +67,7 @@ export default function ExtensionInstallPrompt({
         {[
           "Record Google Meet, Zoom, and Teams directly in your browser",
           "Mix tab audio and microphone into a clean recording",
-          "Automatically send the transcript to your SoraBase workflow",
+          "Automatically send the transcript to your Sorabase workflow",
         ].map((feat) => (
           <div key={feat} className="flex items-start gap-2">
             <svg className="w-3.5 h-3.5 text-positive-DEFAULT flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

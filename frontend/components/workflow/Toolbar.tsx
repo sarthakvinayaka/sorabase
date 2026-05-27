@@ -38,9 +38,9 @@ export default function Toolbar({ onRun }: Props) {
         <Link
           href={isRecruiting ? "/dashboard" : "/general/dashboard"}
           className="font-display italic text-[17px] leading-none text-stone-900 dark:text-stone-100 hover:opacity-60 transition-opacity"
-          aria-label="SoraBase home"
+          aria-label="Sorabase home"
         >
-          SoraBase
+          Sorabase
         </Link>
         <div className="h-3.5 w-px bg-stone-200 dark:bg-stone-700" />
         <div className="flex items-center gap-0.5 bg-stone-100 dark:bg-stone-800 rounded-lg p-0.5">

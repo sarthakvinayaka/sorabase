@@ -41,7 +41,7 @@ export default function SiteFooter() {
               className="font-display italic text-stone-900 dark:text-stone-100 hover:opacity-70 transition-opacity"
               style={{ fontSize: "clamp(2.8rem, 6vw, 5rem)", lineHeight: 1.05 }}
             >
-              SoraBase
+              Sorabase
             </Link>
           </div>
           <p className="text-sm text-stone-400 dark:text-stone-500 leading-relaxed max-w-xs lg:text-right">
@@ -82,7 +82,7 @@ export default function SiteFooter() {
       <div className="mkt-section py-6 border-t border-stone-100 dark:border-stone-900 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <p className="text-xs text-stone-400 dark:text-stone-500">
-            © {new Date().getFullYear()} SoraBase, Inc.
+            © {new Date().getFullYear()} Sorabase, Inc.
           </p>
           <span aria-hidden className="text-stone-300 dark:text-stone-700">·</span>
           <p className="text-xs text-stone-400 dark:text-stone-500">

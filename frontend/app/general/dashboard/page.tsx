@@ -312,7 +312,7 @@ function CaptureCTA() {
       <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-aubergine-50 dark:bg-aubergine-950/20 border border-aubergine-200 dark:border-aubergine-900">
         <span className="w-1.5 h-1.5 rounded-full bg-aubergine-500 flex-shrink-0" />
         <p className="text-xs text-aubergine-700 dark:text-aubergine-400">
-          SoraBase Capture ready — open extension to record a meeting
+          Sorabase Capture ready — open extension to record a meeting
         </p>
       </div>
     );

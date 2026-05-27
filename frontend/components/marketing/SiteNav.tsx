@@ -42,11 +42,11 @@ export default function SiteNav() {
         <Link
           href="/"
           className="flex-shrink-0 flex items-center gap-2.5 hover:opacity-75 transition-opacity"
-          aria-label="SoraBase home"
+          aria-label="Sorabase home"
         >
           <LogoMark size={28} className="text-stone-900 dark:text-stone-100" />
           <span className="font-display italic text-[22px] leading-none text-stone-900 dark:text-stone-100">
-            SoraBase
+            Sorabase
           </span>
         </Link>
 

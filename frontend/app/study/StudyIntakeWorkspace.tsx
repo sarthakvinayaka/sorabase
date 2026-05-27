@@ -375,7 +375,7 @@ export default function StudyIntakeWorkspace() {
               New lecture
             </h1>
             <p className="text-sm text-stone-400 dark:text-stone-500 mt-1.5">
-              Drop in a lecture and SoraBase turns it into structured study material.
+              Drop in a lecture and Sorabase turns it into structured study material.
             </p>
           </div>
           <Link
@@ -411,7 +411,7 @@ export default function StudyIntakeWorkspace() {
                 <textarea
                   value={transcript}
                   onChange={(e) => setTranscript(e.target.value)}
-                  placeholder="Paste your lecture transcript here…&#10;&#10;You can include speaker labels, timestamps, or just raw text — SoraBase will handle it."
+                  placeholder="Paste your lecture transcript here…&#10;&#10;You can include speaker labels, timestamps, or just raw text — Sorabase will handle it."
                   rows={12}
                   className="w-full resize-none rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-4 py-3.5 text-sm text-stone-800 dark:text-stone-200 placeholder-stone-300 dark:placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-aubergine-400 dark:focus:ring-aubergine-600 transition font-mono leading-relaxed"
                 />
@@ -638,7 +638,7 @@ export default function StudyIntakeWorkspace() {
         {/* ── Template selector ── */}
         <section className="space-y-3">
           <p className="text-xs text-stone-500 dark:text-stone-400">
-            Choose what SoraBase focuses on when analysing your lecture.
+            Choose what Sorabase focuses on when analysing your lecture.
           </p>
           <div className="grid grid-cols-2 gap-2">
             {TEMPLATES.map((t) => (
@@ -758,7 +758,7 @@ function LiveCapturePanel({
           <span className="text-sm font-semibold text-red-700 dark:text-red-400">Recording in progress</span>
         </div>
         <p className="text-xs text-red-600 dark:text-red-400 flex-1">
-          SoraBase Capture is recording your current tab. Stop the recording from the extension to begin analysis.
+          Sorabase Capture is recording your current tab. Stop the recording from the extension to begin analysis.
         </p>
       </div>
     );
@@ -769,10 +769,10 @@ function LiveCapturePanel({
       <div className="rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-5 py-5 space-y-3">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-aubergine-500" />
-          <p className="text-sm font-medium text-stone-700 dark:text-stone-300">SoraBase Capture ready</p>
+          <p className="text-sm font-medium text-stone-700 dark:text-stone-300">Sorabase Capture ready</p>
         </div>
         <p className="text-xs text-stone-400 dark:text-stone-500 leading-relaxed">
-          Open the SoraBase Capture extension in your browser to start recording your lecture.
+          Open the Sorabase Capture extension in your browser to start recording your lecture.
           When you stop the recording it will appear here automatically for analysis.
         </p>
         <div className="flex items-center gap-2 pt-1">
@@ -792,7 +792,7 @@ function LiveCapturePanel({
       <div>
         <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">Record your lecture live</p>
         <p className="text-xs text-stone-400 dark:text-stone-500 mt-1 leading-relaxed">
-          Install the SoraBase Capture extension to record Google Meet, Zoom, or Teams lectures
+          Install the Sorabase Capture extension to record Google Meet, Zoom, or Teams lectures
           directly from your browser. Transcription and analysis start automatically when you stop recording.
         </p>
       </div>
@@ -815,7 +815,7 @@ function LiveCapturePanel({
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
         </svg>
-        Install SoraBase Capture
+        Install Sorabase Capture
       </a>
     </div>
   );

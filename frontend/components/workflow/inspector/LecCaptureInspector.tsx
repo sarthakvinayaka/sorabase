@@ -7,7 +7,7 @@ interface Props { id: string; data: LecCaptureNodeData }
 
 const MODES: { value: LecCaptureMode; label: string; hint: string }[] = [
   { value: "paste",            label: "Paste transcript",  hint: "Copy-paste text directly into this node." },
-  { value: "browser_capture", label: "Browser capture",   hint: "Use the SoraBase Capture extension to record a live lecture." },
+  { value: "browser_capture", label: "Browser capture",   hint: "Use the Sorabase Capture extension to record a live lecture." },
   { value: "zoom_bot",        label: "Zoom bot",          hint: "A bot joins your Zoom lecture and transcribes it automatically." },
 ];
 
@@ -56,7 +56,7 @@ export default function LecCaptureInspector({ id, data }: Props) {
           <div className="rounded-lg border border-dashed border-sky-300 dark:border-sky-700 bg-sky-50 dark:bg-sky-950/20 px-4 py-4 text-center">
             <p className="text-xs font-medium text-sky-700 dark:text-sky-400">Extension required</p>
             <p className="text-2xs text-sky-600 dark:text-sky-500 mt-1 leading-relaxed">
-              Open the SoraBase Capture extension on your lecture tab to start recording. Transcript will appear here automatically.
+              Open the Sorabase Capture extension on your lecture tab to start recording. Transcript will appear here automatically.
             </p>
           </div>
         </Field>

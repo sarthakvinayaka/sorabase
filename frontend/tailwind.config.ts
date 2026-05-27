@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 /**
- * SoraBase design system.
+ * Sorabase design system.
  *
  * Philosophy: warm stone neutrals, smoked aubergine accent, editorial serif headings.
  * No loud gradients, no AI-purple, no toy-rounded UI.

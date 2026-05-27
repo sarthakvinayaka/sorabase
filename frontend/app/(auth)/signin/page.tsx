@@ -68,7 +68,7 @@ export default function SignInPage() {
           Welcome back.
         </h1>
         <p className="text-[13px] text-stone-500 dark:text-stone-400">
-          Sign in to your SoraBase workspace.
+          Sign in to your Sorabase workspace.
         </p>
       </div>
 

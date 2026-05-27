@@ -2,7 +2,7 @@
  * GET /api/extension/session
  *
  * Called by the Chrome extension popup to check whether the current browser
- * session belongs to a signed-in SoraBase user.
+ * session belongs to a signed-in Sorabase user.
  *
  * The extension fetch() call includes cookies (credentials:"include"). Because
  * the extension has host_permissions for sorabase.org and extension requests
@@ -14,7 +14,7 @@
  *   200 { authenticated: false }                               — no session
  *
  * Always returns 200 so the extension can distinguish "not signed in"
- * (authenticated:false) from "SoraBase unreachable" (fetch throw/non-200).
+ * (authenticated:false) from "Sorabase unreachable" (fetch throw/non-200).
  *
  * CORS: the response includes explicit CORS headers allowing the extension
  * origin (chrome-extension://*) so the popup can read the response body.

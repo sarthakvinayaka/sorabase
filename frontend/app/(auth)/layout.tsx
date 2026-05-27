@@ -17,11 +17,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <Link
             href="/"
             className="flex items-center gap-2.5 hover:opacity-70 transition-opacity"
-            aria-label="SoraBase home"
+            aria-label="Sorabase home"
           >
             <LogoMark size={26} className="text-stone-900 dark:text-stone-100" />
             <span className="font-display italic text-[20px] leading-none text-stone-900 dark:text-stone-100">
-              SoraBase
+              Sorabase
             </span>
           </Link>
         </header>
@@ -34,7 +34,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         {/* Footer */}
         <footer className="px-8 lg:px-12 py-5">
           <p className="text-xs text-stone-400 dark:text-stone-500">
-            © {new Date().getFullYear()} SoraBase, Inc.
+            © {new Date().getFullYear()} Sorabase, Inc.
             {" · "}
             <a href="#" className="hover:text-stone-600 dark:hover:text-stone-300 transition-colors">
               Privacy
@@ -64,7 +64,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="flex items-center gap-3 mb-auto">
             <div className="h-px w-8 bg-aubergine-700" />
             <span className="text-[10px] font-semibold tracking-[0.18em] uppercase text-stone-600">
-              SoraBase
+              Sorabase
             </span>
           </div>
 
@@ -84,7 +84,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <span className="text-aubergine-900/80">doesn&apos;t.</span>
             </h2>
             <p className="mt-8 text-[13px] text-stone-500 leading-relaxed max-w-xs">
-              SoraBase extracts structured, confidence-scored data from every call —
+              Sorabase extracts structured, confidence-scored data from every call —
               automatically, every time.
             </p>
           </div>

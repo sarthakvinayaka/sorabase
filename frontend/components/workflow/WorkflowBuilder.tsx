@@ -46,7 +46,7 @@ export default function WorkflowBuilder() {
       }
     } else if (sourceData.inputMode === "browser_capture") {
       if (!sourceData.captureConversationId) {
-        appendLog("Browser capture not complete. Start a recording via the SoraBase Capture extension.", "error");
+        appendLog("Browser capture not complete. Start a recording via the Sorabase Capture extension.", "error");
         return;
       }
     } else if (!sourceData.transcript.trim()) {
