@@ -116,17 +116,22 @@ function createPanel() {
 
   // Critical: auto-approve getDisplayMedia with loopback system audio.
   // This is the Granola trick — no picker dialog, always captures system output.
-  panelWin.webContents.setDisplayMediaRequestHandler(async (_req, callback) => {
-    const sources = await desktopCapturer.getSources({ types: ["screen"] });
-    callback({
-      video: sources[0],  // required even though we discard the video track
-      audio: "loopback",  // ← ScreenCaptureKit (macOS 13+) / WASAPI loopback (Windows)
-    });
-  });
-
-  panelWin.loadFile(
-    path.join(__dirname, "../src/renderer/panel.html"),
+  // setDisplayMediaRequestHandler lives on Session, not WebContents.
+  panelWin.webContents.session.setDisplayMediaRequestHandler(
+    async (
+      _req: Electron.DisplayMediaRequestHandlerHandlerRequest,
+      callback: (streams: Electron.Streams) => void,
+    ) => {
+      const sources = await desktopCapturer.getSources({ types: ["screen"] });
+      callback({
+        video: sources[0],  // required even though we discard the video track
+        audio: "loopback",  // ← ScreenCaptureKit (macOS 13+) / WASAPI loopback (Windows)
+      });
+    },
   );
+
+  // panel.html is copied to dist/renderer/ by esbuild.config.mjs
+  panelWin.loadFile(path.join(__dirname, "renderer/panel.html"));
 
   if (isDev) panelWin.webContents.openDevTools({ mode: "detach" });
 
@@ -190,7 +195,7 @@ function showAuthWindow() {
 
   authWin.loadURL(`${SORABASE_URL}/signin`);
 
-  authWin.webContents.on("did-navigate", (_, url) => {
+  authWin.webContents.on("did-navigate", (_: Electron.Event, url: string) => {
     // Sign-in redirects away from /signin — treat as authenticated
     if (
       !url.includes("/signin") &&
@@ -225,7 +230,7 @@ ipcMain.handle("auth:logout", async () => {
   return { ok: true };
 });
 
-ipcMain.handle("capture:start", (_event, opts: { mode: string; label: string }) => {
+ipcMain.handle("capture:start", (_event: Electron.IpcMainInvokeEvent, opts: { mode: string; label: string }) => {
   audioChunks.length = 0;
   isRecording = true;
   captureMode = opts.mode || "general";
@@ -235,7 +240,7 @@ ipcMain.handle("capture:start", (_event, opts: { mode: string; label: string }) 
   return { ok: true };
 });
 
-ipcMain.on("capture:chunk", (_event, b64: string) => {
+ipcMain.on("capture:chunk", (_event: Electron.IpcMainEvent, b64: string) => {
   if (b64) audioChunks.push(b64);
 });
 
@@ -298,9 +303,9 @@ function checkAuth(): Promise<{ authenticated: boolean; user?: { id: string; ema
       session: ses,
     });
 
-    req.on("response", (res) => {
+    req.on("response", (res: Electron.IncomingMessage) => {
       let raw = "";
-      res.on("data", (chunk) => (raw += chunk));
+      res.on("data", (chunk: Buffer) => (raw += chunk));
       res.on("end", () => {
         try {
           resolve(JSON.parse(raw));
@@ -370,9 +375,9 @@ function assembleAndUpload(
     req.setHeader("Content-Type", `multipart/form-data; boundary=${boundary}`);
     req.setHeader("Content-Length", String(body.length));
 
-    req.on("response", (res) => {
+    req.on("response", (res: Electron.IncomingMessage) => {
       let raw = "";
-      res.on("data", (chunk) => (raw += chunk));
+      res.on("data", (chunk: Buffer) => (raw += chunk));
       res.on("end", () => {
         if ((res.statusCode ?? 0) >= 200 && (res.statusCode ?? 0) < 300) {
           try {
@@ -397,7 +402,7 @@ function assembleAndUpload(
       });
     });
 
-    req.on("error", (err) => reject(err));
+    req.on("error", (err: Error) => reject(err));
     req.write(body);
     req.end();
   });

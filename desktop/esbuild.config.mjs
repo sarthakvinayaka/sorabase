@@ -12,6 +12,7 @@
  */
 
 import * as esbuild from "esbuild";
+import { copyFileSync, mkdirSync } from "fs";
 
 const watch = process.argv.includes("--watch");
 
@@ -54,12 +55,19 @@ const rendererCtx = await esbuild.context({
   format: "iife",
 });
 
+// Copy panel.html into dist/renderer/ so it lives next to panel.js
+function copyHtml() {
+  mkdirSync("dist/renderer", { recursive: true });
+  copyFileSync("src/renderer/panel.html", "dist/renderer/panel.html");
+}
+
 if (watch) {
   await Promise.all([
     mainCtx.watch(),
     preloadCtx.watch(),
     rendererCtx.watch(),
   ]);
+  copyHtml();
   console.log("Watching for changes…");
 } else {
   await Promise.all([
@@ -67,6 +75,7 @@ if (watch) {
     preloadCtx.rebuild(),
     rendererCtx.rebuild(),
   ]);
+  copyHtml();
   await Promise.all([
     mainCtx.dispose(),
     preloadCtx.dispose(),

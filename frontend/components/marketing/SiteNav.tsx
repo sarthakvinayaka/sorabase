@@ -55,6 +55,7 @@ export default function SiteNav() {
           <NavLink href="/#how-it-works" current={pathname}>How it works</NavLink>
           <NavLink href="/#modes"        current={pathname}>For teams</NavLink>
           <NavLink href="/pricing"       current={pathname}>Pricing</NavLink>
+          <NavLink href="/desktop"       current={pathname}>Desktop app</NavLink>
         </nav>
 
         {/* ── Desktop right side ────────────────────────────────────────── */}
@@ -102,6 +103,7 @@ export default function SiteNav() {
             <MobileNavLink href="/#how-it-works">How it works</MobileNavLink>
             <MobileNavLink href="/#modes">For teams</MobileNavLink>
             <MobileNavLink href="/pricing">Pricing</MobileNavLink>
+            <MobileNavLink href="/desktop">Desktop app</MobileNavLink>
           </nav>
           <div className="flex flex-col gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
             {!user && (

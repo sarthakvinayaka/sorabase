@@ -1,0 +1,151 @@
+name: Desktop Release
+
+# Trigger: push a tag like "desktop-v0.1.0"
+# Manual trigger also available from the Actions tab.
+on:
+  push:
+    tags:
+      - "desktop-v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version number (e.g. 0.2.0) — updates package.json and tags the release"
+        required: true
+        default: ""
+
+permissions:
+  contents: write   # needed to create GitHub Releases and upload assets
+
+jobs:
+  # ── macOS build (.dmg universal: arm64 + x64) ──────────────────────────────
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Install dependencies
+        working-directory: desktop
+        run: npm ci
+
+      - name: Build TypeScript
+        working-directory: desktop
+        run: npm run build
+
+      - name: Package macOS DMG
+        working-directory: desktop
+        run: npm run dist:mac
+        env:
+          # Set these in GitHub repo → Settings → Secrets for notarisation.
+          # Without them the app still builds — users see "unidentified developer"
+          # and can open it via System Settings → Privacy → Open Anyway.
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CSC_LINK: ${{ secrets.MAC_CERTS }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTS_PASSWORD }}
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sorabase-mac
+          path: desktop/release/*.dmg
+
+  # ── Windows build (.exe NSIS installer) ────────────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: desktop/package-lock.json
+
+      - name: Install dependencies
+        working-directory: desktop
+        run: npm ci
+
+      - name: Build TypeScript
+        working-directory: desktop
+        run: npm run build
+
+      - name: Package Windows installer
+        working-directory: desktop
+        run: npm run dist:win
+        env:
+          CSC_LINK: ${{ secrets.WIN_CERTS }}
+          CSC_KEY_PASSWORD: ${{ secrets.WIN_CERTS_PASSWORD }}
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sorabase-windows
+          path: desktop/release/*.exe
+
+  # ── Create GitHub Release and attach both binaries ─────────────────────────
+  publish:
+    needs: [build-mac, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sorabase-mac
+          path: artifacts/mac
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sorabase-windows
+          path: artifacts/win
+
+      - name: Get version from tag or input
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF_NAME#desktop-v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name || format('desktop-v{0}', steps.version.outputs.version) }}
+          name: "Sorabase Desktop v${{ steps.version.outputs.version }}"
+          body: |
+            ## Sorabase Desktop v${{ steps.version.outputs.version }}
+
+            Granola-style system audio capture — no meeting bot required.
+            Captures whatever plays through your speakers using ScreenCaptureKit (macOS) or WASAPI loopback (Windows).
+
+            ### Install
+
+            **macOS (Apple Silicon + Intel)**
+            1. Download `Sorabase-${{ steps.version.outputs.version }}-arm64.dmg` (M1/M2/M3) or the `x64` version (Intel)
+            2. Open the DMG, drag Sorabase to Applications
+            3. First launch: right-click → Open to bypass Gatekeeper (unsigned build)
+            4. Grant Screen Recording permission when prompted
+
+            **Windows**
+            1. Download `Sorabase-Setup-${{ steps.version.outputs.version }}.exe`
+            2. Run the installer — it installs to your user profile (no admin required)
+
+            ### Requirements
+            - macOS 13 Ventura or later (ScreenCaptureKit)
+            - Windows 10 or later (WASAPI loopback)
+            - A Sorabase account at sorabase.org
+          files: |
+            artifacts/mac/*.dmg
+            artifacts/win/*.exe
+          draft: false
+          prerelease: false

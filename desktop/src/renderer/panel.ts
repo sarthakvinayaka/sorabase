@@ -11,6 +11,8 @@
  * as a base64 string. Main assembles them and POSTs to Sorabase.
  */
 
+export {}; // make this file a module so declare global is valid
+
 declare global {
   interface Window {
     sorabase: {
@@ -208,8 +210,7 @@ async function startCapture() {
     // We request a minimal video track to satisfy the API contract; it gets discarded.
     stream = await navigator.mediaDevices.getDisplayMedia({
       video: {
-        // @ts-expect-error — Electron/Chromium-specific constraint
-        frameRate: { ideal: 1, max: 1 },
+        frameRate: { ideal: 1, max: 1 } as MediaTrackConstraints["frameRate"],
         width: { ideal: 1 },
         height: { ideal: 1 },
       },

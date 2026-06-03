@@ -7,13 +7,72 @@
   "scripts": {
     "build": "node esbuild.config.mjs",
     "start": "npm run build && electron .",
-    "dev": "node esbuild.config.mjs && electron . --dev"
+    "dev": "node esbuild.config.mjs && electron . --dev",
+    "dist:mac": "npm run build && electron-builder --mac --publish never",
+    "dist:win": "npm run build && electron-builder --win --publish never",
+    "dist:all": "npm run build && electron-builder --mac --win --publish never",
+    "release": "npm run build && electron-builder --publish always"
+  },
+  "build": {
+    "appId": "org.sorabase.desktop",
+    "productName": "Sorabase",
+    "copyright": "Copyright © 2025 Sorabase",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/tray-template.png",
+      "assets/tray-rec-template.png",
+      "src/renderer/panel.html",
+      "package.json"
+    ],
+    "extraMetadata": {
+      "main": "dist/main.js"
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["arm64", "x64"] }
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.icns",
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "installerIcon": "assets/icon.ico",
+      "shortcutName": "Sorabase"
+    },
+    "dmg": {
+      "title": "Install Sorabase",
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "sarthakvinayaka",
+      "repo": "sorabase"
+    }
   },
   "dependencies": {
     "electron": "^29.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "electron-builder": "^25.0.0",
     "esbuild": "^0.20.0",
     "typescript": "^5.4.0"
   }
