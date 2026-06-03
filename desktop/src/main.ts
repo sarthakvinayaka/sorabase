@@ -114,8 +114,8 @@ function setTrayRecording(recording: boolean) {
 
 function createPanel() {
   panelWin = new BrowserWindow({
-    width: 320,
-    height: 520,
+    width: 340,
+    height: 540,
     frame: false,
     resizable: false,
     alwaysOnTop: true,
@@ -203,26 +203,36 @@ function showAuthWindow() {
   }
 
   authWin = new BrowserWindow({
-    width: 520,
-    height: 680,
+    width: 460,
+    height: 620,
     title: "Sign in to Sorabase",
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
     webPreferences: {
       partition: "persist:sorabase",
     },
   });
 
-  authWin.loadURL(`${SORABASE_URL}/signin`);
-
-  authWin.webContents.on("did-navigate", (_: Electron.Event, url: string) => {
-    if (
-      !url.includes("/signin") &&
-      !url.includes("/signup") &&
-      url.startsWith(SORABASE_URL)
-    ) {
+  // Prevent auth window from navigating away to the main app.
+  // Any navigation away from /signin or /signup means auth completed.
+  function onNavigate(_: Electron.Event, url: string) {
+    const isAuthPage = url.includes("/signin") || url.includes("/signup") || url.includes("/api/auth");
+    if (!isAuthPage) {
+      // Strip event listeners so close doesn't re-trigger
+      authWin?.webContents.removeListener("did-navigate", onNavigate);
+      authWin?.webContents.removeListener("did-navigate-in-page", onNavigate);
       authWin?.close();
+      // Re-check auth and bring the capture panel forward
       panelWin?.webContents.send("auth:signed-in");
+      setTimeout(() => showPanel(), 300);
     }
-  });
+  }
+
+  authWin.webContents.on("did-navigate", onNavigate);
+  authWin.webContents.on("did-navigate-in-page", onNavigate);
+
+  authWin.loadURL(`${SORABASE_URL}/signin`);
 
   authWin.on("closed", () => {
     authWin = null;
