@@ -129,18 +129,26 @@ function createPanel() {
     },
   });
 
-  // Critical: auto-approve getDisplayMedia with loopback system audio.
-  // setDisplayMediaRequestHandler lives on Session, not WebContents.
+  // Auto-approve getDisplayMedia with system audio loopback.
+  // desktopCapturer.getSources() returns [] when Screen Recording permission
+  // is not yet granted — passing undefined to callback crashes Electron,
+  // so we guard and let the renderer handle NotFoundError gracefully.
   panelWin.webContents.session.setDisplayMediaRequestHandler(
     async (
       _req: Electron.DisplayMediaRequestHandlerHandlerRequest,
       callback: (streams: Electron.Streams) => void,
     ) => {
-      const sources = await desktopCapturer.getSources({ types: ["screen"] });
-      callback({
-        video: sources[0],
-        audio: "loopback",
-      });
+      try {
+        const sources = await desktopCapturer.getSources({ types: ["screen"] });
+        if (!sources || sources.length === 0) {
+          // No permission yet — returning empty triggers NotFoundError in renderer
+          callback({} as Electron.Streams);
+          return;
+        }
+        callback({ video: sources[0], audio: "loopback" });
+      } catch {
+        callback({} as Electron.Streams);
+      }
     },
   );
 
