@@ -214,19 +214,20 @@ function showAuthWindow() {
     },
   });
 
-  // Close auth window once the user has signed in and been redirected
-  // away from all auth pages. Use did-navigate only (not did-navigate-in-page
-  // which fires on Next.js client-side transitions within the signin page itself).
-  authWin.webContents.on("did-navigate", (_: Electron.Event, url: string) => {
+  // After each navigation, hit the session endpoint to see if auth completed.
+  // This is more reliable than guessing from the URL, which varies across
+  // Next.js versions, OAuth providers, and middleware configurations.
+  authWin.webContents.on("did-navigate", async (_: Electron.Event, url: string) => {
     if (!url || url.startsWith("data:") || url.startsWith("about:")) return;
-    const isAuthPage =
-      url.includes("/signin") ||
-      url.includes("/signup") ||
-      url.includes("/api/auth");
-    if (!isAuthPage) {
-      authWin?.close();
-      panelWin?.webContents.send("auth:signed-in");
-      setTimeout(() => showPanel(), 300);
+    try {
+      const result = await checkAuth();
+      if (result.authenticated) {
+        authWin?.close();
+        panelWin?.webContents.send("auth:signed-in");
+        setTimeout(() => showPanel(), 300);
+      }
+    } catch {
+      // keep window open on error
     }
   });
 
