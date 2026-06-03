@@ -1,0 +1,20 @@
+{
+  "name": "sorabase-desktop",
+  "productName": "Sorabase",
+  "version": "0.1.0",
+  "description": "Capture meeting audio without a bot — Granola-style system audio capture",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "start": "npm run build && electron .",
+    "dev": "node esbuild.config.mjs && electron . --dev"
+  },
+  "dependencies": {
+    "electron": "^29.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.4.0"
+  }
+}

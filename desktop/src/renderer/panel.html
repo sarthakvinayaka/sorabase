@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sorabase Capture</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --aubergine:      #5e3848;
+      --aubergine-dark: #3a1828;
+      --aubergine-lite: #f5eef1;
+      --stone-50:  #fafaf9;
+      --stone-100: #f5f5f4;
+      --stone-200: #e7e5e4;
+      --stone-400: #a8a29e;
+      --stone-500: #78716c;
+      --stone-700: #44403c;
+      --stone-900: #1c1917;
+      --red:   #dc2626;
+      --amber: #d97706;
+      --green: #16a34a;
+      --radius: 10px;
+    }
+
+    html, body {
+      width: 320px;
+      background: var(--stone-50);
+      color: var(--stone-900);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      user-select: none;
+      -webkit-app-region: no-drag;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    /* ── drag handle ── */
+    .titlebar {
+      -webkit-app-region: drag;
+      height: 8px;
+      background: var(--stone-100);
+      border-bottom: 1px solid var(--stone-200);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .panel { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+    /* ── header ── */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-size: 14px; font-weight: 700; color: var(--aubergine);
+      letter-spacing: -0.01em;
+    }
+    .logo span { font-weight: 400; color: var(--stone-500); }
+    .user-pill {
+      display: flex; align-items: center; gap-: 6px;
+      background: var(--stone-100); border: 1px solid var(--stone-200);
+      border-radius: 99px; padding: 3px 10px 3px 8px;
+      font-size: 11px; color: var(--stone-500);
+      cursor: pointer;
+      gap: 5px;
+    }
+    .user-pill:hover { background: var(--stone-200); }
+    .user-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); flex-shrink: 0;
+    }
+    .user-dot.offline { background: var(--stone-400); }
+
+    /* ── views ── */
+    .view { display: none; flex-direction: column; gap: 14px; }
+    .view.active { display: flex; }
+
+    /* ── permission warning ── */
+    .warning-box {
+      background: #fffbeb; border: 1px solid #fde68a;
+      border-radius: 8px; padding: 10px 12px;
+      font-size: 11px; color: #92400e; line-height: 1.5;
+    }
+    .warning-box strong { display: block; margin-bottom: 2px; }
+
+    /* ── auth view ── */
+    .auth-message {
+      text-align: center; color: var(--stone-500); font-size: 12px;
+      line-height: 1.6; padding: 8px 0;
+    }
+    .auth-message strong { display: block; color: var(--stone-700); margin-bottom: 4px; }
+
+    /* ── mode selector ── */
+    .section-label {
+      font-size: 11px; font-weight: 600; color: var(--stone-500);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
+    }
+    .mode-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .mode-btn {
+      border: 1.5px solid var(--stone-200); border-radius: 8px;
+      background: white; padding: 8px 6px; text-align: center;
+      cursor: pointer; transition: border-color .15s, background .15s;
+      font-size: 11px; color: var(--stone-700); line-height: 1.3;
+    }
+    .mode-btn:hover { border-color: var(--stone-400); }
+    .mode-btn.selected {
+      border-color: var(--aubergine); background: var(--aubergine-lite);
+      color: var(--aubergine-dark);
+    }
+    .mode-btn .mode-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+
+    /* ── label input ── */
+    .field label {
+      display: block; font-size: 11px; font-weight: 600;
+      color: var(--stone-500); margin-bottom: 5px;
+    }
+    input[type="text"] {
+      width: 100%; border: 1.5px solid var(--stone-200); border-radius: 8px;
+      padding: 7px 10px; font-size: 12px; color: var(--stone-900);
+      background: white; outline: none; transition: border-color .15s;
+    }
+    input[type="text"]:focus { border-color: var(--aubergine); }
+    input[type="text"]::placeholder { color: var(--stone-400); }
+
+    /* ── buttons ── */
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; transition: background .15s, opacity .15s;
+      width: 100%;
+    }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-primary { background: var(--aubergine); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--aubergine-dark); }
+    .btn-danger  { background: var(--red);       color: white; }
+    .btn-danger:hover:not(:disabled)  { background: #b91c1c; }
+    .btn-ghost {
+      background: white; color: var(--stone-700);
+      border: 1.5px solid var(--stone-200);
+    }
+    .btn-ghost:hover:not(:disabled) { background: var(--stone-100); }
+
+    /* ── recording view ── */
+    .rec-indicator {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 18px 0 14px;
+    }
+    .rec-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--red); animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(.85); }
+    }
+    .rec-timer { font-size: 28px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+    .rec-label  { font-size: 11px; color: var(--stone-500); text-align: center; margin-top: -6px; }
+
+    .btn-row { display: flex; gap: 8px; }
+    .btn-row .btn { flex: 1; }
+
+    /* ── upload / done / error ── */
+    .status-box {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 10px; padding: 20px 0; text-align: center;
+    }
+    .status-icon { font-size: 36px; }
+    .status-title { font-size: 14px; font-weight: 700; color: var(--stone-900); }
+    .status-sub   { font-size: 12px; color: var(--stone-500); line-height: 1.5; }
+    .spinner {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 3px solid var(--stone-200); border-top-color: var(--aubergine);
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="titlebar"></div>
+  <div class="panel">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">Sorabase <span>Capture</span></div>
+      <div class="user-pill" id="user-pill">
+        <span class="user-dot offline" id="user-dot"></span>
+        <span id="user-label">…</span>
+      </div>
+    </div>
+
+    <!-- View: checking auth -->
+    <div class="view active" id="view-checking">
+      <div class="status-box">
+        <div class="spinner"></div>
+        <div class="status-sub">Checking session…</div>
+      </div>
+    </div>
+
+    <!-- View: not signed in -->
+    <div class="view" id="view-auth">
+      <div class="auth-message">
+        <strong>Sign in to start capturing</strong>
+        Sign in to your Sorabase account to record meetings without a bot.
+      </div>
+      <button class="btn btn-primary" id="btn-login">Sign in to Sorabase</button>
+    </div>
+
+    <!-- View: permission needed -->
+    <div class="view" id="view-permission">
+      <div class="warning-box">
+        <strong>Screen Recording permission needed</strong>
+        Open System Settings → Privacy &amp; Security → Screen &amp; System Audio Recording and enable Sorabase.
+      </div>
+      <button class="btn btn-ghost" id="btn-open-settings">Open System Settings</button>
+      <button class="btn btn-primary" id="btn-recheck-permission">I've granted access — retry</button>
+    </div>
+
+    <!-- View: idle / config -->
+    <div class="view" id="view-idle">
+      <div>
+        <div class="section-label">Mode</div>
+        <div class="mode-grid">
+          <button class="mode-btn selected" data-mode="general">
+            <span class="mode-icon">📝</span>General
+          </button>
+          <button class="mode-btn" data-mode="recruiting">
+            <span class="mode-icon">🧑‍💼</span>Recruiter
+          </button>
+          <button class="mode-btn" data-mode="study">
+            <span class="mode-icon">📚</span>Study
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="session-label">Label <span style="font-weight:400;color:var(--stone-400)">(optional)</span></label>
+        <input type="text" id="session-label" placeholder="e.g. Interview — Jane Doe" />
+      </div>
+
+      <button class="btn btn-primary" id="btn-start">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>
+        Start capture
+      </button>
+    </div>
+
+    <!-- View: recording -->
+    <div class="view" id="view-recording">
+      <div class="rec-indicator">
+        <div class="rec-dot"></div>
+        <div class="rec-timer" id="rec-timer">0:00</div>
+      </div>
+      <div class="rec-label" id="rec-mode-label">General mode</div>
+      <div class="btn-row">
+        <button class="btn btn-danger" id="btn-stop">Stop &amp; process</button>
+        <button class="btn btn-ghost" id="btn-cancel">Cancel</button>
+      </div>
+    </div>
+
+    <!-- View: uploading -->
+    <div class="view" id="view-uploading">
+      <div class="status-box">
+        <div class="spinner"></div>
+        <div class="status-title">Transcribing…</div>
+        <div class="status-sub">Sending to Whisper. This takes about 30–60 s.</div>
+      </div>
+    </div>
+
+    <!-- View: done -->
+    <div class="view" id="view-done">
+      <div class="status-box">
+        <div class="status-icon">✅</div>
+        <div class="status-title">Done</div>
+        <div class="status-sub">Opening Sorabase in your browser…</div>
+      </div>
+      <button class="btn btn-ghost" id="btn-new">Capture another</button>
+    </div>
+
+    <!-- View: error -->
+    <div class="view" id="view-error">
+      <div class="status-box">
+        <div class="status-icon">⚠️</div>
+        <div class="status-title">Something went wrong</div>
+        <div class="status-sub" id="error-message"></div>
+      </div>
+      <button class="btn btn-ghost" id="btn-retry">Try again</button>
+    </div>
+
+  </div>
+  <script src="../../dist/renderer/panel.js"></script>
+</body>
+</html>
