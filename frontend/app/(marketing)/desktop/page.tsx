@@ -20,12 +20,16 @@ export default function DesktopPage() {
 
       {/* ── Hero ── */}
       <section className="max-w-3xl mx-auto px-6 pt-20 pb-12 text-center">
-        {/* App icon */}
-        <div
-          className="w-20 h-20 rounded-[22px] mx-auto mb-8 flex items-center justify-center text-white font-bold text-3xl shadow-lg"
-          style={{ background: "#5e3848" }}
-        >
-          S
+        {/* App icon — matches the installed .icns */}
+        <div className="w-20 h-20 rounded-[22px] mx-auto mb-8 shadow-lg overflow-hidden">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <rect width="100" height="100" rx="20" fill="#0C1221"/>
+            <path d="M14 50 C19 50 19 39 24 39 C29 39 29 61 34 61 C39 61 43 32 47 27 C50 23 52 42 56 44"
+              stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+            <line x1="56" y1="33" x2="86" y2="33" stroke="white" strokeWidth="6" strokeLinecap="round"/>
+            <line x1="56" y1="44" x2="86" y2="44" stroke="white" strokeWidth="6" strokeLinecap="round"/>
+            <line x1="56" y1="55" x2="86" y2="55" stroke="white" strokeWidth="6" strokeLinecap="round"/>
+          </svg>
         </div>
 
         <div className="inline-flex items-center gap-2 rounded-full border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/30 px-4 py-1.5 mb-6">

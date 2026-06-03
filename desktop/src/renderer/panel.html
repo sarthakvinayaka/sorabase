@@ -52,9 +52,10 @@
       display: flex; align-items: center; justify-content: space-between;
     }
     .logo {
-      font-size: 14px; font-weight: 700; color: var(--aubergine);
-      letter-spacing: -0.01em;
+      font-size: 14px; font-weight: 700; color: var(--stone-900);
+      letter-spacing: -0.01em; display: flex; align-items: center; gap: 7px;
     }
+    .logo svg { flex-shrink: 0; }
     .logo span { font-weight: 400; color: var(--stone-500); }
     .user-pill {
       display: flex; align-items: center; gap-: 6px;
@@ -199,7 +200,17 @@
 
     <!-- Header -->
     <div class="header">
-      <div class="logo">Sorabase <span>Capture</span></div>
+      <div class="logo">
+        <!-- Sorabase waveform mark (matches website logo) -->
+        <svg width="22" height="13" viewBox="8 17 84 50" fill="none" aria-hidden="true">
+          <path d="M14 50 C19 50 19 39 24 39 C29 39 29 61 34 61 C39 61 43 32 47 27 C50 23 52 42 56 44"
+            stroke="#0C1221" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="56" y1="33" x2="86" y2="33" stroke="#0C1221" stroke-width="6" stroke-linecap="round"/>
+          <line x1="56" y1="44" x2="86" y2="44" stroke="#0C1221" stroke-width="6" stroke-linecap="round"/>
+          <line x1="56" y1="55" x2="86" y2="55" stroke="#0C1221" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+        Sorabase <span>Capture</span>
+      </div>
       <div class="user-pill" id="user-pill">
         <span class="user-dot offline" id="user-dot"></span>
         <span id="user-label">…</span>
