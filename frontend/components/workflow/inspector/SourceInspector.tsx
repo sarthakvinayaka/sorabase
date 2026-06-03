@@ -35,6 +35,11 @@ const MODES: { value: SourceInputMode; label: string; hint: string }[] = [
     label: "Zoom cloud recording",
     hint:  "Pull in a completed cloud recording from Zoom after the meeting ends.",
   },
+  {
+    value: "desktop_capture",
+    label: "Desktop capture",
+    hint:  "Record with the Sorabase Desktop app — captures system audio directly, no bot needed. Works with native Zoom, Teams, Meet, or any app.",
+  },
 ];
 
 export default function SourceInspector({ id, data }: Props) {
@@ -129,6 +134,11 @@ export default function SourceInspector({ id, data }: Props) {
           <ZoomPicker id={id} data={data} update={update} />
           <AutoSessionsPanel />
         </>
+      )}
+
+      {/* Desktop capture */}
+      {data.inputMode === "desktop_capture" && (
+        <DesktopCapturePanel id={id} data={data} update={update} mode={mode} />
       )}
 
       {/* Reference field — shown for all transcript modes */}
@@ -687,6 +697,190 @@ function AutoSessionsPanel() {
         })}
       </div>
     </Field>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Desktop capture panel
+// ---------------------------------------------------------------------------
+
+interface DesktopCapturePanelProps {
+  id: string;
+  data: SourceNodeData;
+  update: (id: string, patch: Partial<Record<string, unknown>>) => void;
+  mode: string;
+}
+
+function DesktopCapturePanel({ id, data, update, mode }: DesktopCapturePanelProps) {
+  const isGeneral = mode === "general";
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState("");
+
+  const load = useCallback(() => {
+    setLoading(true);
+    setError("");
+    // Desktop app creates conversations with source_type "desktop_audio" or "desktop_live_capture"
+    Promise.all([
+      listConversations({ source_type: "desktop_audio",        transcript_status: "ready", limit: 15 }),
+      listConversations({ source_type: "desktop_live_capture", transcript_status: "ready", limit: 15 }),
+    ])
+      .then(([a, b]) => {
+        const merged = [...a, ...b].sort(
+          (x, y) => new Date(y.created_at).getTime() - new Date(x.created_at).getTime(),
+        );
+        setConversations(merged.slice(0, 20));
+      })
+      .catch(() => setError("Failed to load captures. Is the backend running?"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  function handleSelect(conv: ConversationSummary) {
+    const meta = (conv.source_metadata ?? {}) as Record<string, unknown>;
+    update(id, {
+      desktopConversationId: conv.id,
+      desktopLabel:          String(meta.label ?? meta.job_reference ?? "Desktop capture"),
+      desktopCreatedAt:      conv.created_at,
+      desktopCharCount:      conv.char_count ?? 0,
+      conversationId:        conv.id,
+      status:                "configured",
+    });
+  }
+
+  function handleClear() {
+    update(id, {
+      desktopConversationId: undefined,
+      desktopLabel:          undefined,
+      desktopCreatedAt:      undefined,
+      desktopCharCount:      undefined,
+      conversationId:        undefined,
+      status:                "idle",
+    });
+  }
+
+  // Selected
+  if (data.desktopConversationId) {
+    return (
+      <Field label="Desktop capture">
+        <div className="rounded-lg border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/20 px-3 py-2.5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-aubergine-800 dark:text-aubergine-300 truncate">
+                {data.desktopLabel || "Desktop capture"}
+              </p>
+              <p className="text-[10px] text-aubergine-600 dark:text-aubergine-500 mt-0.5">
+                {data.desktopCharCount ? `${data.desktopCharCount.toLocaleString()} chars · ` : ""}
+                {data.desktopCreatedAt
+                  ? new Date(data.desktopCreatedAt).toLocaleDateString(undefined, {
+                      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+                    })
+                  : ""}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-[10px] font-medium text-aubergine-600 hover:text-aubergine-800 dark:hover:text-aubergine-300 flex-shrink-0 mt-0.5"
+            >
+              Change
+            </button>
+          </div>
+        </div>
+        <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-1.5">
+          Transcript ready — click Run to extract through the {isGeneral ? "General" : "Recruiting"} workflow.
+        </p>
+      </Field>
+    );
+  }
+
+  return (
+    <>
+      {/* How-to banner */}
+      <Field label="Desktop capture">
+        <div className="rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 px-3 py-3">
+          <p className="text-[11px] font-semibold text-stone-700 dark:text-stone-300 mb-1">How to use</p>
+          <ol className="space-y-1.5 text-[10px] text-stone-500 dark:text-stone-400 leading-relaxed list-decimal list-inside">
+            <li>Open the <strong className="font-medium text-stone-700 dark:text-stone-300">Sorabase Desktop</strong> app (waveform icon in menu bar)</li>
+            <li>Select <strong className="font-medium text-stone-700 dark:text-stone-300">{isGeneral ? "General" : "Recruiter"}</strong> mode and click <strong className="font-medium text-stone-700 dark:text-stone-300">Start capture</strong></li>
+            <li>Join your meeting normally — no bot joins</li>
+            <li>Click <strong className="font-medium text-stone-700 dark:text-stone-300">Stop &amp; process</strong> when done</li>
+            <li>Come back here and select the capture below</li>
+          </ol>
+          <a
+            href="/desktop"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-2.5 text-[10px] font-medium text-aubergine-800 dark:text-aubergine-400 hover:underline"
+          >
+            Download Sorabase Desktop →
+          </a>
+        </div>
+      </Field>
+
+      {/* Recent captures list */}
+      <Field label="Recent captures">
+        <div className="flex items-center justify-between mb-1.5">
+          <p className="text-[10px] text-stone-400 dark:text-stone-500">Select a completed capture</p>
+          <button
+            type="button"
+            onClick={load}
+            disabled={loading}
+            className="text-[10px] font-medium text-aubergine-800 hover:text-aubergine-900 disabled:opacity-40"
+          >
+            {loading ? "Loading…" : "Refresh"}
+          </button>
+        </div>
+
+        {error && <p className="text-[10px] text-red-500 mb-2">{error}</p>}
+
+        {!loading && conversations.length === 0 && !error && (
+          <div className="rounded-lg border border-dashed border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 px-4 py-5 text-center">
+            <p className="text-xs font-medium text-stone-400 dark:text-stone-500">No desktop captures yet</p>
+            <p className="text-[10px] text-stone-300 dark:text-stone-600 mt-1 leading-relaxed">
+              Use the Sorabase Desktop app to record a meeting, then click Refresh.
+            </p>
+          </div>
+        )}
+
+        {conversations.length > 0 && (
+          <div className="rounded-lg border border-stone-200 dark:border-stone-700 overflow-hidden">
+            {conversations.map((conv, i) => {
+              const meta  = (conv.source_metadata ?? {}) as Record<string, unknown>;
+              const label = String(meta.label ?? meta.job_reference ?? "Desktop capture");
+              const date  = new Date(conv.created_at).toLocaleDateString(undefined, {
+                month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+              });
+              const src = conv.source_type === "desktop_live_capture" ? "Live" : "Audio";
+              return (
+                <button
+                  key={conv.id}
+                  type="button"
+                  onClick={() => handleSelect(conv)}
+                  className={[
+                    "w-full text-left px-3 py-2.5 hover:bg-stone-50 dark:hover:bg-stone-800/60 transition-colors",
+                    i > 0 ? "border-t border-stone-100 dark:border-stone-800" : "",
+                  ].join(" ")}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium text-stone-700 dark:text-stone-300 truncate">{label}</p>
+                      <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-0.5">{src} · {date}</p>
+                    </div>
+                    {conv.char_count && (
+                      <p className="text-[10px] font-mono text-stone-300 dark:text-stone-600 flex-shrink-0">
+                        {conv.char_count.toLocaleString()} ch
+                      </p>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </Field>
+    </>
   );
 }
 

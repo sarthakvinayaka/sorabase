@@ -16,7 +16,7 @@ export type WorkflowNodeType =
 export type NodeStatus = "idle" | "configured" | "running" | "completed" | "error";
 
 // Source
-export type SourceInputMode = "transcript_paste" | "audio_upload" | "zoom" | "zoom_bot" | "browser_capture";
+export type SourceInputMode = "transcript_paste" | "audio_upload" | "zoom" | "zoom_bot" | "browser_capture" | "desktop_capture";
 
 export interface SourceNodeData extends Record<string, unknown> {
   nodeType: "source";
@@ -45,6 +45,11 @@ export interface SourceNodeData extends Record<string, unknown> {
   captureLabel?: string;
   captureStatus?: "idle" | "recording" | "processing" | "done" | "error";
   captureError?: string;
+  // Desktop capture mode (Sorabase Desktop app)
+  desktopConversationId?: string;
+  desktopLabel?: string;
+  desktopCreatedAt?: string;
+  desktopCharCount?: number;
 }
 
 // Extraction
