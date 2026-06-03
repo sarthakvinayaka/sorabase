@@ -11,8 +11,8 @@ const GITHUB_RELEASES = "https://github.com/sarthakvinayaka/sorabase/releases";
 const LATEST_VERSION  = "0.1.0";
 
 const MAC_ARM_URL  = `${GITHUB_RELEASES}/download/desktop-v${LATEST_VERSION}/Sorabase-${LATEST_VERSION}-arm64.dmg`;
-const MAC_X64_URL  = `${GITHUB_RELEASES}/download/desktop-v${LATEST_VERSION}/Sorabase-${LATEST_VERSION}-x64.dmg`;
-const WIN_URL      = `${GITHUB_RELEASES}/download/desktop-v${LATEST_VERSION}/Sorabase-Setup-${LATEST_VERSION}.exe`;
+const MAC_X64_URL  = `${GITHUB_RELEASES}/download/desktop-v${LATEST_VERSION}/Sorabase-${LATEST_VERSION}.dmg`;
+const WIN_URL      = `${GITHUB_RELEASES}/download/desktop-v${LATEST_VERSION}/Sorabase.Setup.${LATEST_VERSION}.exe`;
 
 export default function DesktopPage() {
   return (
