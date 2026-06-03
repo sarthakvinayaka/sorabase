@@ -37,9 +37,7 @@
       ],
       "category": "public.app-category.productivity",
       "icon": "assets/icon.icns",
-      "entitlements": "assets/entitlements.mac.plist",
-      "entitlementsInherit": "assets/entitlements.mac.plist",
-      "hardenedRuntime": true,
+      "identity": null,
       "gatekeeperAssess": false
     },
     "win": {
