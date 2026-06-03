@@ -159,6 +159,24 @@
     .btn-row { display: flex; gap: 8px; }
     .btn-row .btn { flex: 1; }
 
+    /* ── live indicator badge ── */
+    .live-badge {
+      display: none; align-items: center; gap: 5px;
+      justify-content: center; font-size: 10px; font-weight: 600;
+      color: var(--green); letter-spacing: 0.04em;
+    }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+    /* ── live transcript ── */
+    .live-transcript-wrap {
+      border: 1px solid var(--stone-200); border-radius: 8px;
+      background: white; height: 90px; overflow-y: auto; padding: 8px 10px;
+    }
+    #live-transcript { display: flex; flex-direction: column; gap: 4px; }
+    .live-line { font-size: 11px; line-height: 1.5; color: var(--stone-700); }
+    .live-speaker { font-weight: 600; color: var(--aubergine); }
+    .live-placeholder { font-size: 11px; color: var(--stone-400); font-style: italic; }
+
     /* ── upload / done / error ── */
     .status-box {
       display: flex; flex-direction: column; align-items: center;
@@ -250,6 +268,17 @@
         <div class="rec-timer" id="rec-timer">0:00</div>
       </div>
       <div class="rec-label" id="rec-mode-label">General mode</div>
+
+      <!-- Live transcript (shown only when Deepgram key is available) -->
+      <div id="live-indicator" class="live-badge" style="display:none">
+        <span class="live-dot"></span>LIVE TRANSCRIPT
+      </div>
+      <div class="live-transcript-wrap" id="live-transcript-wrap" style="display:none">
+        <div id="live-transcript">
+          <p class="live-placeholder">Listening…</p>
+        </div>
+      </div>
+
       <div class="btn-row">
         <button class="btn btn-danger" id="btn-stop">Stop &amp; process</button>
         <button class="btn btn-ghost" id="btn-cancel">Cancel</button>

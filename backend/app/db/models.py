@@ -542,3 +542,53 @@ class StudyQuestion(Base):
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
     lecture = relationship("StudyLecture", back_populates="questions")
+
+
+# ---------------------------------------------------------------------------
+# Desktop Live Capture
+# ---------------------------------------------------------------------------
+
+class CaptureSession(Base):
+    """
+    Tracks a live desktop audio capture session.
+    Created when the desktop app starts recording. TranscriptChunks are
+    appended in real-time from Deepgram; the /complete endpoint joins them
+    into a Conversation for downstream workflow.
+    Falls back to source="desktop_upload" when Deepgram is unavailable
+    (audio is uploaded via the existing Whisper path instead).
+    """
+
+    __tablename__ = "capture_sessions"
+
+    id          = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    org_id      = Column(UUID(as_uuid=True), nullable=False)
+    mode        = Column(String(50),  nullable=False, default="general")     # general | recruiting | study
+    label       = Column(String(255), nullable=True)
+    status      = Column(String(50),  nullable=False, default="active")      # active | assembling | ready | failed
+    source      = Column(String(50),  nullable=False, default="desktop_live")  # desktop_live | desktop_upload
+    conversation_id = Column(UUID(as_uuid=True), ForeignKey("conversations.id"), nullable=True)
+    error_message   = Column(Text, nullable=True)
+    chunk_count     = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+    chunks = relationship(
+        "TranscriptChunk", back_populates="capture_session",
+        order_by="TranscriptChunk.seq",
+    )
+
+
+class TranscriptChunk(Base):
+    """One utterance streamed from Deepgram during a CaptureSession."""
+
+    __tablename__ = "transcript_chunks"
+
+    id                 = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    capture_session_id = Column(UUID(as_uuid=True), ForeignKey("capture_sessions.id"), nullable=False)
+    seq                = Column(Integer, nullable=False)       # insertion order
+    text               = Column(Text,    nullable=False)
+    speaker            = Column(String(100), nullable=True)    # diarization label e.g. "Speaker 0"
+    confidence         = Column(Float,   nullable=True)
+    created_at         = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+    capture_session = relationship("CaptureSession", back_populates="chunks")

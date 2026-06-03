@@ -1,31 +1,49 @@
 /**
  * Renderer — panel UI + audio capture
  *
- * The Granola-style capture works because main.ts installs
- * setDisplayMediaRequestHandler with audio:'loopback'. When we call
- * getDisplayMedia() here, Electron intercepts it and returns a system-audio
- * stream (ScreenCaptureKit on macOS 13+, WASAPI loopback on Windows) without
- * showing the OS screen-picker dialog to the user.
+ * Two paths depending on whether DEEPGRAM_API_KEY env var is set:
  *
- * MediaRecorder chunks the stream every 10 s and sends each chunk to main
- * as a base64 string. Main assembles them and POSTs to Sorabase.
+ * Live transcription (Deepgram key set):
+ *   getDisplayMedia → AudioContext → raw PCM → Deepgram WebSocket
+ *   → finalized utterances → IPC text-chunk → main → backend CaptureSession
+ *   → on Stop → IPC done-live → main → /api/extension/text-complete
+ *
+ * Audio upload (no Deepgram key):
+ *   getDisplayMedia → MediaRecorder → 10-second base64 chunks → IPC chunk → main
+ *   → on Stop → IPC done → main → /api/extension/upload → Whisper
  */
 
-export {}; // make this file a module so declare global is valid
+export {};
 
 declare global {
   interface Window {
     sorabase: {
-      checkAuth():         Promise<{ authenticated: boolean; user?: { id: string; email: string; name: string } }>;
-      login():             Promise<void>;
-      logout():            Promise<void>;
-      startCapture(o: { mode: string; label: string }): Promise<{ ok: boolean }>;
-      cancelCapture():     Promise<{ ok: boolean }>;
+      checkAuth(): Promise<{
+        authenticated: boolean;
+        user?: { id: string; email: string; name: string };
+      }>;
+      login(): Promise<void>;
+      logout(): Promise<void>;
+      startCapture(o: { mode: string; label: string; live?: boolean }): Promise<{
+        ok: boolean;
+        session_id?: string | null;
+      }>;
+      cancelCapture(): Promise<{ ok: boolean }>;
+      // Audio upload path
       sendChunk(b: string): void;
-      doneRecording():     void;
+      doneRecording(): void;
+      // Live transcription path
+      sendTextChunk(text: string, speaker?: string, confidence?: number): void;
+      doneRecordingLive(): void;
+      // Events from main
       onStatus(cb: (s: StatusPayload) => void): void;
       onAuthSignedIn(cb: () => void): void;
+      // OS permission
       screenPermission(): Promise<string>;
+      // Env vars
+      deepgramKey(): string | null;
+      sorabaseUrl(): string;
+      // Cleanup
       off(channel: string): void;
     };
   }
@@ -34,7 +52,7 @@ declare global {
 interface StatusPayload {
   state: "uploading" | "done" | "error";
   message?: string;
-  result?: { redirect_url?: string };
+  result?: { redirect_url?: string; conversation_id?: string; lecture_id?: string };
 }
 
 // ---------------------------------------------------------------------------
@@ -53,8 +71,17 @@ type ViewId =
 
 let currentView: ViewId = "checking";
 let selectedMode = "general";
+
+// Audio path (no Deepgram key)
 let mediaRecorder: MediaRecorder | null = null;
 let captureStream: MediaStream | null = null;
+
+// Live path (Deepgram key available)
+let deepgramWs: WebSocket | null = null;
+let audioCtx: AudioContext | null = null;
+let scriptProcessor: ScriptProcessorNode | null = null;
+let useLivePath = false;
+
 let timerInterval: ReturnType<typeof setInterval> | null = null;
 let startTime = 0;
 
@@ -74,7 +101,8 @@ function showView(id: ViewId) {
 }
 
 function setUserDisplay(email: string, online: boolean) {
-  $("user-label").textContent = email ? shortenEmail(email) : (online ? "Signed in" : "Not signed in");
+  $("user-label").textContent =
+    email ? shortenEmail(email) : online ? "Signed in" : "Not signed in";
   $<HTMLElement>("user-dot").className = `user-dot${online ? "" : " offline"}`;
 }
 
@@ -93,16 +121,12 @@ async function init() {
 }
 
 async function checkPermissionThenAuth() {
-  // On macOS, check Screen Recording permission before showing the idle view.
-  // On Windows, permission is not required upfront — it's implicit in the API call.
   const status = await window.sorabase.screenPermission();
-
   if (status === "denied") {
     showView("permission");
     setUserDisplay("", false);
     return;
   }
-
   await checkAuth();
 }
 
@@ -122,7 +146,6 @@ async function checkAuth() {
 // ---------------------------------------------------------------------------
 
 function setupListeners() {
-  // IPC events from main
   window.sorabase.onStatus((payload) => {
     if (payload.state === "uploading") {
       showView("uploading");
@@ -137,12 +160,8 @@ function setupListeners() {
     await checkAuth();
   });
 
-  // Auth view
-  $("btn-login").addEventListener("click", () => {
-    window.sorabase.login();
-  });
+  $("btn-login").addEventListener("click", () => window.sorabase.login());
 
-  // User pill — click to sign out when signed in, sign in when not
   $("user-pill").addEventListener("click", async () => {
     if (currentView === "auth") {
       window.sorabase.login();
@@ -153,10 +172,8 @@ function setupListeners() {
     }
   });
 
-  // Permission view
   $("btn-open-settings").addEventListener("click", () => {
-    // Open macOS System Settings directly to Screen Recording pane
-    const { shell } = window.require?.("electron") ?? {};
+    const { shell } = (window as unknown as { require?: (m: string) => { shell: { openExternal: (u: string) => void } } }).require?.("electron") ?? {};
     if (shell) {
       shell.openExternal(
         "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture",
@@ -169,45 +186,34 @@ function setupListeners() {
     await checkPermissionThenAuth();
   });
 
-  // Mode buttons
   document.querySelectorAll<HTMLButtonElement>(".mode-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document
-        .querySelectorAll(".mode-btn")
-        .forEach((b) => b.classList.remove("selected"));
+      document.querySelectorAll(".mode-btn").forEach((b) => b.classList.remove("selected"));
       btn.classList.add("selected");
       selectedMode = btn.dataset.mode ?? "general";
     });
   });
 
-  // Start capture
   $("btn-start").addEventListener("click", startCapture);
-
-  // Stop capture
   $("btn-stop").addEventListener("click", stopCapture);
-
-  // Cancel capture
   $("btn-cancel").addEventListener("click", cancelCapture);
-
-  // New session after done/error
   $("btn-new").addEventListener("click", () => showView("idle"));
   $("btn-retry").addEventListener("click", () => showView("idle"));
 }
 
 // ---------------------------------------------------------------------------
-// Capture
+// Capture — path selection
 // ---------------------------------------------------------------------------
 
 async function startCapture() {
   const label = $<HTMLInputElement>("session-label").value.trim();
-
   $<HTMLButtonElement>("btn-start").disabled = true;
+
+  const deepgramKey = window.sorabase.deepgramKey();
+  useLivePath = deepgramKey !== null && deepgramKey.length > 0;
 
   let stream: MediaStream;
   try {
-    // getDisplayMedia is intercepted by main's setDisplayMediaRequestHandler.
-    // audio:'loopback' is injected server-side — here we just declare we want audio.
-    // We request a minimal video track to satisfy the API contract; it gets discarded.
     stream = await navigator.mediaDevices.getDisplayMedia({
       video: {
         frameRate: { ideal: 1, max: 1 } as MediaTrackConstraints["frameRate"],
@@ -225,9 +231,8 @@ async function startCapture() {
   } catch (err: unknown) {
     $<HTMLButtonElement>("btn-start").disabled = false;
     const e = err as DOMException;
-    if (e.name === "NotAllowedError") return; // user cancelled — do nothing
+    if (e.name === "NotAllowedError") return;
     if (e.name === "NotFoundError" || e.name === "NotReadableError") {
-      // macOS permission not granted yet
       showView("permission");
       return;
     }
@@ -235,28 +240,170 @@ async function startCapture() {
     return;
   }
 
-  // Drop video — audio only
   stream.getVideoTracks().forEach((t) => t.stop());
-
   const audioTracks = stream.getAudioTracks();
+
   if (audioTracks.length === 0) {
     $<HTMLButtonElement>("btn-start").disabled = false;
     showError(
       "No system audio track was returned. " +
-      "Make sure Screen Recording permission is granted in System Settings.",
+        "Make sure Screen Recording permission is granted in System Settings.",
     );
     return;
   }
 
   captureStream = stream;
 
-  // Tell main to flip into recording state (updates tray badge, etc.)
-  await window.sorabase.startCapture({ mode: selectedMode, label });
+  // Tell main to flip into recording state (also creates CaptureSession if live)
+  await window.sorabase.startCapture({ mode: selectedMode, label, live: useLivePath });
 
-  // Set up MediaRecorder
+  const modeName =
+    ({ general: "General mode", recruiting: "Recruiter mode", study: "Study mode" } as Record<string, string>)[
+      selectedMode
+    ] ?? selectedMode;
+  $("rec-mode-label").textContent = label ? `${modeName} · ${label}` : modeName;
+
+  // Show/hide live transcript UI
+  const liveIndicator = document.getElementById("live-indicator");
+  const liveWrap = document.getElementById("live-transcript-wrap");
+  if (liveIndicator) liveIndicator.style.display = useLivePath ? "flex" : "none";
+  if (liveWrap) liveWrap.style.display = useLivePath ? "block" : "none";
+  // Clear prior transcript
+  const liveEl = document.getElementById("live-transcript");
+  if (liveEl) liveEl.innerHTML = '<p class="live-placeholder">Listening…</p>';
+
+  if (useLivePath && deepgramKey) {
+    startDeepgramCapture(audioTracks, deepgramKey);
+  } else {
+    startMediaRecorderCapture(audioTracks);
+  }
+
+  startTimer();
+  showView("recording");
+}
+
+// ---------------------------------------------------------------------------
+// Live path — Deepgram WebSocket + AudioContext → PCM streaming
+// ---------------------------------------------------------------------------
+
+function startDeepgramCapture(tracks: MediaStreamTrack[], apiKey: string) {
+  const params = new URLSearchParams({
+    model: "nova-2",
+    diarize: "true",
+    interim_results: "false",
+    encoding: "linear16",
+    sample_rate: "48000",
+    channels: "1",
+    language: "en",
+    punctuate: "true",
+    smart_format: "true",
+  });
+
+  deepgramWs = new WebSocket(
+    `wss://api.deepgram.com/v1/listen?${params}`,
+    ["token", apiKey],
+  );
+
+  deepgramWs.binaryType = "arraybuffer";
+
+  deepgramWs.onopen = () => {
+    const audioStream = new MediaStream(tracks);
+
+    // ScriptProcessor is deprecated but universally supported in Electron's Chromium.
+    audioCtx = new AudioContext({ sampleRate: 48_000 });
+    const source = audioCtx.createMediaStreamSource(audioStream);
+    scriptProcessor = audioCtx.createScriptProcessor(4_096, 1, 1);
+    source.connect(scriptProcessor);
+    scriptProcessor.connect(audioCtx.destination);
+
+    scriptProcessor.onaudioprocess = (evt) => {
+      if (!deepgramWs || deepgramWs.readyState !== WebSocket.OPEN) return;
+      const floats = evt.inputBuffer.getChannelData(0);
+      const int16 = new Int16Array(floats.length);
+      for (let i = 0; i < floats.length; i++) {
+        int16[i] = Math.max(-32_768, Math.min(32_767, floats[i] * 32_768));
+      }
+      deepgramWs.send(int16.buffer);
+    };
+  };
+
+  deepgramWs.onmessage = (evt) => {
+    try {
+      const data = JSON.parse(evt.data as string);
+      if (data.type !== "Results") return;
+      const alt = data?.channel?.alternatives?.[0];
+      const transcript: string = alt?.transcript ?? "";
+      if (!transcript || !data.is_final) return;
+
+      const words: Array<{ speaker?: number; confidence?: number }> = alt?.words ?? [];
+      const speaker =
+        words[0]?.speaker !== undefined ? `Speaker ${words[0].speaker}` : undefined;
+      const confidence: number | undefined = alt?.confidence;
+
+      // Send to main → backend CaptureSession
+      window.sorabase.sendTextChunk(transcript, speaker, confidence);
+
+      // Update live transcript display
+      appendLiveTranscript(transcript, speaker);
+    } catch {
+      // malformed JSON — ignore
+    }
+  };
+
+  deepgramWs.onerror = () => {
+    stopDeepgramCapture();
+    showError(
+      "Deepgram connection error. Check your DEEPGRAM_API_KEY and network connection.",
+    );
+  };
+
+  deepgramWs.onclose = () => {
+    stopDeepgramCapture();
+  };
+}
+
+function stopDeepgramCapture() {
+  scriptProcessor?.disconnect();
+  scriptProcessor = null;
+  audioCtx?.close().catch(() => {});
+  audioCtx = null;
+  captureStream?.getTracks().forEach((t) => t.stop());
+  captureStream = null;
+
+  if (deepgramWs && deepgramWs.readyState === WebSocket.OPEN) {
+    deepgramWs.close(1000, "Recording stopped");
+  }
+  deepgramWs = null;
+}
+
+function appendLiveTranscript(text: string, speaker?: string) {
+  const el = document.getElementById("live-transcript");
+  if (!el) return;
+  // Remove placeholder on first real utterance
+  const placeholder = el.querySelector(".live-placeholder");
+  if (placeholder) placeholder.remove();
+  const line = document.createElement("p");
+  line.className = "live-line";
+  if (speaker) {
+    const sp = document.createElement("span");
+    sp.className = "live-speaker";
+    sp.textContent = speaker + ": ";
+    line.appendChild(sp);
+  }
+  line.appendChild(document.createTextNode(text));
+  el.appendChild(line);
+  const wrap = document.getElementById("live-transcript-wrap");
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+}
+
+// ---------------------------------------------------------------------------
+// Audio upload path — MediaRecorder → base64 chunks
+// ---------------------------------------------------------------------------
+
+function startMediaRecorderCapture(tracks: MediaStreamTrack[]) {
   const mimeType = pickMimeType();
   mediaRecorder = new MediaRecorder(
-    new MediaStream(audioTracks),
+    new MediaStream(tracks),
     mimeType ? { mimeType } : undefined,
   );
 
@@ -276,38 +423,45 @@ async function startCapture() {
     window.sorabase.doneRecording();
   };
 
-  mediaRecorder.start(10_000); // 10-second chunks match the extension behaviour
-  startTime = Date.now();
-
-  // Update UI
-  const modeName = { general: "General mode", recruiting: "Recruiter mode", study: "Study mode" }[
-    selectedMode
-  ] ?? selectedMode;
-  $("rec-mode-label").textContent = label ? `${modeName} · ${label}` : modeName;
-
-  startTimer();
-  showView("recording");
+  mediaRecorder.start(10_000);
 }
+
+// ---------------------------------------------------------------------------
+// Stop / cancel
+// ---------------------------------------------------------------------------
 
 function stopCapture() {
   stopTimer();
-  if (mediaRecorder && mediaRecorder.state !== "inactive") {
-    mediaRecorder.stop(); // triggers onstop → doneRecording
+
+  if (useLivePath) {
+    stopDeepgramCapture();
+    window.sorabase.doneRecordingLive();
+    showView("uploading");
   } else {
-    captureStream?.getTracks().forEach((t) => t.stop());
-    captureStream = null;
-    window.sorabase.doneRecording();
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop(); // triggers onstop → doneRecording
+    } else {
+      captureStream?.getTracks().forEach((t) => t.stop());
+      captureStream = null;
+      window.sorabase.doneRecording();
+    }
+    mediaRecorder = null;
+    showView("uploading");
   }
-  mediaRecorder = null;
-  showView("uploading");
 }
 
 function cancelCapture() {
   stopTimer();
-  mediaRecorder?.stop();
-  mediaRecorder = null;
-  captureStream?.getTracks().forEach((t) => t.stop());
-  captureStream = null;
+
+  if (useLivePath) {
+    stopDeepgramCapture();
+  } else {
+    mediaRecorder?.stop();
+    mediaRecorder = null;
+    captureStream?.getTracks().forEach((t) => t.stop());
+    captureStream = null;
+  }
+
   window.sorabase.cancelCapture();
   $<HTMLButtonElement>("btn-start").disabled = false;
   showView("idle");
@@ -319,6 +473,7 @@ function cancelCapture() {
 
 function startTimer() {
   stopTimer();
+  startTime = Date.now();
   const tick = () => {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
     const m = Math.floor(elapsed / 60);

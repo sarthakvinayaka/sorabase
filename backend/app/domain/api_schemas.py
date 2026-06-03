@@ -318,6 +318,43 @@ class AuditLogResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Desktop live-capture schemas
+# ---------------------------------------------------------------------------
+
+class CaptureSessionCreate(BaseModel):
+    mode: Literal["general", "recruiting", "study"] = "general"
+    label: str | None = None
+    source: Literal["desktop_live", "desktop_upload"] = "desktop_live"
+
+
+class CaptureSessionRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    mode: str
+    label: str | None
+    status: str          # active | assembling | ready | failed
+    source: str
+    conversation_id: uuid.UUID | None
+    error_message: str | None
+    chunk_count: int
+    created_at: datetime
+    updated_at: datetime
+
+
+class TranscriptChunkAppend(BaseModel):
+    text: str = Field(..., min_length=1, description="Finalized transcript utterance from Deepgram.")
+    speaker: str | None = Field(None, description="Diarization label e.g. 'Speaker 0'.")
+    confidence: float | None = None
+
+
+class CaptureCompleteResponse(BaseModel):
+    capture_session_id: uuid.UUID
+    conversation_id: uuid.UUID
+    status: str   # "ready"
+
+
+# ---------------------------------------------------------------------------
 # Export schema
 # ---------------------------------------------------------------------------
 
