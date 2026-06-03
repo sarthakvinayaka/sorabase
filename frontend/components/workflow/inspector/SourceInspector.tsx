@@ -9,12 +9,32 @@ import { useExtensionStatus } from "@/lib/useExtensionStatus";
 
 interface Props { id: string; data: SourceNodeData }
 
-const MODES: { value: SourceInputMode; label: string }[] = [
-  { value: "transcript_paste", label: "Paste transcript" },
-  { value: "audio_upload",     label: "Audio upload" },
-  { value: "browser_capture",  label: "Browser capture" },
-  { value: "zoom_bot",         label: "Zoom bot (live)" },
-  { value: "zoom",             label: "Zoom cloud recording" },
+const MODES: { value: SourceInputMode; label: string; hint: string }[] = [
+  {
+    value: "transcript_paste",
+    label: "Paste transcript",
+    hint:  "Copy your transcript from Zoom, Google Meet, Teams, Otter, or anywhere else and paste it here.",
+  },
+  {
+    value: "audio_upload",
+    label: "Audio / video upload",
+    hint:  "Upload an MP3, MP4, M4A, or WAV file. Transcribed automatically — no bot needed.",
+  },
+  {
+    value: "browser_capture",
+    label: "Browser capture",
+    hint:  "Record your meeting tab live using the Sorabase Chrome extension. No bot joins the call.",
+  },
+  {
+    value: "zoom_bot",
+    label: "Zoom bot (live)",
+    hint:  "A bot joins as a participant and records the call automatically.",
+  },
+  {
+    value: "zoom",
+    label: "Zoom cloud recording",
+    hint:  "Pull in a completed cloud recording from Zoom after the meeting ends.",
+  },
 ];
 
 export default function SourceInspector({ id, data }: Props) {
@@ -26,9 +46,9 @@ export default function SourceInspector({ id, data }: Props) {
 
       {/* Input mode */}
       <Field label="Input type">
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           {MODES.map((m) => (
-            <label key={m.value} className="flex items-center gap-2.5 cursor-pointer group">
+            <label key={m.value} className="flex items-start gap-2.5 cursor-pointer group rounded-lg px-2 py-2 hover:bg-stone-50 dark:hover:bg-stone-800/60 transition-colors -mx-2">
               <input
                 type="radio"
                 className="sr-only"
@@ -39,13 +59,27 @@ export default function SourceInspector({ id, data }: Props) {
               />
               <div
                 className={[
-                  "w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 transition-colors",
+                  "w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 mt-0.5 transition-colors",
                   data.inputMode === m.value
                     ? "border-aubergine-700 bg-aubergine-700"
                     : "border-stone-300 dark:border-stone-600 group-hover:border-stone-400",
                 ].join(" ")}
               />
-              <span className="text-sm text-stone-700 dark:text-stone-300">{m.label}</span>
+              <div className="min-w-0">
+                <span className={[
+                  "text-sm font-medium leading-none",
+                  data.inputMode === m.value
+                    ? "text-stone-900 dark:text-stone-100"
+                    : "text-stone-700 dark:text-stone-300",
+                ].join(" ")}>
+                  {m.label}
+                </span>
+                {data.inputMode === m.value && (
+                  <p className="text-[11px] text-stone-400 dark:text-stone-500 mt-1 leading-relaxed">
+                    {m.hint}
+                  </p>
+                )}
+              </div>
             </label>
           ))}
         </div>
@@ -79,14 +113,9 @@ export default function SourceInspector({ id, data }: Props) {
         <BrowserCapturePanel id={id} data={data} update={update} mode={mode} />
       )}
 
-      {/* Audio upload placeholder */}
+      {/* Audio upload */}
       {data.inputMode === "audio_upload" && (
-        <Field label="Audio file">
-          <div className="rounded-lg border border-dashed border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 px-4 py-6 text-center">
-            <p className="text-xs text-stone-400 dark:text-stone-500">Audio upload available on the intake page.</p>
-            <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-1">MP3, M4A, WAV — max 25 MB</p>
-          </div>
-        </Field>
+        <AudioUploadPanel id={id} data={data} update={update} mode={mode} />
       )}
 
       {/* Zoom bot (live capture) */}
@@ -696,16 +725,27 @@ function BrowserCapturePanel({ id, data, update, mode }: BrowserCapturePanelProp
             Extension not installed
           </p>
           <p className="text-[10px] text-aubergine-600 dark:text-aubergine-500 leading-relaxed mb-2.5">
-            Install the Sorabase Capture extension to record Google Meet, Zoom, and Teams directly in your browser.
+            Install the Sorabase Capture Chrome extension to record Google Meet, Zoom, or Teams directly in your browser — no bot joins the call.
           </p>
-          <a
-            href="https://chrome.google.com/webstore/detail/sorabase-capture/EXTENSION_ID"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1 text-[10px] font-semibold text-white bg-aubergine-800 hover:bg-aubergine-900 transition-colors px-2.5 py-1.5 rounded"
-          >
-            Install extension →
-          </a>
+          <p className="text-[10px] text-aubergine-500 dark:text-aubergine-600 leading-relaxed">
+            Extension coming soon — or use{" "}
+            <button
+              type="button"
+              onClick={() => update(id, { inputMode: "transcript_paste" })}
+              className="underline underline-offset-2 hover:text-aubergine-800 dark:hover:text-aubergine-300 transition-colors"
+            >
+              paste transcript
+            </button>
+            {" "}or{" "}
+            <button
+              type="button"
+              onClick={() => update(id, { inputMode: "audio_upload" })}
+              className="underline underline-offset-2 hover:text-aubergine-800 dark:hover:text-aubergine-300 transition-colors"
+            >
+              audio upload
+            </button>
+            {" "}in the meantime.
+          </p>
         </div>
       </Field>
     );
@@ -805,6 +845,169 @@ function BrowserCapturePanel({ id, data, update, mode }: BrowserCapturePanelProp
         </p>
       </div>
     </Field>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Audio upload panel
+// ---------------------------------------------------------------------------
+
+type UploadState = "idle" | "uploading" | "done" | "error";
+
+interface AudioUploadPanelProps {
+  id: string;
+  data: SourceNodeData;
+  update: (id: string, patch: Partial<Record<string, unknown>>) => void;
+  mode: string;
+}
+
+function AudioUploadPanel({ id, data, update, mode }: AudioUploadPanelProps) {
+  const [uploadState, setUploadState] = useState<UploadState>("idle");
+  const [fileName,    setFileName]    = useState("");
+  const [error,       setError]       = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFile(file: File) {
+    const MAX_MB = 25;
+    if (file.size > MAX_MB * 1024 * 1024) {
+      setError(`File too large — maximum ${MAX_MB} MB.`);
+      return;
+    }
+    const allowed = ["audio/mpeg", "audio/mp4", "audio/m4a", "audio/wav", "audio/webm", "video/mp4", "video/webm"];
+    if (!allowed.includes(file.type) && !file.name.match(/\.(mp3|mp4|m4a|wav|webm)$/i)) {
+      setError("Unsupported file type. Use MP3, MP4, M4A, WAV, or WebM.");
+      return;
+    }
+
+    setFileName(file.name);
+    setError("");
+    setUploadState("uploading");
+
+    try {
+      const form = new FormData();
+      form.append("file",  file);
+      form.append("mode",  mode);
+      if (data.jobReference) form.append("job_reference", data.jobReference);
+
+      const res = await fetch("/api/audio", { method: "POST", body: form });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { detail?: string };
+        throw new Error(body.detail ?? `Upload failed (${res.status})`);
+      }
+      const json = await res.json() as { conversation_id?: string };
+      update(id, {
+        audioConversationId: json.conversation_id,
+        audioFileName:       file.name,
+        status:              "configured",
+      });
+      setUploadState("done");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Upload failed. Please try again.");
+      setUploadState("error");
+    }
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  }
+
+  function handleReset() {
+    setUploadState("idle");
+    setFileName("");
+    setError("");
+    update(id, { audioConversationId: undefined, audioFileName: undefined, status: "idle" });
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  if (uploadState === "done" && data.audioConversationId) {
+    return (
+      <Field label="Audio file">
+        <div className="rounded-lg border border-aubergine-200 dark:border-aubergine-900 bg-aubergine-50 dark:bg-aubergine-950/20 px-3 py-2.5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-aubergine-800 dark:text-aubergine-300">Uploaded — transcribing…</p>
+              <p className="text-[11px] text-aubergine-600 dark:text-aubergine-500 mt-0.5 truncate">{fileName}</p>
+              <p className="text-[10px] text-aubergine-600/70 dark:text-aubergine-600 mt-1 leading-relaxed">
+                Transcription runs in the background. Click Run once it&apos;s ready, or run now and the workflow will wait.
+              </p>
+            </div>
+            <button type="button" onClick={handleReset} className="text-[10px] font-medium text-aubergine-600 hover:text-aubergine-800 flex-shrink-0 mt-0.5">
+              Change
+            </button>
+          </div>
+        </div>
+      </Field>
+    );
+  }
+
+  return (
+    <Field label="Audio file">
+      <div
+        onDrop={handleDrop}
+        onDragOver={(e) => e.preventDefault()}
+        onClick={() => inputRef.current?.click()}
+        className={[
+          "rounded-lg border-2 border-dashed px-4 py-6 text-center cursor-pointer transition-colors",
+          uploadState === "uploading"
+            ? "border-aubergine-300 dark:border-aubergine-800 bg-aubergine-50/50 dark:bg-aubergine-950/10"
+            : uploadState === "error"
+            ? "border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/10"
+            : "border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 hover:border-aubergine-300 dark:hover:border-aubergine-800 hover:bg-aubergine-50/30 dark:hover:bg-aubergine-950/10",
+        ].join(" ")}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".mp3,.mp4,.m4a,.wav,.webm,audio/*,video/mp4,video/webm"
+          className="sr-only"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+        />
+
+        {uploadState === "uploading" ? (
+          <>
+            <div className="flex items-center justify-center gap-1.5 mb-1.5">
+              <SpinIcon />
+              <p className="text-xs font-medium text-aubergine-700 dark:text-aubergine-400">Uploading…</p>
+            </div>
+            <p className="text-[10px] text-stone-400 dark:text-stone-500 truncate max-w-full">{fileName}</p>
+          </>
+        ) : (
+          <>
+            <p className="text-xs font-medium text-stone-600 dark:text-stone-400 mb-1">
+              Drop a file or click to browse
+            </p>
+            <p className="text-[10px] text-stone-400 dark:text-stone-500">MP3 · MP4 · M4A · WAV · WebM — max 25 MB</p>
+            <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-0.5">
+              Transcribed automatically. No bot needed.
+            </p>
+          </>
+        )}
+      </div>
+
+      {error && (
+        <div className="mt-2 flex items-start gap-2 rounded border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/20 px-3 py-2">
+          <p className="text-[11px] text-red-600 dark:text-red-400 flex-1">{error}</p>
+          <button type="button" onClick={handleReset} className="text-[10px] font-medium text-red-500 hover:text-red-700 flex-shrink-0">
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      <p className="mt-1.5 text-[10px] text-stone-400 dark:text-stone-500 leading-relaxed">
+        Works with any local recording — Zoom local record, QuickTime, Voice Memos, or any other audio source.
+      </p>
+    </Field>
+  );
+}
+
+function SpinIcon() {
+  return (
+    <svg className="w-3.5 h-3.5 animate-spin text-aubergine-600" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+    </svg>
   );
 }
 
