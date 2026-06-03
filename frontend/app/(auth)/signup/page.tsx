@@ -72,11 +72,9 @@ export default function SignUpPage() {
     }
   }
 
-  function handleOAuth(provider: "google" | "microsoft") {
+  function handleOAuth(provider: "google") {
     setFormState("loading");
-    nextAuthSignIn(provider === "google" ? "google" : "azure-ad", {
-      callbackUrl: "/onboarding",
-    });
+    nextAuthSignIn("google", { callbackUrl: "/onboarding" });
   }
 
   const isLoaded = !isLoading;
@@ -122,8 +120,7 @@ export default function SignUpPage() {
         <>
           {/* OAuth buttons */}
           <div className="space-y-2.5 mb-5">
-            <OAuthButton provider="google"    onClick={() => handleOAuth("google")} />
-            <OAuthButton provider="microsoft" onClick={() => handleOAuth("microsoft")} />
+            <OAuthButton provider="google" onClick={() => handleOAuth("google")} />
           </div>
 
           {/* Divider */}
@@ -339,7 +336,7 @@ function OAuthButton({
   provider,
   onClick,
 }: {
-  provider: "google" | "microsoft";
+  provider: "google";
   onClick: () => void;
 }) {
   return (
@@ -348,8 +345,8 @@ function OAuthButton({
       onClick={onClick}
       className="w-full flex items-center justify-center gap-3 rounded border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-4 py-2.5 text-[13px] font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 hover:border-stone-300 dark:hover:border-stone-600 transition-colors"
     >
-      {provider === "google" ? <GoogleIcon /> : <MicrosoftIcon />}
-      Continue with {provider === "google" ? "Google" : "Microsoft"}
+      <GoogleIcon />
+      Continue with Google
     </button>
   );
 }
@@ -411,13 +408,3 @@ function GoogleIcon() {
   );
 }
 
-function MicrosoftIcon() {
-  return (
-    <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none">
-      <path fill="#F25022" d="M1 1h10.5v10.5H1z"/>
-      <path fill="#7FBA00" d="M12.5 1H23v10.5H12.5z"/>
-      <path fill="#00A4EF" d="M1 12.5h10.5V23H1z"/>
-      <path fill="#FFB900" d="M12.5 12.5H23V23H12.5z"/>
-    </svg>
-  );
-}
