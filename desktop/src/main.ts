@@ -214,23 +214,21 @@ function showAuthWindow() {
     },
   });
 
-  // Prevent auth window from navigating away to the main app.
-  // Any navigation away from /signin or /signup means auth completed.
-  function onNavigate(_: Electron.Event, url: string) {
-    const isAuthPage = url.includes("/signin") || url.includes("/signup") || url.includes("/api/auth");
+  // Close auth window once the user has signed in and been redirected
+  // away from all auth pages. Use did-navigate only (not did-navigate-in-page
+  // which fires on Next.js client-side transitions within the signin page itself).
+  authWin.webContents.on("did-navigate", (_: Electron.Event, url: string) => {
+    if (!url || url.startsWith("data:") || url.startsWith("about:")) return;
+    const isAuthPage =
+      url.includes("/signin") ||
+      url.includes("/signup") ||
+      url.includes("/api/auth");
     if (!isAuthPage) {
-      // Strip event listeners so close doesn't re-trigger
-      authWin?.webContents.removeListener("did-navigate", onNavigate);
-      authWin?.webContents.removeListener("did-navigate-in-page", onNavigate);
       authWin?.close();
-      // Re-check auth and bring the capture panel forward
       panelWin?.webContents.send("auth:signed-in");
       setTimeout(() => showPanel(), 300);
     }
-  }
-
-  authWin.webContents.on("did-navigate", onNavigate);
-  authWin.webContents.on("did-navigate-in-page", onNavigate);
+  });
 
   authWin.loadURL(`${SORABASE_URL}/signin`);
 
