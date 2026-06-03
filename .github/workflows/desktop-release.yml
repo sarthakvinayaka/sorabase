@@ -113,14 +113,16 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "tag=desktop-v${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           else
             echo "version=${GITHUB_REF_NAME#desktop-v}" >> $GITHUB_OUTPUT
+            echo "tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
           fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name || format('desktop-v{0}', steps.version.outputs.version) }}
+          tag_name: ${{ steps.version.outputs.tag }}
           name: "Sorabase Desktop v${{ steps.version.outputs.version }}"
           body: |
             ## Sorabase Desktop v${{ steps.version.outputs.version }}
