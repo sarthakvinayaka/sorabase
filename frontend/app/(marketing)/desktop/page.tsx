@@ -71,6 +71,20 @@ export default function DesktopPage() {
           </a>
         </div>
 
+        {/* Unsigned-app notice */}
+        <div className="mt-6 max-w-xl mx-auto rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-left">
+          <p className="text-[12px] font-semibold text-amber-800 dark:text-amber-400 mb-1">
+            macOS first-launch fix
+          </p>
+          <p className="text-[12px] text-amber-700 dark:text-amber-500 leading-relaxed">
+            If macOS says the app is &ldquo;damaged&rdquo;, open <strong>Terminal</strong> and run:<br/>
+            <code className="font-mono bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded text-[11px]">
+              xattr -cr /Applications/Sorabase.app
+            </code>
+            <br/>Then double-click to open. This is a one-time step for unsigned builds.
+          </p>
+        </div>
+
         <p className="mt-4 text-[12px] text-stone-400 dark:text-stone-500">
           macOS 13+ · Windows 10+ · Free with your Sorabase account ·{" "}
           <a href={MAC_X64_URL} className="underline underline-offset-2 hover:text-stone-600">
@@ -80,6 +94,7 @@ export default function DesktopPage() {
           <a href={GITHUB_RELEASES} className="underline underline-offset-2 hover:text-stone-600">
             All releases
           </a>
+        </p>
         </p>
       </section>
 
@@ -125,7 +140,7 @@ export default function DesktopPage() {
             },
             {
               label: "Open the app",
-              detail: "The first time, macOS will say \"Apple cannot verify this app.\" Go to System Settings → Privacy & Security → scroll down → click Open Anyway. This is a one-time step for unsigned builds.",
+              detail: "Because the app is unsigned, macOS will say it is \"damaged\" on first launch. Open Terminal and run: xattr -cr /Applications/Sorabase.app — then double-click to open. This is a one-time step caused by macOS quarantine.",
             },
             {
               label: "Grant Screen Recording permission",
