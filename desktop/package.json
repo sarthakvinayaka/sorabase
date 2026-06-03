@@ -3,6 +3,7 @@
   "productName": "Sorabase",
   "version": "0.1.0",
   "description": "Capture meeting audio without a bot — Granola-style system audio capture",
+  "author": "Sorabase",
   "main": "dist/main.js",
   "scripts": {
     "build": "node esbuild.config.mjs",
@@ -25,7 +26,6 @@
       "dist/**/*",
       "assets/tray-template.png",
       "assets/tray-rec-template.png",
-      "src/renderer/panel.html",
       "package.json"
     ],
     "extraMetadata": {
@@ -67,11 +67,10 @@
       "repo": "sorabase"
     }
   },
-  "dependencies": {
-    "electron": "^29.4.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "electron": "^29.4.0",
     "electron-builder": "^25.0.0",
     "esbuild": "^0.20.0",
     "typescript": "^5.4.0"
