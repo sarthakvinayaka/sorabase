@@ -214,26 +214,26 @@ function showAuthWindow() {
     },
   });
 
-  // After each navigation, hit the session endpoint to see if auth completed.
-  // This is more reliable than guessing from the URL, which varies across
-  // Next.js versions, OAuth providers, and middleware configurations.
-  authWin.webContents.on("did-navigate", async (_: Electron.Event, url: string) => {
-    if (!url || url.startsWith("data:") || url.startsWith("about:")) return;
+  authWin.loadURL(`${SORABASE_URL}/signin`);
+
+  // Poll the session endpoint every 2 s. NextAuth uses fetch() + client-side
+  // redirect after sign-in, which never fires did-navigate, so URL watching
+  // doesn't work. Polling detects auth within 2 s regardless of the redirect type.
+  let pollTimer: ReturnType<typeof setInterval> | null = setInterval(async () => {
+    if (!authWin || authWin.isDestroyed()) return;
     try {
       const result = await checkAuth();
       if (result.authenticated) {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
         authWin?.close();
         panelWin?.webContents.send("auth:signed-in");
         setTimeout(() => showPanel(), 300);
       }
-    } catch {
-      // keep window open on error
-    }
-  });
-
-  authWin.loadURL(`${SORABASE_URL}/signin`);
+    } catch { /* keep polling */ }
+  }, 2000);
 
   authWin.on("closed", () => {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
     authWin = null;
   });
 }
