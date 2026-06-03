@@ -216,21 +216,28 @@ function showAuthWindow() {
 
   authWin.loadURL(`${SORABASE_URL}/signin`);
 
-  // Poll the session endpoint every 2 s. NextAuth uses fetch() + client-side
-  // redirect after sign-in, which never fires did-navigate, so URL watching
-  // doesn't work. Polling detects auth within 2 s regardless of the redirect type.
+  // Detect sign-in by reading the NextAuth session cookie directly from the
+  // persist:sorabase cookie store. This avoids all SameSite / net.request
+  // issues — the cookie is written by the renderer and we read it in the
+  // main process. Check every second; close as soon as the cookie appears.
   let pollTimer: ReturnType<typeof setInterval> | null = setInterval(async () => {
     if (!authWin || authWin.isDestroyed()) return;
     try {
-      const result = await checkAuth();
-      if (result.authenticated) {
+      const ses = session.fromPartition("persist:sorabase");
+      const cookies = await ses.cookies.get({ url: SORABASE_URL });
+      const signedIn = cookies.some(
+        (c) =>
+          c.name === "next-auth.session-token" ||
+          c.name === "__Secure-next-auth.session-token",
+      );
+      if (signedIn) {
         if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
         authWin?.close();
         panelWin?.webContents.send("auth:signed-in");
         setTimeout(() => showPanel(), 300);
       }
     } catch { /* keep polling */ }
-  }, 2000);
+  }, 1000);
 
   authWin.on("closed", () => {
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
@@ -242,33 +249,36 @@ function showAuthWindow() {
 // Auth helper
 // ---------------------------------------------------------------------------
 
-function checkAuth(): Promise<{
+async function checkAuth(): Promise<{
   authenticated: boolean;
   user?: { id: string; email: string; name: string };
 }> {
-  return new Promise((resolve) => {
+  // Check the cookie store directly — avoids SameSite issues with net.request.
+  // Then fetch user details by running fetch() inside the panel renderer
+  // (which shares the persist:sorabase session and sends cookies correctly).
+  try {
     const ses = session.fromPartition("persist:sorabase");
-    const req = net.request({
-      method: "GET",
-      url: `${SORABASE_URL}/api/extension/session`,
-      session: ses,
-    });
+    const cookies = await ses.cookies.get({ url: SORABASE_URL });
+    const hasSession = cookies.some(
+      (c) =>
+        c.name === "next-auth.session-token" ||
+        c.name === "__Secure-next-auth.session-token",
+    );
+    if (!hasSession) return { authenticated: false };
 
-    req.on("response", (res: Electron.IncomingMessage) => {
-      let raw = "";
-      res.on("data", (chunk: Buffer) => (raw += chunk));
-      res.on("end", () => {
-        try {
-          resolve(JSON.parse(raw));
-        } catch {
-          resolve({ authenticated: false });
-        }
-      });
-    });
+    // Session cookie present — fetch user details via the panel renderer
+    // so the request carries cookies from the persist:sorabase partition.
+    if (panelWin && !panelWin.isDestroyed()) {
+      const result = await panelWin.webContents.executeJavaScript(
+        `fetch('${SORABASE_URL}/api/extension/session',{credentials:'include'}).then(r=>r.json()).catch(()=>({authenticated:false}))`,
+      );
+      return result as { authenticated: boolean; user?: { id: string; email: string; name: string } };
+    }
 
-    req.on("error", () => resolve({ authenticated: false }));
-    req.end();
-  });
+    return { authenticated: true };
+  } catch {
+    return { authenticated: false };
+  }
 }
 
 // ---------------------------------------------------------------------------
