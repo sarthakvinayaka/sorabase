@@ -298,7 +298,7 @@ async function assembleAndUpload(state) {
       credentials: "include",
     });
   } catch (err) {
-    return { ok: false, error: `Network error: ${err.message}. Is SoraBase open?` };
+    return { ok: false, error: `Network error: ${err.message}. Is Sorabase open?` };
   }
 
   if (!res.ok) {
@@ -311,7 +311,7 @@ async function assembleAndUpload(state) {
     if (res.status === 401) {
       return {
         ok: false,
-        error: "Not signed in to SoraBase. Please open SoraBase, sign in, then try again.",
+        error: "Not signed in to Sorabase. Please open Sorabase, sign in, then try again.",
       };
     }
     return { ok: false, error: detail };
@@ -359,15 +359,15 @@ const ICON = chrome.runtime.getURL("icons/icon48.png");
 
 async function notifySuccess(mode) {
   const message = {
-    general:    "Schema extraction ready. Open SoraBase to review.",
+    general:    "Schema extraction ready. Open Sorabase to review.",
     recruiting: "Recording sent. Run your workflow to extract candidate data.",
     study:      "Lecture captured. Extraction in progress — open SoraBase to review.",
-  }[mode] ?? "Recording processed. Open SoraBase to review.";
+  }[mode] ?? "Recording processed. Open Sorabase to review.";
 
   chrome.notifications.create({
     type:    "basic",
     iconUrl: ICON,
-    title:   "SoraBase — Recording processed",
+    title:   "Sorabase — Recording processed",
     message,
   });
 }
@@ -376,7 +376,7 @@ async function notifyError(message) {
   chrome.notifications.create({
     type:    "basic",
     iconUrl: ICON,
-    title:   "SoraBase — Capture failed",
+    title:   "Sorabase — Capture failed",
     message,
   });
 }

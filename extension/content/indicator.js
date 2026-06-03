@@ -22,7 +22,7 @@ function showIndicator() {
   indicator.id = "sorabase-capture-indicator";
   indicator.innerHTML = `
     <span class="sb-rec-dot"></span>
-    <span class="sb-rec-label">Recording — SoraBase Capture</span>
+    <span class="sb-rec-label">Recording — Sorabase Capture</span>
   `;
   document.body.appendChild(indicator);
 }

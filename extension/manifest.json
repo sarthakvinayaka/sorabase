@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "SoraBase Capture",
-  "short_name": "SoraBase",
-  "description": "Capture browser meeting audio and send to SoraBase for structured extraction.",
+  "name": "Sorabase Capture",
+  "short_name": "Sorabase",
+  "description": "Capture browser meeting audio and send to Sorabase for structured extraction.",
   "version": "1.0.0",
 
   "icons": {
@@ -13,7 +13,7 @@
 
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "SoraBase Capture",
+    "default_title": "Sorabase Capture",
     "default_icon": {
       "16":  "icons/icon16.png",
       "48":  "icons/icon48.png",
