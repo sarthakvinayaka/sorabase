@@ -95,7 +95,6 @@ export default function DesktopPage() {
             All releases
           </a>
         </p>
-        </p>
       </section>
 
       {/* ── How it works ── */}
