@@ -419,20 +419,34 @@ function startMediaRecorderCapture(tracks: MediaStreamTrack[]) {
     mimeType ? { mimeType } : undefined,
   );
 
+  // Accumulate all blobs in memory and convert once at stop time.
+  // This avoids the race condition where onstop fires before the last
+  // FileReader.onloadend, causing doneRecording() to arrive at main
+  // before the final chunk and resulting in "No audio was captured".
+  const blobs: Blob[] = [];
+
   mediaRecorder.ondataavailable = (evt) => {
     if (!evt.data || evt.data.size === 0) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const b64 = (reader.result as string).split(",")[1];
-      if (b64) window.sorabase.sendChunk(b64);
-    };
-    reader.readAsDataURL(evt.data);
+    blobs.push(evt.data);
   };
 
   mediaRecorder.onstop = () => {
     captureStream?.getTracks().forEach((t) => t.stop());
     captureStream = null;
-    window.sorabase.doneRecording();
+
+    if (blobs.length === 0) {
+      window.sorabase.doneRecording();
+      return;
+    }
+
+    const combined = new Blob(blobs, { type: blobs[0].type || "audio/webm" });
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const b64 = (reader.result as string).split(",")[1];
+      if (b64) window.sorabase.sendChunk(b64);
+      window.sorabase.doneRecording();
+    };
+    reader.readAsDataURL(combined);
   };
 
   mediaRecorder.start(10_000);
