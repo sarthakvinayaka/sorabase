@@ -38,6 +38,8 @@ import {
   systemPreferences,
 } from "electron";
 import path from "path";
+import * as nodeHttp from "http";
+import type { AddressInfo } from "net";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -216,59 +218,89 @@ function positionNearTray() {
 // Auth window
 // ---------------------------------------------------------------------------
 
-function showAuthWindow() {
-  // Open sign-in in the user's real browser — Google OAuth blocks Electron
-  // webviews regardless of user agent. After sign-in, the web app redirects
-  // to sorabase://auth-complete?code=... which we handle in handleDeepLink().
-  const callbackUrl = encodeURIComponent("/auth/desktop-complete");
-  shell.openExternal(`${SORABASE_URL}/signin?callbackUrl=${callbackUrl}`);
+// ---------------------------------------------------------------------------
+// Local auth callback server
+// ---------------------------------------------------------------------------
+// Electron starts a tiny HTTP server on a random localhost port.
+// The sign-in URL includes the port so the browser page can POST the
+// one-time code back to us via http://127.0.0.1:PORT — no custom protocol
+// registration needed, works on all platforms.
+
+let authServer: nodeHttp.Server | null = null;
+let authServerPort = 0;
+
+function startAuthServer(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    // Close any previous server before starting a new one
+    authServer?.close();
+
+    authServer = nodeHttp.createServer((req, res) => {
+      // Chrome's Private Network Access requires this header on preflight
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+      res.setHeader("Access-Control-Allow-Private-Network", "true");
+
+      if (req.method === "OPTIONS") {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
+
+      const urlObj = new URL(req.url ?? "/", `http://127.0.0.1:${authServerPort}`);
+      if (urlObj.pathname !== "/auth-callback") {
+        res.writeHead(404);
+        res.end("Not found");
+        return;
+      }
+
+      const code = urlObj.searchParams.get("code");
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ ok: true }));
+
+      // Stop accepting connections — one sign-in at a time
+      authServer?.close();
+      authServer = null;
+
+      if (code) {
+        exchangeCodeAndComplete(code);
+      }
+    });
+
+    authServer.on("error", reject);
+    authServer.listen(0, "127.0.0.1", () => {
+      authServerPort = (authServer!.address() as AddressInfo).port;
+      resolve(authServerPort);
+    });
+  });
 }
 
-// ---------------------------------------------------------------------------
-// Deep-link handler  (sorabase://auth-complete?code=...)
-// ---------------------------------------------------------------------------
-
-async function handleDeepLink(url: string) {
-  if (!url.startsWith("sorabase://auth-complete")) return;
-
-  let code: string | null;
+async function exchangeCodeAndComplete(code: string) {
   try {
-    code = new URL(url).searchParams.get("code");
-  } catch {
-    return;
-  }
-  if (!code) return;
-
-  try {
-    // Exchange the one-time code for the session cookie value
     const body = Buffer.from(JSON.stringify({ code }));
     const result = await new Promise<{ cookie_name: string; cookie_value: string }>(
       (resolve, reject) => {
         const req = net.request({ method: "POST", url: `${SORABASE_URL}/api/auth/desktop-code` });
         req.setHeader("Content-Type", "application/json");
         req.setHeader("Content-Length", String(body.length));
-
         req.on("response", (res: Electron.IncomingMessage) => {
           let raw = "";
           res.on("data", (chunk: Buffer) => (raw += chunk));
           res.on("end", () => {
-            if ((res.statusCode ?? 0) >= 200 && (res.statusCode ?? 0) < 300) {
-              try { resolve(JSON.parse(raw)); }
-              catch { reject(new Error("Invalid JSON")); }
+            if ((res.statusCode ?? 0) < 300) {
+              try { resolve(JSON.parse(raw)); } catch { reject(new Error("Bad JSON")); }
             } else {
-              reject(new Error(`Exchange failed (${res.statusCode})`));
+              reject(new Error(`Code exchange failed (${res.statusCode})`));
             }
           });
         });
-
         req.on("error", reject);
         req.write(body);
         req.end();
       },
     );
 
-    // Plant the session cookie into the persist:sorabase partition so
-    // checkAuth() and assembleAndUpload() can find it without SameSite issues.
+    // Plant the session cookie into Electron's persist:sorabase partition
     const ses = session.fromPartition("persist:sorabase");
     await ses.cookies.set({
       url: SORABASE_URL,
@@ -282,13 +314,35 @@ async function handleDeepLink(url: string) {
     panelWin?.webContents.send("auth:signed-in");
     setTimeout(() => showPanel(), 300);
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    showPanel();
     panelWin?.webContents.send("status", {
       state: "error",
-      message: `Sign-in failed: ${message}. Please try again.`,
+      message: `Sign-in failed: ${err instanceof Error ? err.message : String(err)}`,
     });
-    showPanel();
   }
+}
+
+async function showAuthWindow() {
+  try {
+    const port = await startAuthServer();
+    const callbackUrl = encodeURIComponent(`/auth/desktop-complete?port=${port}`);
+    shell.openExternal(`${SORABASE_URL}/signin?callbackUrl=${callbackUrl}`);
+  } catch {
+    // Fallback: open sign-in without the port (user sees success page but panel
+    // won't auto-update — they can retry from the panel)
+    shell.openExternal(`${SORABASE_URL}/signin`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Deep-link handler (sorabase:// — kept as secondary path)
+// ---------------------------------------------------------------------------
+
+async function handleDeepLink(url: string) {
+  if (!url.startsWith("sorabase://auth-complete")) return;
+  let code: string | null;
+  try { code = new URL(url).searchParams.get("code"); } catch { return; }
+  if (code) await exchangeCodeAndComplete(code);
 }
 
 // ---------------------------------------------------------------------------
