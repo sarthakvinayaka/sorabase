@@ -33,7 +33,13 @@
     },
     "mac": {
       "target": [
-        { "target": "dmg", "arch": ["arm64", "x64"] }
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
       ],
       "category": "public.app-category.productivity",
       "icon": "assets/icon.icns",
@@ -42,7 +48,12 @@
     },
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "icon": "assets/icon.ico"
     },
@@ -58,10 +69,9 @@
       "repo": "sorabase"
     }
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "electron": "^29.4.0",
+    "electron": "^42.3.3",
     "electron-builder": "^25.0.0",
     "esbuild": "^0.20.0",
     "typescript": "^5.4.0"
