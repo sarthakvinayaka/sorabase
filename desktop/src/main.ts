@@ -52,7 +52,6 @@ const isDev = process.argv.includes("--dev");
 
 let tray: Tray | null = null;
 let panelWin: BrowserWindow | null = null;
-let authWin: BrowserWindow | null = null;
 
 // Audio upload path state
 const audioChunks: string[] = [];
@@ -218,67 +217,78 @@ function positionNearTray() {
 // ---------------------------------------------------------------------------
 
 function showAuthWindow() {
-  if (authWin && !authWin.isDestroyed()) {
-    authWin.focus();
+  // Open sign-in in the user's real browser — Google OAuth blocks Electron
+  // webviews regardless of user agent. After sign-in, the web app redirects
+  // to sorabase://auth-complete?code=... which we handle in handleDeepLink().
+  const callbackUrl = encodeURIComponent("/auth/desktop-complete");
+  shell.openExternal(`${SORABASE_URL}/signin?callbackUrl=${callbackUrl}`);
+}
+
+// ---------------------------------------------------------------------------
+// Deep-link handler  (sorabase://auth-complete?code=...)
+// ---------------------------------------------------------------------------
+
+async function handleDeepLink(url: string) {
+  if (!url.startsWith("sorabase://auth-complete")) return;
+
+  let code: string | null;
+  try {
+    code = new URL(url).searchParams.get("code");
+  } catch {
     return;
   }
+  if (!code) return;
 
-  authWin = new BrowserWindow({
-    width: 480,
-    height: 680,
-    title: "Sign in to Sorabase",
-    resizable: false,
-    minimizable: false,
-    maximizable: false,
-    webPreferences: {
-      partition: "persist:sorabase",
-    },
-  });
+  try {
+    // Exchange the one-time code for the session cookie value
+    const body = Buffer.from(JSON.stringify({ code }));
+    const result = await new Promise<{ cookie_name: string; cookie_value: string }>(
+      (resolve, reject) => {
+        const req = net.request({ method: "POST", url: `${SORABASE_URL}/api/auth/desktop-code` });
+        req.setHeader("Content-Type", "application/json");
+        req.setHeader("Content-Length", String(body.length));
 
-  // Google OAuth blocks embedded webviews that advertise the Electron user
-  // agent. Override it to a plain Chrome UA so Google allows the flow.
-  authWin.webContents.setUserAgent(
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
-    "AppleWebKit/537.36 (KHTML, like Gecko) " +
-    "Chrome/124.0.0.0 Safari/537.36",
-  );
+        req.on("response", (res: Electron.IncomingMessage) => {
+          let raw = "";
+          res.on("data", (chunk: Buffer) => (raw += chunk));
+          res.on("end", () => {
+            if ((res.statusCode ?? 0) >= 200 && (res.statusCode ?? 0) < 300) {
+              try { resolve(JSON.parse(raw)); }
+              catch { reject(new Error("Invalid JSON")); }
+            } else {
+              reject(new Error(`Exchange failed (${res.statusCode})`));
+            }
+          });
+        });
 
-  // If any OAuth step opens a new window (e.g. Google consent popups),
-  // open them in the same auth window rather than a new detached window.
-  authWin.webContents.setWindowOpenHandler(({ url }) => {
-    authWin?.loadURL(url);
-    return { action: "deny" };
-  });
+        req.on("error", reject);
+        req.write(body);
+        req.end();
+      },
+    );
 
-  authWin.loadURL(`${SORABASE_URL}/signin`);
+    // Plant the session cookie into the persist:sorabase partition so
+    // checkAuth() and assembleAndUpload() can find it without SameSite issues.
+    const ses = session.fromPartition("persist:sorabase");
+    await ses.cookies.set({
+      url: SORABASE_URL,
+      name: result.cookie_name,
+      value: result.cookie_value,
+      secure: result.cookie_name.startsWith("__Secure"),
+      httpOnly: true,
+      sameSite: "lax",
+    });
 
-  // Detect sign-in by reading the NextAuth session cookie directly from the
-  // persist:sorabase cookie store. This avoids all SameSite / net.request
-  // issues — the cookie is written by the renderer and we read it in the
-  // main process. Check every second; close as soon as the cookie appears.
-  let pollTimer: ReturnType<typeof setInterval> | null = setInterval(async () => {
-    if (!authWin || authWin.isDestroyed()) return;
-    try {
-      const ses = session.fromPartition("persist:sorabase");
-      const cookies = await ses.cookies.get({ url: SORABASE_URL });
-      const signedIn = cookies.some(
-        (c) =>
-          c.name === "next-auth.session-token" ||
-          c.name === "__Secure-next-auth.session-token",
-      );
-      if (signedIn) {
-        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-        authWin?.close();
-        panelWin?.webContents.send("auth:signed-in");
-        setTimeout(() => showPanel(), 300);
-      }
-    } catch { /* keep polling */ }
-  }, 1000);
-
-  authWin.on("closed", () => {
-    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-    authWin = null;
-  });
+    panelWin?.webContents.send("auth:signed-in");
+    setTimeout(() => showPanel(), 300);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    panelWin?.webContents.send("status", {
+      state: "error",
+      message: `Sign-in failed: ${message}. Please try again.`,
+    });
+    showPanel();
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -706,6 +716,30 @@ ipcMain.handle("open:system-settings", () => {
 // ---------------------------------------------------------------------------
 // App lifecycle
 // ---------------------------------------------------------------------------
+
+// Register sorabase:// as the default protocol client so the OS routes
+// sorabase://auth-complete?code=... back to this app after browser sign-in.
+if (!app.isDefaultProtocolClient("sorabase")) {
+  app.setAsDefaultProtocolClient("sorabase");
+}
+
+// Ensure single instance — second launch on Windows/Linux delivers the
+// deep-link URL via argv instead of open-url.
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on("second-instance", (_e, argv) => {
+    const url = argv.find((a) => a.startsWith("sorabase://"));
+    if (url) handleDeepLink(url);
+    else showPanel();
+  });
+}
+
+// macOS delivers deep links via open-url
+app.on("open-url", (_e, url) => {
+  handleDeepLink(url);
+});
 
 app.dock?.hide();
 
