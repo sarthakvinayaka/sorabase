@@ -315,14 +315,16 @@ async function checkAuth(): Promise<{
         res.on("end", () => {
           try {
             const data = JSON.parse(raw) as { authenticated: boolean; user?: { id: string; email: string; name: string } };
-            resolve(data.authenticated ? data : { authenticated: true });
+            resolve(data); // trust the server completely
           } catch {
-            resolve({ authenticated: true });
+            // Parse error — cookie exists, assume authenticated so idle view shows
+            resolve({ authenticated: true, user: { id: "", email: "", name: "Signed in" } });
           }
         });
       });
 
-      req.on("error", () => resolve({ authenticated: true }));
+      // Network error — cookie exists, show idle and let upload surface any real 401
+      req.on("error", () => resolve({ authenticated: true, user: { id: "", email: "", name: "Signed in" } }));
       req.end();
     });
   } catch {

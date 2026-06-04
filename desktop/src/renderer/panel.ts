@@ -87,6 +87,7 @@ let useLivePath = false;
 
 let timerInterval: ReturnType<typeof setInterval> | null = null;
 let startTime = 0;
+let isCancelled = false; // prevents onstop from uploading after cancelCapture()
 
 // ---------------------------------------------------------------------------
 // DOM helpers
@@ -120,7 +121,11 @@ function shortenEmail(email: string): string {
 async function init() {
   showView("checking");
   setupListeners();
-  await checkPermissionThenAuth();
+  try {
+    await checkPermissionThenAuth();
+  } catch (err) {
+    showError(`Startup error: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }
 
 async function checkPermissionThenAuth({ skipStatusCheck = false } = {}) {
@@ -201,8 +206,14 @@ function setupListeners() {
   $("btn-start").addEventListener("click", startCapture);
   $("btn-stop").addEventListener("click", stopCapture);
   $("btn-cancel").addEventListener("click", cancelCapture);
-  $("btn-new").addEventListener("click", () => showView("idle"));
-  $("btn-retry").addEventListener("click", () => showView("idle"));
+  $("btn-new").addEventListener("click", () => {
+    $<HTMLButtonElement>("btn-start").disabled = false;
+    showView("idle");
+  });
+  $("btn-retry").addEventListener("click", () => {
+    $<HTMLButtonElement>("btn-start").disabled = false;
+    showView("idle");
+  });
 
   // Tray menu shortcuts — work even when panel is not in focus
   window.sorabase.onStopFromTray(stopCapture);
@@ -214,6 +225,7 @@ function setupListeners() {
 // ---------------------------------------------------------------------------
 
 async function startCapture() {
+  isCancelled = false;
   const label = $<HTMLInputElement>("session-label").value.trim();
   $<HTMLButtonElement>("btn-start").disabled = true;
 
@@ -436,6 +448,15 @@ function startMediaRecorderCapture(tracks: MediaStreamTrack[]) {
     captureStream?.getTracks().forEach((t) => t.stop());
     captureStream = null;
 
+    // If the user cancelled, do not upload — cancelCapture() already sent
+    // capture:cancel to main. Calling doneRecording() here would send
+    // capture:done after the cancel cleared audioChunks, causing a false
+    // "No audio was captured" error to overwrite the idle view.
+    if (isCancelled) {
+      isCancelled = false;
+      return;
+    }
+
     if (blobs.length === 0) {
       window.sorabase.doneRecording();
       return;
@@ -480,6 +501,7 @@ function stopCapture() {
 
 function cancelCapture() {
   stopTimer();
+  isCancelled = true; // must be set before mediaRecorder.stop() triggers onstop
 
   if (useLivePath) {
     stopDeepgramCapture();
