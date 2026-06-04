@@ -231,16 +231,16 @@ let authServerPort = 0;
 
 function startAuthServer(): Promise<number> {
   return new Promise((resolve, reject) => {
-    // Close any previous server before starting a new one
     authServer?.close();
 
     authServer = nodeHttp.createServer((req, res) => {
-      // Chrome's Private Network Access requires this header on preflight
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+      // Required for Chrome's Private Network Access (HTTPS page → http://127.0.0.1)
+      res.setHeader("Access-Control-Allow-Origin",          "*");
+      res.setHeader("Access-Control-Allow-Methods",         "POST, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers",         "Content-Type");
       res.setHeader("Access-Control-Allow-Private-Network", "true");
 
+      // Preflight
       if (req.method === "OPTIONS") {
         res.writeHead(204);
         res.end();
@@ -248,23 +248,33 @@ function startAuthServer(): Promise<number> {
       }
 
       const urlObj = new URL(req.url ?? "/", `http://127.0.0.1:${authServerPort}`);
-      if (urlObj.pathname !== "/auth-callback") {
+      if (req.method !== "POST" || urlObj.pathname !== "/auth-callback") {
         res.writeHead(404);
         res.end("Not found");
         return;
       }
 
-      const code = urlObj.searchParams.get("code");
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ ok: true }));
+      // Read POST body
+      let body = "";
+      req.on("data", (chunk: Buffer) => { body += chunk.toString(); });
+      req.on("end", () => {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: true }));
 
-      // Stop accepting connections — one sign-in at a time
-      authServer?.close();
-      authServer = null;
+        // Close server — one sign-in per session
+        authServer?.close();
+        authServer = null;
 
-      if (code) {
-        exchangeCodeAndComplete(code);
-      }
+        try {
+          const { cookie_name, cookie_value } = JSON.parse(body) as {
+            cookie_name: string;
+            cookie_value: string;
+          };
+          if (cookie_name && cookie_value) {
+            setSessionCookieAndComplete(cookie_name, cookie_value);
+          }
+        } catch { /* bad JSON — ignore */ }
+      });
     });
 
     authServer.on("error", reject);
@@ -275,42 +285,17 @@ function startAuthServer(): Promise<number> {
   });
 }
 
-async function exchangeCodeAndComplete(code: string) {
+async function setSessionCookieAndComplete(cookieName: string, cookieValue: string) {
   try {
-    const body = Buffer.from(JSON.stringify({ code }));
-    const result = await new Promise<{ cookie_name: string; cookie_value: string }>(
-      (resolve, reject) => {
-        const req = net.request({ method: "POST", url: `${SORABASE_URL}/api/auth/desktop-code` });
-        req.setHeader("Content-Type", "application/json");
-        req.setHeader("Content-Length", String(body.length));
-        req.on("response", (res: Electron.IncomingMessage) => {
-          let raw = "";
-          res.on("data", (chunk: Buffer) => (raw += chunk));
-          res.on("end", () => {
-            if ((res.statusCode ?? 0) < 300) {
-              try { resolve(JSON.parse(raw)); } catch { reject(new Error("Bad JSON")); }
-            } else {
-              reject(new Error(`Code exchange failed (${res.statusCode})`));
-            }
-          });
-        });
-        req.on("error", reject);
-        req.write(body);
-        req.end();
-      },
-    );
-
-    // Plant the session cookie into Electron's persist:sorabase partition
     const ses = session.fromPartition("persist:sorabase");
     await ses.cookies.set({
-      url: SORABASE_URL,
-      name: result.cookie_name,
-      value: result.cookie_value,
-      secure: result.cookie_name.startsWith("__Secure"),
+      url:      SORABASE_URL,
+      name:     cookieName,
+      value:    cookieValue,
+      secure:   cookieName.startsWith("__Secure"),
       httpOnly: true,
       sameSite: "lax",
     });
-
     panelWin?.webContents.send("auth:signed-in");
     setTimeout(() => showPanel(), 300);
   } catch (err) {
@@ -340,9 +325,15 @@ async function showAuthWindow() {
 
 async function handleDeepLink(url: string) {
   if (!url.startsWith("sorabase://auth-complete")) return;
-  let code: string | null;
-  try { code = new URL(url).searchParams.get("code"); } catch { return; }
-  if (code) await exchangeCodeAndComplete(code);
+  let cookieName: string | null, cookieValue: string | null;
+  try {
+    const u = new URL(url);
+    cookieName  = u.searchParams.get("cookie_name");
+    cookieValue = u.searchParams.get("cookie_value");
+  } catch { return; }
+  if (cookieName && cookieValue) {
+    await setSessionCookieAndComplete(cookieName, cookieValue);
+  }
 }
 
 // ---------------------------------------------------------------------------
