@@ -29,7 +29,7 @@ const store = new Map<string, CodeEntry>();
 
 function prune() {
   const now = Date.now();
-  for (const [k, v] of store) if (v.expiresAt < now) store.delete(k);
+  store.forEach((v, k) => { if (v.expiresAt < now) store.delete(k); });
 }
 
 export async function GET(req: NextRequest) {
