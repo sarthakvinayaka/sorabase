@@ -237,8 +237,14 @@ async function startCapture() {
   } catch (err: unknown) {
     $<HTMLButtonElement>("btn-start").disabled = false;
     const e = err as DOMException;
-    if (e.name === "NotAllowedError") return;
-    if (e.name === "NotFoundError" || e.name === "NotReadableError") {
+    // NotAllowedError means the handler returned empty (Screen Recording not granted).
+    // NotFoundError / NotReadableError also indicate a permission/device issue.
+    // In all three cases show the permission view so the user knows what to do.
+    if (
+      e.name === "NotAllowedError" ||
+      e.name === "NotFoundError" ||
+      e.name === "NotReadableError"
+    ) {
       showView("permission");
       return;
     }
