@@ -84,18 +84,31 @@ function createTray() {
 }
 
 function refreshTrayMenu() {
-  const menu = Menu.buildFromTemplate([
-    {
-      label: isRecording ? "● Recording…" : "Sorabase Capture",
-      enabled: false,
-    },
+  const items: Electron.MenuItemConstructorOptions[] = [
+    { label: isRecording ? "● Recording…" : "Sorabase Capture", enabled: false },
     { type: "separator" },
-    { label: isRecording ? "Show panel" : "Start capture", click: showPanel },
+    { label: "Show panel", click: showPanel },
+  ];
+
+  if (isRecording) {
+    items.push({
+      label: "Stop & process",
+      click: () => panelWin?.webContents.send("capture:stop-from-tray"),
+    });
+    items.push({
+      label: "Cancel recording",
+      click: () => panelWin?.webContents.send("capture:cancel-from-tray"),
+    });
+  }
+
+  items.push(
+    { type: "separator" },
     { label: "Open Sorabase", click: () => shell.openExternal(SORABASE_URL) },
     { type: "separator" },
     { label: "Quit", click: () => app.quit() },
-  ]);
-  tray?.setContextMenu(menu);
+  );
+
+  tray?.setContextMenu(Menu.buildFromTemplate(items));
 }
 
 function setTrayRecording(recording: boolean) {
@@ -162,6 +175,11 @@ function createPanel() {
 }
 
 function togglePanel() {
+  // Never hide the panel during recording — user needs access to Stop button.
+  if (isRecording) {
+    showPanel();
+    return;
+  }
   if (panelWin?.isVisible()) {
     panelWin.hide();
   } else {

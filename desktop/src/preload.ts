@@ -31,6 +31,8 @@ contextBridge.exposeInMainWorld("sorabase", {
     ipcRenderer.on("status", (_e, s) => cb(s)),
   onAuthSignedIn: (cb: () => void) =>
     ipcRenderer.on("auth:signed-in", () => cb()),
+  onStopFromTray:   (cb: () => void) => ipcRenderer.on("capture:stop-from-tray",   () => cb()),
+  onCancelFromTray: (cb: () => void) => ipcRenderer.on("capture:cancel-from-tray", () => cb()),
 
   // OS permission check (screen recording)
   screenPermission: () => ipcRenderer.invoke("permission:screen"),

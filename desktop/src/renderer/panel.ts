@@ -38,6 +38,8 @@ declare global {
       // Events from main
       onStatus(cb: (s: StatusPayload) => void): void;
       onAuthSignedIn(cb: () => void): void;
+      onStopFromTray(cb: () => void): void;
+      onCancelFromTray(cb: () => void): void;
       // OS permission
       screenPermission(): Promise<string>;
       // Env vars
@@ -199,6 +201,10 @@ function setupListeners() {
   $("btn-cancel").addEventListener("click", cancelCapture);
   $("btn-new").addEventListener("click", () => showView("idle"));
   $("btn-retry").addEventListener("click", () => showView("idle"));
+
+  // Tray menu shortcuts — work even when panel is not in focus
+  window.sorabase.onStopFromTray(stopCapture);
+  window.sorabase.onCancelFromTray(cancelCapture);
 }
 
 // ---------------------------------------------------------------------------
