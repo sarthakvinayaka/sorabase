@@ -224,8 +224,8 @@ function showAuthWindow() {
   }
 
   authWin = new BrowserWindow({
-    width: 460,
-    height: 620,
+    width: 480,
+    height: 680,
     title: "Sign in to Sorabase",
     resizable: false,
     minimizable: false,
@@ -233,6 +233,21 @@ function showAuthWindow() {
     webPreferences: {
       partition: "persist:sorabase",
     },
+  });
+
+  // Google OAuth blocks embedded webviews that advertise the Electron user
+  // agent. Override it to a plain Chrome UA so Google allows the flow.
+  authWin.webContents.setUserAgent(
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
+    "AppleWebKit/537.36 (KHTML, like Gecko) " +
+    "Chrome/124.0.0.0 Safari/537.36",
+  );
+
+  // If any OAuth step opens a new window (e.g. Google consent popups),
+  // open them in the same auth window rather than a new detached window.
+  authWin.webContents.setWindowOpenHandler(({ url }) => {
+    authWin?.loadURL(url);
+    return { action: "deny" };
   });
 
   authWin.loadURL(`${SORABASE_URL}/signin`);
