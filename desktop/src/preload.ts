@@ -37,6 +37,9 @@ contextBridge.exposeInMainWorld("sorabase", {
   // OS permission check (screen recording)
   screenPermission: () => ipcRenderer.invoke("permission:screen"),
 
+  // Open System Settings (can't use shell directly in sandboxed renderer)
+  openSystemSettings: () => ipcRenderer.invoke("open:system-settings"),
+
   // Expose env vars the renderer needs (read-only, set before app launch)
   // DEEPGRAM_API_KEY — set this env var to enable Granola-style live transcription.
   // When absent the app falls back to the existing audio-upload + Whisper path.

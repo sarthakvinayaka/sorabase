@@ -42,6 +42,7 @@ declare global {
       onCancelFromTray(cb: () => void): void;
       // OS permission
       screenPermission(): Promise<string>;
+      openSystemSettings(): void;
       // Env vars
       deepgramKey(): string | null;
       sorabaseUrl(): string;
@@ -175,12 +176,7 @@ function setupListeners() {
   });
 
   $("btn-open-settings").addEventListener("click", () => {
-    const { shell } = (window as unknown as { require?: (m: string) => { shell: { openExternal: (u: string) => void } } }).require?.("electron") ?? {};
-    if (shell) {
-      shell.openExternal(
-        "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture",
-      );
-    }
+    window.sorabase.openSystemSettings();
   });
 
   $("btn-recheck-permission").addEventListener("click", async () => {

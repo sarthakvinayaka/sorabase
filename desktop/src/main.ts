@@ -444,7 +444,7 @@ function completeLiveSession(
 // Audio upload helper (legacy path — no Deepgram key)
 // ---------------------------------------------------------------------------
 
-function assembleAndUpload(
+async function assembleAndUpload(
   chunks: string[],
   mode: string,
   label: string,
@@ -478,16 +478,28 @@ function assembleAndUpload(
 
   const body = Buffer.concat(parts);
 
+  // Read session cookie explicitly — net.request with a session partition
+  // doesn't reliably send SameSite cookies. Setting Cookie header directly
+  // bypasses that restriction (same fix as checkAuth).
+  const ses = session.fromPartition("persist:sorabase");
+  const cookies = await ses.cookies.get({ url: SORABASE_URL });
+  const sessionCookie = cookies.find(
+    (c) =>
+      c.name === "next-auth.session-token" ||
+      c.name === "__Secure-next-auth.session-token",
+  );
+
   return new Promise((resolve, reject) => {
-    const ses = session.fromPartition("persist:sorabase");
     const req = net.request({
       method: "POST",
       url: `${SORABASE_URL}/api/extension/upload`,
-      session: ses,
     });
 
     req.setHeader("Content-Type", `multipart/form-data; boundary=${boundary}`);
     req.setHeader("Content-Length", String(body.length));
+    if (sessionCookie) {
+      req.setHeader("Cookie", `${sessionCookie.name}=${sessionCookie.value}`);
+    }
 
     req.on("response", (res: Electron.IncomingMessage) => {
       let raw = "";
@@ -666,6 +678,12 @@ ipcMain.handle("capture:cancel", () => {
 ipcMain.handle("permission:screen", () => {
   if (process.platform !== "darwin") return "granted";
   return systemPreferences.getMediaAccessStatus("screen");
+});
+
+ipcMain.handle("open:system-settings", () => {
+  shell.openExternal(
+    "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture",
+  );
 });
 
 // ---------------------------------------------------------------------------
