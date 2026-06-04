@@ -253,29 +253,42 @@ async function checkAuth(): Promise<{
   authenticated: boolean;
   user?: { id: string; email: string; name: string };
 }> {
-  // Check the cookie store directly — avoids SameSite issues with net.request.
-  // Then fetch user details by running fetch() inside the panel renderer
-  // (which shares the persist:sorabase session and sends cookies correctly).
   try {
+    // Read session cookie directly from the persist:sorabase store.
     const ses = session.fromPartition("persist:sorabase");
     const cookies = await ses.cookies.get({ url: SORABASE_URL });
-    const hasSession = cookies.some(
+    const sessionCookie = cookies.find(
       (c) =>
         c.name === "next-auth.session-token" ||
         c.name === "__Secure-next-auth.session-token",
     );
-    if (!hasSession) return { authenticated: false };
 
-    // Session cookie present — fetch user details via the panel renderer
-    // so the request carries cookies from the persist:sorabase partition.
-    if (panelWin && !panelWin.isDestroyed()) {
-      const result = await panelWin.webContents.executeJavaScript(
-        `fetch('${SORABASE_URL}/api/extension/session',{credentials:'include'}).then(r=>r.json()).catch(()=>({authenticated:false}))`,
-      );
-      return result as { authenticated: boolean; user?: { id: string; email: string; name: string } };
-    }
+    if (!sessionCookie) return { authenticated: false };
 
-    return { authenticated: true };
+    // Cookie exists — call the session endpoint with an explicit Cookie header.
+    // This bypasses SameSite restrictions that block net.request when no
+    // session is specified, and avoids the CORS issue with executeJavaScript
+    // on the file:// panel renderer.
+    return new Promise((resolve) => {
+      const req = net.request({ method: "GET", url: `${SORABASE_URL}/api/extension/session` });
+      req.setHeader("Cookie", `${sessionCookie.name}=${sessionCookie.value}`);
+
+      req.on("response", (res: Electron.IncomingMessage) => {
+        let raw = "";
+        res.on("data", (chunk: Buffer) => (raw += chunk));
+        res.on("end", () => {
+          try {
+            const data = JSON.parse(raw) as { authenticated: boolean; user?: { id: string; email: string; name: string } };
+            resolve(data.authenticated ? data : { authenticated: true });
+          } catch {
+            resolve({ authenticated: true });
+          }
+        });
+      });
+
+      req.on("error", () => resolve({ authenticated: true }));
+      req.end();
+    });
   } catch {
     return { authenticated: false };
   }
