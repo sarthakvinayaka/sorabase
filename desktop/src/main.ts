@@ -143,24 +143,27 @@ function createPanel() {
   });
 
   // Auto-approve getDisplayMedia with system audio loopback.
-  // desktopCapturer.getSources() returns [] when Screen Recording permission
-  // is not yet granted — passing undefined to callback crashes Electron,
-  // so we guard and let the renderer handle NotFoundError gracefully.
+  // On macOS 14+ the OS may show a system audio permission dialog.
+  // Drop alwaysOnTop while the handler runs so that dialog isn't hidden
+  // behind the panel — otherwise getDisplayMedia hangs indefinitely.
   panelWin.webContents.session.setDisplayMediaRequestHandler(
     async (
       _req: Electron.DisplayMediaRequestHandlerHandlerRequest,
       callback: (streams: Electron.Streams) => void,
     ) => {
+      panelWin?.setAlwaysOnTop(false);
       try {
         const sources = await desktopCapturer.getSources({ types: ["screen"] });
         if (!sources || sources.length === 0) {
-          // No permission yet — returning empty triggers NotFoundError in renderer
           callback({} as Electron.Streams);
           return;
         }
         callback({ video: sources[0], audio: "loopback" });
       } catch {
         callback({} as Electron.Streams);
+      } finally {
+        // Re-raise after a short delay so recording UI stays on top
+        setTimeout(() => panelWin?.setAlwaysOnTop(true), 800);
       }
     },
   );
