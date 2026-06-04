@@ -123,12 +123,14 @@ async function init() {
   await checkPermissionThenAuth();
 }
 
-async function checkPermissionThenAuth() {
-  const status = await window.sorabase.screenPermission();
-  if (status === "denied") {
-    showView("permission");
-    setUserDisplay("", false);
-    return;
+async function checkPermissionThenAuth({ skipStatusCheck = false } = {}) {
+  if (!skipStatusCheck) {
+    const status = await window.sorabase.screenPermission();
+    if (status === "denied") {
+      showView("permission");
+      setUserDisplay("", false);
+      return;
+    }
   }
   await checkAuth();
 }
@@ -181,7 +183,11 @@ function setupListeners() {
 
   $("btn-recheck-permission").addEventListener("click", async () => {
     showView("checking");
-    await checkPermissionThenAuth();
+    // Skip the TCC status check — macOS 16 can lag in reflecting the
+    // updated value after the user grants permission in System Settings.
+    // Just proceed to auth; if capture still fails the permission view
+    // will show again via the NotAllowedError handler in startCapture.
+    await checkPermissionThenAuth({ skipStatusCheck: true });
   });
 
   document.querySelectorAll<HTMLButtonElement>(".mode-btn").forEach((btn) => {
